@@ -10,23 +10,29 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import useTheme from "../data/useTheme.js";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Feather, AntDesign } from "@expo/vector-icons";
-import { Form, Item, Input } from "native-base";
+import { TextInput, ActivityIndicator } from "react-native-paper";
+import { handleSignUp, handleSignIn } from "../actions/AuthActions";
+import useTheme from "../hooks/useTheme.js";
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 const SCREEN_WIDTH = Dimensions.get("window").width;
 
 const SignIn = () => {
   const themeStyle = useTheme();
-  const [isSignInSelected, setIsSignInSelected] = useState(true);
 
   const SignInSlide = useState(new Animated.Value(0))[0];
   const SignUpSlide = useState(new Animated.Value(1000))[0];
 
+  const [isSignInSelected, setIsSignInSelected] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordAgain, setPasswordAgain] = useState("");
+  const [firstname, setFirstname] = useState("");
+  const [lastname, setLastname] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorText, setErrorText] = useState("");
 
   const TapSignUpAnimation = () => {
     Animated.sequence([
@@ -56,208 +62,393 @@ const SignIn = () => {
       }),
     ]).start();
   };
+  const signUp = async () => {
+    setErrorText("");
+    if (firstname.trim() === "") {
+      setErrorText("First Name cannot be empty");
+      return;
+    }
+    if (lastname.trim() === "") {
+      setErrorText("Last Name cannot be empty");
+      return;
+    }
+    if (email.trim() === "") {
+      setErrorText("Email cannot be empty");
+      return;
+    }
+    if (password.trim() === "") {
+      setErrorText("Password cannot be empty");
+      return;
+    }
+    if (passwordAgain.trim() === "") {
+      setErrorText("Repeat Password cannot be empty");
+      return;
+    }
+    if (password !== passwordAgain) {
+      setErrorText("Password does not match");
+      return;
+    }
+    setIsLoading(true);
+    handleSignUp(email, password, firstname, lastname)
+      .then(() => {
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.log(error);
+        setErrorText(error);
+      });
+  };
+  const handleSignInValide = () => {
+    setErrorText("");
+    if (email.trim() === "") {
+      setErrorText("Email cannot be empty");
+      return;
+    }
+    if (password.trim() === "") {
+      setErrorText("Password cannot be empty");
+      return;
+    }
+
+    setIsLoading(true);
+    handleSignIn(email, password)
+      .then((user) => {
+        console.log(user);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.log(error);
+        setErrorText(error);
+      });
+  };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <SafeAreaView
-        style={{
-          display: "flex",
-          height: SCREEN_HEIGHT,
-          backgroundColor: themeStyle.backgroundColor,
-        }}
-      >
-        {/* Header UI */}
+    <KeyboardAwareScrollView>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <SafeAreaView
+          style={{
+            display: "flex",
+            height: SCREEN_HEIGHT,
+            backgroundColor: themeStyle.backgroundColor,
+          }}
+        >
+          {/* Header UI */}
 
-        <View style={styles.headerStyle}>
-          <View
-            style={{
-              padding: 10,
-              backgroundColor: themeStyle.primaryColor,
-              borderRadius: 10,
-            }}
-          >
-            <Feather name="user" color="#FFF" size={30} />
+          <View style={styles.headerStyle}>
+            <View
+              style={{
+                padding: 10,
+                backgroundColor: themeStyle.primaryColor,
+                borderRadius: 10,
+              }}
+            >
+              <Feather name="user" color="#FFF" size={30} />
+            </View>
+
+            <View
+              style={{
+                display: "flex",
+                justifyContent: "space-evenly",
+                alignItems: "center",
+                flexDirection: "row",
+                width: SCREEN_WIDTH * 0.4,
+              }}
+            >
+              <TouchableOpacity
+                style={{
+                  borderBottomWidth: isSignInSelected ? 1 : null,
+                  paddingBottom: isSignInSelected ? 2 : null,
+                  borderBottomColor: themeStyle.textColor,
+                }}
+                onPress={() => {
+                  TapSignInAnimation();
+                  setIsSignInSelected(true);
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: isSignInSelected ? 16 : null,
+                    fontWeight: isSignInSelected ? "600" : null,
+                    color: themeStyle.textColor,
+                  }}
+                >
+                  Sign In
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={{
+                  borderBottomWidth: isSignInSelected ? null : 1,
+                  paddingBottom: isSignInSelected ? null : 2,
+                  borderBottomColor: themeStyle.textColor,
+                }}
+                onPress={() => {
+                  TapSignUpAnimation();
+                  setIsSignInSelected(false);
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: isSignInSelected ? null : 16,
+                    fontWeight: isSignInSelected ? null : "600",
+                    color: themeStyle.textColor,
+                  }}
+                >
+                  Sign Up
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
-          <View
+          {/* SignIn UI */}
+
+          <Animated.View
             style={{
               display: "flex",
+              flex: 1,
               justifyContent: "space-evenly",
-              alignItems: "center",
-              flexDirection: "row",
-              width: SCREEN_WIDTH * 0.4,
+              marginTop: 30,
+              position: "absolute",
+              top: SCREEN_HEIGHT * 0.2,
+              transform: [{ translateX: SignInSlide }],
             }}
           >
-            <TouchableOpacity
+            <View
               style={{
-                borderBottomWidth: isSignInSelected ? 1 : null,
-                paddingBottom: isSignInSelected ? 2 : null,
-                borderBottomColor: themeStyle.textColor,
-              }}
-              onPress={() => {
-                TapSignInAnimation();
-                setIsSignInSelected(true);
+                marginHorizontal: SCREEN_WIDTH * 0.1,
               }}
             >
-              <Text
-                style={{
-                  fontSize: isSignInSelected ? 16 : null,
-                  fontWeight: isSignInSelected ? "600" : null,
-                  color: themeStyle.textColor,
-                }}
-              >
-                Sign In
+              <Text style={{ fontSize: 35, color: themeStyle.textColor }}>
+                Welcome <Text style={{ fontWeight: "600" }}>back,</Text>
               </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={{
-                borderBottomWidth: isSignInSelected ? null : 1,
-                paddingBottom: isSignInSelected ? null : 2,
-                borderBottomColor: themeStyle.textColor,
-              }}
-              onPress={() => {
-                TapSignUpAnimation();
-                setIsSignInSelected(false);
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: isSignInSelected ? null : 16,
-                  fontWeight: isSignInSelected ? null : "600",
-                  color: themeStyle.textColor,
-                }}
-              >
-                Sign Up
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* SignIn UI */}
-
-        <Animated.View
-          style={{
-            display: "flex",
-            flex: 1,
-            justifyContent: "space-evenly",
-            marginTop: 30,
-            position: "absolute",
-            top: SCREEN_HEIGHT * 0.2,
-            transform: [{ translateX: SignInSlide }],
-          }}
-        >
-          <View
-            style={{
-              marginHorizontal: SCREEN_WIDTH * 0.1,
-            }}
-          >
-            <Text style={{ fontSize: 35, color: themeStyle.textColor }}>
-              Welcome <Text style={{ fontWeight: "600" }}>back,</Text>
-            </Text>
-            <Form style={{ marginVertical: SCREEN_HEIGHT * 0.075 }}>
-              <Item>
-                <Input
+              <View style={{ marginVertical: SCREEN_HEIGHT * 0.075 }}>
+                <TextInput
                   value={email}
                   placeholder="Email Address"
-                  placeholderTextColor={themeStyle.textColor}
                   onChangeText={(event) => setEmail(event)}
+                  style={{
+                    color: themeStyle.textColor,
+                    backgroundColor: themeStyle.backgroundColor,
+                  }}
+                  keyboardType="email-address"
+                  theme={{
+                    colors: {
+                      placeholder: themeStyle.textColor,
+                      text: themeStyle.textColor,
+                    },
+                  }}
                 />
-              </Item>
-              <Item style={{ marginVertical: 25 }}>
-                <Input
+                <TextInput
                   value={password}
                   placeholder="Password"
-                  placeholderTextColor={themeStyle.textColor}
+                  secureTextEntry
                   onChangeText={(event) => setPassword(event)}
+                  style={{
+                    color: themeStyle.textColor,
+                    backgroundColor: themeStyle.backgroundColor,
+                    marginTop: 25,
+                  }}
+                  theme={{
+                    colors: {
+                      placeholder: themeStyle.textColor,
+                      text: themeStyle.textColor,
+                    },
+                  }}
                 />
-              </Item>
-            </Form>
-          </View>
+                <Text
+                  style={{
+                    marginHorizontal: SCREEN_WIDTH * 0.05,
+                    marginVertical: 25,
+                    color: "red",
+                  }}
+                >
+                  * {errorText}
+                </Text>
+              </View>
+            </View>
 
-          <View
+            <View
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexDirection: "row",
+                width: SCREEN_WIDTH,
+                paddingHorizontal: SCREEN_WIDTH * 0.1,
+              }}
+            >
+              <TouchableOpacity style={{ padding: 10 }}>
+                <Text style={{ color: themeStyle.textColor }}>
+                  Forgot Password?
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity>
+                <View
+                  style={{
+                    padding: 10,
+                    backgroundColor: themeStyle.accentColor,
+                    borderRadius: 10,
+                  }}
+                >
+                  {isLoading ? (
+                    <ActivityIndicator animating={true} color="#FFF" />
+                  ) : (
+                    <AntDesign
+                      name="arrowright"
+                      size={35}
+                      color="#FFF"
+                      onPress={() => handleSignInValide()}
+                    />
+                  )}
+                </View>
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
+
+          {/* SignUp UI */}
+          <Animated.View
             style={{
               display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexDirection: "row",
-              width: SCREEN_WIDTH,
-              paddingHorizontal: SCREEN_WIDTH * 0.1,
+              flex: 1,
+              justifyContent: "space-evenly",
+              marginTop: 30,
+              position: "absolute",
+              top: SCREEN_HEIGHT * 0.2,
+              transform: [{ translateX: SignUpSlide }],
             }}
           >
-            <TouchableOpacity style={{ padding: 10 }}>
-              <Text style={{ color: themeStyle.textColor }}>
-                Forgot Password?
+            <View
+              style={{
+                marginHorizontal: SCREEN_WIDTH * 0.1,
+              }}
+            >
+              <Text style={{ fontSize: 35, color: themeStyle.textColor }}>
+                Hello <Text style={{ fontWeight: "600" }}>Beautiful,</Text>
               </Text>
-            </TouchableOpacity>
+              <Text style={{ color: themeStyle.textColor }}>
+                Enter your information below
+              </Text>
+            </View>
 
-            <TouchableOpacity>
-              <View
-                style={{
-                  padding: 10,
-                  backgroundColor: themeStyle.accentColor,
-                  borderRadius: 10,
-                }}
-              >
-                <AntDesign name="arrowright" size={35} color="#FFF" />
-              </View>
-            </TouchableOpacity>
-          </View>
-        </Animated.View>
-
-        {/* SignUp UI */}
-        <Animated.View
-          style={{
-            display: "flex",
-            flex: 1,
-            justifyContent: "space-evenly",
-            marginTop: 30,
-            position: "absolute",
-            top: SCREEN_HEIGHT * 0.2,
-            transform: [{ translateX: SignUpSlide }],
-          }}
-        >
-          <View
-            style={{
-              marginHorizontal: SCREEN_WIDTH * 0.1,
-            }}
-          >
-            <Text style={{ fontSize: 35, color: themeStyle.textColor }}>
-              Hello <Text style={{ fontWeight: "600" }}>Beautiful,</Text>
-            </Text>
-            <Text style={{ color: themeStyle.textColor }}>
-              Enter your information below
-            </Text>
-            <Form style={{ marginVertical: SCREEN_HEIGHT * 0.075 }}>
-              <Item>
-                <Input
+            <View
+              style={{
+                marginHorizontal: SCREEN_WIDTH * 0.05,
+              }}
+            >
+              <View style={{ marginVertical: SCREEN_HEIGHT * 0.075 }}>
+                <View
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <TextInput
+                    value={firstname}
+                    placeholder="First Name"
+                    placeholderTextColor={themeStyle.textColor}
+                    onChangeText={(event) => setFirstname(event)}
+                    style={{
+                      width: "45%",
+                      color: themeStyle.textColor,
+                      backgroundColor: themeStyle.backgroundColor,
+                    }}
+                    theme={{
+                      colors: {
+                        placeholder: themeStyle.textColor,
+                        text: themeStyle.textColor,
+                      },
+                    }}
+                  />
+                  <TextInput
+                    value={lastname}
+                    placeholder="Last Name"
+                    placeholderTextColor={themeStyle.textColor}
+                    onChangeText={(event) => setLastname(event)}
+                    style={{
+                      width: "40%",
+                      color: themeStyle.textColor,
+                      backgroundColor: themeStyle.backgroundColor,
+                    }}
+                    theme={{
+                      colors: {
+                        placeholder: themeStyle.textColor,
+                        text: themeStyle.textColor,
+                      },
+                    }}
+                  />
+                </View>
+                <TextInput
                   value={email}
                   placeholder="Email Address"
+                  keyboardType="email-address"
                   placeholderTextColor={themeStyle.textColor}
                   onChangeText={(event) => setEmail(event)}
+                  style={{
+                    color: themeStyle.textColor,
+                    backgroundColor: themeStyle.backgroundColor,
+                    marginTop: 10,
+                  }}
+                  theme={{
+                    colors: {
+                      placeholder: themeStyle.textColor,
+                      text: themeStyle.textColor,
+                    },
+                  }}
                 />
-              </Item>
-              <Item style={{ marginTop: 25 }}>
-                <Input
+                <TextInput
                   value={password}
                   placeholder="Password"
+                  secureTextEntry
                   placeholderTextColor={themeStyle.textColor}
                   onChangeText={(event) => setPassword(event)}
+                  style={{
+                    color: themeStyle.textColor,
+                    backgroundColor: themeStyle.backgroundColor,
+                    marginTop: 10,
+                  }}
+                  theme={{
+                    colors: {
+                      placeholder: themeStyle.textColor,
+                      text: themeStyle.textColor,
+                    },
+                  }}
                 />
-              </Item>
-              <Item style={{ marginVertical: 25 }}>
-                <Input
+                <TextInput
                   value={passwordAgain}
-                  placeholder="Password Again"
+                  secureTextEntry
+                  placeholder="Repeat Password"
                   placeholderTextColor={themeStyle.textColor}
-                  onChangeText={(event) => setPasswordAgain(event)}
+                  onChangeText={(event) => {
+                    setPasswordAgain(event);
+                  }}
+                  style={{
+                    color: themeStyle.textColor,
+                    backgroundColor: themeStyle.backgroundColor,
+                    marginTop: 10,
+                  }}
+                  theme={{
+                    colors: {
+                      placeholder: themeStyle.textColor,
+                      text: themeStyle.textColor,
+                    },
+                  }}
                 />
-              </Item>
-            </Form>
-          </View>
+                <Text
+                  style={{
+                    marginTop: 10,
+                    marginHorizontal: SCREEN_WIDTH * 0.05,
+                    color: "red",
+                  }}
+                >
+                  * {errorText}
+                </Text>
+              </View>
+            </View>
 
-          <View style={{ marginLeft: SCREEN_WIDTH * 0.75 }}>
-            <TouchableOpacity>
+            <View style={{ marginLeft: SCREEN_WIDTH * 0.75 }}>
               <View
                 style={{
                   padding: 10,
@@ -266,13 +457,22 @@ const SignIn = () => {
                   width: 60,
                 }}
               >
-                <AntDesign name="arrowright" size={35} color="#FFF" />
+                {isLoading ? (
+                  <ActivityIndicator animating={true} color="#FFF" />
+                ) : (
+                  <AntDesign
+                    name="arrowright"
+                    size={35}
+                    color="#FFF"
+                    onPress={() => signUp()}
+                  />
+                )}
               </View>
-            </TouchableOpacity>
-          </View>
-        </Animated.View>
-      </SafeAreaView>
-    </TouchableWithoutFeedback>
+            </View>
+          </Animated.View>
+        </SafeAreaView>
+      </TouchableWithoutFeedback>
+    </KeyboardAwareScrollView>
   );
 };
 

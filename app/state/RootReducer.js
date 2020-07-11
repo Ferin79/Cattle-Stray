@@ -1,16 +1,21 @@
 import React, { createContext } from "react";
 import ThemeReducer from "./ThemeReducer";
-import AuthReducer from "./AuthReducer";
+import LocationReducer from "./LocationReducer";
 
 export const GlobalContext = createContext();
 
 export const ContextProvider = ({ children }) => {
-  const { AuthState, AuthDispatch } = AuthReducer();
   const { ThemeState, ThemeDispatch } = ThemeReducer();
+  const { LocationState, LocationDispatch } = LocationReducer();
 
   return (
     <GlobalContext.Provider
-      value={{ AuthState, AuthDispatch, ThemeState, ThemeDispatch }}
+      value={{
+        ThemeState,
+        ThemeDispatch,
+        LocationState,
+        LocationDispatch,
+      }}
     >
       {children}
     </GlobalContext.Provider>

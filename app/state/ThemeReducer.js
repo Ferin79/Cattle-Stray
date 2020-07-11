@@ -6,11 +6,11 @@ const ThemeReducer = () => {
   };
 
   const reducer = (state, action) => {
-    switch (action) {
+    switch (action.type) {
       case "TOGGLE_THEME":
-        return state.lightTheme ? false : true;
+        return { ...state, lightTheme: !state.lightTheme };
       default:
-        return;
+        return state;
     }
   };
   const [ThemeState, ThemeDispatch] = useReducer(reducer, initialState);
