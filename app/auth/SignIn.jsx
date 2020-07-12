@@ -224,6 +224,7 @@ const SignIn = () => {
                 <TextInput
                   value={email}
                   placeholder="Email Address"
+                  keyboardAppearance="dark"
                   onChangeText={(event) => setEmail(event)}
                   style={{
                     color: themeStyle.textColor,
@@ -241,6 +242,7 @@ const SignIn = () => {
                   value={password}
                   placeholder="Password"
                   secureTextEntry
+                  keyboardAppearance="dark"
                   onChangeText={(event) => setPassword(event)}
                   style={{
                     color: themeStyle.textColor,
@@ -348,6 +350,7 @@ const SignIn = () => {
                   <TextInput
                     value={firstname}
                     placeholder="First Name"
+                    keyboardAppearance="dark"
                     placeholderTextColor={themeStyle.textColor}
                     onChangeText={(event) => setFirstname(event)}
                     style={{
@@ -365,6 +368,7 @@ const SignIn = () => {
                   <TextInput
                     value={lastname}
                     placeholder="Last Name"
+                    keyboardAppearance="dark"
                     placeholderTextColor={themeStyle.textColor}
                     onChangeText={(event) => setLastname(event)}
                     style={{
@@ -384,6 +388,7 @@ const SignIn = () => {
                   value={email}
                   placeholder="Email Address"
                   keyboardType="email-address"
+                  keyboardAppearance="dark"
                   placeholderTextColor={themeStyle.textColor}
                   onChangeText={(event) => setEmail(event)}
                   style={{
@@ -402,6 +407,7 @@ const SignIn = () => {
                   value={password}
                   placeholder="Password"
                   secureTextEntry
+                  keyboardAppearance="dark"
                   placeholderTextColor={themeStyle.textColor}
                   onChangeText={(event) => setPassword(event)}
                   style={{
@@ -420,6 +426,7 @@ const SignIn = () => {
                   value={passwordAgain}
                   secureTextEntry
                   placeholder="Repeat Password"
+                  keyboardAppearance="dark"
                   placeholderTextColor={themeStyle.textColor}
                   onChangeText={(event) => {
                     setPasswordAgain(event);

@@ -1,20 +1,20 @@
 import React, { createContext } from "react";
 import ThemeReducer from "./ThemeReducer";
-import LocationReducer from "./LocationReducer";
+import ReportReducer from "./ReportReducer";
 
 export const GlobalContext = createContext();
 
 export const ContextProvider = ({ children }) => {
   const { ThemeState, ThemeDispatch } = ThemeReducer();
-  const { LocationState, LocationDispatch } = LocationReducer();
+  const { ReportState, ReportDispatch } = ReportReducer();
 
   return (
     <GlobalContext.Provider
       value={{
         ThemeState,
         ThemeDispatch,
-        LocationState,
-        LocationDispatch,
+        ReportState,
+        ReportDispatch,
       }}
     >
       {children}

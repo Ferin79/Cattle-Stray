@@ -7,7 +7,7 @@ const LIGHT_ACCENT_COLOR = "#fd79a8";
 const LIGHT_TEXT_COLOR = "#000";
 
 const DARK_BACKGROUND_COLOR = "#121212";
-const DARK_PRIMARY_COLOR = "#636e72";
+const DARK_PRIMARY_COLOR = "#fd79a8";
 const DARK_ACCENT_COLOR = "#636e72";
 const DARK_TEXT_COLOR = "#FFF";
 

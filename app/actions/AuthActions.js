@@ -14,6 +14,7 @@ export const handleSignUp = (email, password, firstname, lastname) => {
             firstname,
             lastname,
             email,
+            role: "user",
             createdAt: firebase.firestore.Timestamp.now(),
           })
           .then(() => {
