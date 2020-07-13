@@ -1,6 +1,6 @@
 import firebase from "firebase";
 var firebaseConfig = {
-  apiKey: "AIzaSyBl5laXm3EyayNBSAUcF6KIa2BofGTCMSg",
+  apiKey: "AIzaSyAUbEG1L49COARLWsivHYPc1lmTU5hIxd4",
   authDomain: "cattle-stray.firebaseapp.com",
   databaseURL: "https://cattle-stray.firebaseio.com",
   projectId: "cattle-stray",

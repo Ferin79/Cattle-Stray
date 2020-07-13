@@ -22,6 +22,8 @@ export default function Login() {
       console.log(error);
       if (error.code === "auth/network-request-failed") {
         toast.error("Network connectivity issue");
+      }else if(error.code === "auth/user-not-found"){
+        toast.error("User not found");
       }else{
         toast.error(error.message);
       }      

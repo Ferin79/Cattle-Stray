@@ -2,7 +2,9 @@
 .changeNavColor {
   text-decoration: none !important;
   color: white !important;
+  margin: 5px;
 }
 .changeNavButtonColor {
   color: white !important;
+  margin: 10px;
 }
