@@ -2,27 +2,31 @@ import React, { useEffect, useContext, useState } from "react";
 import {
   SafeAreaView,
   View,
-  Text,
   Dimensions,
   PanResponder,
   Animated,
 } from "react-native";
 import { Searchbar, FAB } from "react-native-paper";
 import { GlobalContext } from "../state/RootReducer";
-import MapView from "react-native-maps";
+import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 import * as Location from "expo-location";
 import useTheme from "../hooks/useTheme";
+import useMapTheme from "../hooks/useMapTheme";
+import LoadingScreen from "../hooks/LoadingScreen";
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 const SCREEN_WIDTH = Dimensions.get("window").width;
 
 const Home = ({ navigation }) => {
   const themeStyle = useTheme();
-  const { LocationDispatch } = useContext(GlobalContext);
+  const mapTheme = useMapTheme();
+
+  const { ReportDispatch } = useContext(GlobalContext);
 
   const [latitute, setLatitute] = useState(0);
   const [longitute, setLongitute] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [isMapLoading, setIsMapLoading] = useState(true);
 
   const [searchQuery, setSearchQuery] = React.useState("");
 
@@ -31,6 +35,7 @@ const Home = ({ navigation }) => {
   const pan = useState(
     new Animated.ValueXY({ x: 0, y: SCREEN_HEIGHT - 200 })
   )[0];
+
   const panResponder = useState(
     PanResponder.create({
       onMoveShouldSetPanResponder: () => true,
@@ -44,13 +49,7 @@ const Home = ({ navigation }) => {
       onPanResponderRelease: (e, gestureState) => {
         console.log("MOVE Y: " + gestureState.moveY);
         console.log("DY: " + gestureState.dy);
-        if (gestureState.moveY > SCREEN_HEIGHT - 200) {
-          Animated.spring(pan.y, {
-            toValue: 0,
-            tension: 1,
-            useNativeDriver: true,
-          }).start();
-        } else if (gestureState.moveY < 200) {
+        if (gestureState.moveY < 200) {
           Animated.spring(pan.y, {
             toValue: 0,
             tension: 1,
@@ -86,7 +85,7 @@ const Home = ({ navigation }) => {
 
       let location = await Location.getCurrentPositionAsync({});
       console.log(location);
-      LocationDispatch({
+      ReportDispatch({
         type: "LOAD_LOCATION",
         payload: {
           latitude: location.coords.latitude,
@@ -97,8 +96,13 @@ const Home = ({ navigation }) => {
       setLatitute(location.coords.latitude);
       setLongitute(location.coords.longitude);
       setIsLoading(false);
+      setIsMapLoading(false);
     })();
   }, []);
+
+  if (isMapLoading) {
+    return <LoadingScreen text="Loading..." />;
+  }
 
   return (
     <SafeAreaView
@@ -111,7 +115,8 @@ const Home = ({ navigation }) => {
       {!isLoading && (
         <View>
           <MapView
-            style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT }}
+            provider={PROVIDER_GOOGLE}
+            customMapStyle={mapTheme}
             loadingEnabled
             showsBuildings
             showsCompass
@@ -119,6 +124,7 @@ const Home = ({ navigation }) => {
             showsScale
             shouldRasterizeIOS
             showsTraffic
+            style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT }}
             initialRegion={{
               latitude: latitute,
               longitude: longitute,
@@ -158,10 +164,10 @@ const Home = ({ navigation }) => {
             }}
             color={themeStyle.backgroundColor}
             icon="plus"
-            onPress={() => console.log("Pressed")}
+            onPress={() => navigation.navigate("ReportDrawer")}
           />
 
-          <Animated.View
+          {/* <Animated.View
             style={[
               animatedHeight,
               {
@@ -181,7 +187,7 @@ const Home = ({ navigation }) => {
             <View>
               <Text>Hi</Text>
             </View>
-          </Animated.View>
+          </Animated.View> */}
         </View>
       )}
     </SafeAreaView>

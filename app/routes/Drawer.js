@@ -14,11 +14,12 @@ import {
   Switch,
 } from "react-native-paper";
 import { View } from "react-native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons, Foundation } from "@expo/vector-icons";
 import useTheme from "../hooks/useTheme.js";
 import { GlobalContext } from "../state/RootReducer";
 import HomeStack from "./HomeStack";
 import SettingsStack from "./SettingsStack";
+import ReportStack from "./ReportStack";
 
 const DrawerScreen = createDrawerNavigator();
 
@@ -29,6 +30,7 @@ const Drawer = () => {
     >
       <DrawerScreen.Screen name="HomeDrawer" component={HomeStack} />
       <DrawerScreen.Screen name="SettingsDrawer" component={SettingsStack} />
+      <DrawerScreen.Screen name="ReportDrawer" component={ReportStack} />
     </DrawerScreen.Navigator>
   );
 };
@@ -76,6 +78,25 @@ const DrawerContent = (props) => {
               }}
               labelStyle={{ color: themeStyle.textColor }}
             />
+
+            <DrawerItem
+              label="New Report"
+              icon={({ size }) => (
+                <Foundation
+                  name="page-add"
+                  color={themeStyle.textColor}
+                  size={size}
+                  onPress={() => {
+                    props.navigation.navigate("ReportDrawer");
+                  }}
+                />
+              )}
+              onPress={() => {
+                props.navigation.navigate("ReportDrawer");
+              }}
+              labelStyle={{ color: themeStyle.textColor }}
+            />
+
             <DrawerItem
               label="Profile"
               icon={({ size }) => (
@@ -88,6 +109,7 @@ const DrawerContent = (props) => {
               )}
               labelStyle={{ color: themeStyle.textColor }}
             />
+
             <DrawerItem
               label="Settings"
               icon={({ size }) => (

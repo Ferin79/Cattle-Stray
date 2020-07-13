@@ -13,9 +13,7 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
@@ -23,7 +21,12 @@
       "favicon": "./assets/favicon.png"
     },
     "android": {
-      "package": "com.ferinpatel.cattle"
+      "package": "com.ferinpatel.cattle",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyCKAC0z5uc7fySLKK-DwwYgROIgnuOqZ5c"
+        }
+      }
     }
   }
 }
