@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Cattle Stray",
-    "slug": "app",
+    "slug": "cattle_stray",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -15,7 +15,10 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "config": {
+        "googleMapsApiKey": "AIzaSyCe66OVhbLjhVls27VDc8jKACUM6AyHNx8"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"

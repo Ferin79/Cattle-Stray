@@ -18,7 +18,14 @@ export const handleSignUp = (email, password, firstname, lastname) => {
             createdAt: firebase.firestore.Timestamp.now(),
           })
           .then(() => {
-            resolve(data);
+            firebase
+              .auth()
+              .currentUser.updateProfile({
+                displayName: `${firstname} ${lastname}`,
+              })
+              .then(() => {
+                resolve(data);
+              });
           });
       })
       .catch((error) => {

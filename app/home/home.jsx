@@ -1,18 +1,21 @@
-import React, { useEffect, useContext, useState } from "react";
-import {
-  SafeAreaView,
-  View,
-  Dimensions,
-  PanResponder,
-  Animated,
-} from "react-native";
-import { Searchbar, FAB } from "react-native-paper";
+import React, {
+  useEffect,
+  useContext,
+  useState,
+  useRef,
+  useLayoutEffect,
+} from "react";
+import { SafeAreaView, View, Dimensions } from "react-native";
+import { Searchbar, FAB, Banner } from "react-native-paper";
 import { GlobalContext } from "../state/RootReducer";
 import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 import * as Location from "expo-location";
 import useTheme from "../hooks/useTheme";
 import useMapTheme from "../hooks/useMapTheme";
 import LoadingScreen from "../hooks/LoadingScreen";
+import firebase from "../hooks/useFirebase";
+import * as geofirestore from "geofirestore";
+import RenderMarker from "./RenderMarker";
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 const SCREEN_WIDTH = Dimensions.get("window").width;
@@ -27,53 +30,53 @@ const Home = ({ navigation }) => {
   const [longitute, setLongitute] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isMapLoading, setIsMapLoading] = useState(true);
+  const [reportData, setReportData] = useState([]);
+  const [radiusInKM, setRadiusInKM] = useState(1);
+  const [visible, setVisible] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const [searchQuery, setSearchQuery] = React.useState("");
+  const circleRef = useRef();
+  let mapRef = useRef();
 
   const onChangeSearch = (query) => setSearchQuery(query);
 
-  const pan = useState(
-    new Animated.ValueXY({ x: 0, y: SCREEN_HEIGHT - 200 })
-  )[0];
+  useLayoutEffect(() => {
+    setTimeout(() => {
+      if (circleRef.current) {
+        circleRef.current.setNativeProps({
+          strokeColor: "#0AF",
+          fillColor: "rgba(0,170,255,0.2)",
+        });
+      }
+    }, 100);
+  }, [reportData]);
 
-  const panResponder = useState(
-    PanResponder.create({
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderGrant: () => {
-        pan.extractOffset();
-        return true;
-      },
-      onPanResponderMove: (e, gestureState) => {
-        pan.setValue({ x: 0, y: gestureState.dy });
-      },
-      onPanResponderRelease: (e, gestureState) => {
-        console.log("MOVE Y: " + gestureState.moveY);
-        console.log("DY: " + gestureState.dy);
-        if (gestureState.moveY < 200) {
-          Animated.spring(pan.y, {
-            toValue: 0,
-            tension: 1,
-            useNativeDriver: true,
-          }).start();
-        } else if (gestureState.dy < 0) {
-          Animated.spring(pan.y, {
-            toValue: -SCREEN_HEIGHT + 200,
-            tension: 1,
-            useNativeDriver: true,
-          }).start();
-        } else if (gestureState.dy > 0) {
-          Animated.spring(pan.y, {
-            toValue: SCREEN_HEIGHT - 200,
-            tension: 1,
-            useNativeDriver: true,
-          }).start();
-        }
-      },
-    })
-  )[0];
+  const fetchReports = (location) => {
+    var firebaseRef = firebase.firestore();
+    const GeoFirestore = geofirestore.initializeApp(firebaseRef);
+    const geocollection = GeoFirestore.collection("reports");
 
-  const animatedHeight = {
-    transform: pan.getTranslateTransform(),
+    // Create a GeoQuery based on a location
+    const query = geocollection.near({
+      center: new firebase.firestore.GeoPoint(
+        location.coords.latitude,
+        location.coords.longitude
+      ),
+      radius: radiusInKM,
+    });
+
+    // Get query (as Promise)
+    query.onSnapshot((value) => {
+      const data = [];
+      value.docs.forEach((doc) => {
+        data.push(doc.data());
+      });
+      setReportData([...data]);
+      setLatitute(location.coords.latitude);
+      setLongitute(location.coords.longitude);
+      setIsLoading(false);
+      setIsMapLoading(false);
+    });
   };
 
   useEffect(() => {
@@ -84,7 +87,6 @@ const Home = ({ navigation }) => {
       }
 
       let location = await Location.getCurrentPositionAsync({});
-      console.log(location);
       ReportDispatch({
         type: "LOAD_LOCATION",
         payload: {
@@ -93,12 +95,9 @@ const Home = ({ navigation }) => {
           accuracy: location.coords.accuracy,
         },
       });
-      setLatitute(location.coords.latitude);
-      setLongitute(location.coords.longitude);
-      setIsLoading(false);
-      setIsMapLoading(false);
+      fetchReports(location);
     })();
-  }, []);
+  }, [radiusInKM]);
 
   if (isMapLoading) {
     return <LoadingScreen text="Loading..." />;
@@ -114,7 +113,27 @@ const Home = ({ navigation }) => {
     >
       {!isLoading && (
         <View>
+          <Banner
+            style={{ zIndex: 9999 }}
+            visible={visible}
+            actions={[
+              {
+                label: "OK",
+                onPress: () => setVisible(false),
+              },
+              {
+                label: "Change Now",
+                onPress: () => setVisible(false),
+              },
+            ]}
+          >
+            The Cattle Reports are only shown within the radius specified in
+            Settings. You can change the radius according to your Preferences.
+            Default Radius is 1 km.
+          </Banner>
+
           <MapView
+            ref={(ref) => (mapRef = ref)}
             provider={PROVIDER_GOOGLE}
             customMapStyle={mapTheme}
             loadingEnabled
@@ -128,10 +147,33 @@ const Home = ({ navigation }) => {
             initialRegion={{
               latitude: latitute,
               longitude: longitute,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
+              latitudeDelta: 0.02,
+              longitudeDelta: 0.02,
             }}
-          />
+          >
+            <MapView.Circle
+              ref={circleRef}
+              center={{
+                latitude: latitute,
+                longitude: longitute,
+              }}
+              radius={radiusInKM * 1000}
+              strokeColor="#0AF"
+              fillColor="rgba(0,170,255,0.2)"
+            />
+            {reportData.length &&
+              reportData.map((item, index) => {
+                return (
+                  <RenderMarker
+                    key={index}
+                    title={item.animalType}
+                    description={item.description}
+                    lat={item.animalMovingCoords.U}
+                    long={item.animalMovingCoords.k}
+                  />
+                );
+              })}
+          </MapView>
 
           <Searchbar
             placeholder="Search"
@@ -158,6 +200,27 @@ const Home = ({ navigation }) => {
           <FAB
             style={{
               position: "absolute",
+              top: SCREEN_HEIGHT * 0.7,
+              left: SCREEN_WIDTH * 0.8,
+              backgroundColor: themeStyle.accentColor,
+            }}
+            color={themeStyle.backgroundColor}
+            icon="navigation"
+            onPress={() =>
+              mapRef.animateToRegion(
+                {
+                  latitude: latitute,
+                  longitude: setLongitute,
+                  latitudeDelta: 0.001,
+                  longitudeDelta: 0.001,
+                },
+                1000
+              )
+            }
+          />
+          <FAB
+            style={{
+              position: "absolute",
               top: SCREEN_HEIGHT * 0.8,
               left: SCREEN_WIDTH * 0.8,
               backgroundColor: themeStyle.primaryColor,
@@ -166,28 +229,6 @@ const Home = ({ navigation }) => {
             icon="plus"
             onPress={() => navigation.navigate("ReportDrawer")}
           />
-
-          {/* <Animated.View
-            style={[
-              animatedHeight,
-              {
-                position: "absolute",
-                right: 0,
-                left: 0,
-                width: SCREEN_WIDTH,
-                height: SCREEN_HEIGHT,
-                backgroundColor: "#0af",
-                borderTopLeftRadius: 25,
-                borderTopRightRadius: 25,
-                zIndex: 10,
-              },
-            ]}
-            {...panResponder.panHandlers}
-          >
-            <View>
-              <Text>Hi</Text>
-            </View>
-          </Animated.View> */}
         </View>
       )}
     </SafeAreaView>

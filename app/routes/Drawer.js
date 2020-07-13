@@ -20,6 +20,7 @@ import { GlobalContext } from "../state/RootReducer";
 import HomeStack from "./HomeStack";
 import SettingsStack from "./SettingsStack";
 import ReportStack from "./ReportStack";
+import firebase from "../hooks/useFirebase";
 
 const DrawerScreen = createDrawerNavigator();
 
@@ -50,11 +51,16 @@ const DrawerContent = (props) => {
                 size={50}
               />
               <View style={{ marginLeft: 15, flexDirection: "column" }}>
-                <Title style={{ color: themeStyle.textColor }}>
-                  Patel Ferin
+                <Title
+                  style={{
+                    color: themeStyle.textColor,
+                    textTransform: "capitalize",
+                  }}
+                >
+                  {firebase.auth().currentUser.displayName}
                 </Title>
                 <Caption style={{ color: themeStyle.textColor }}>
-                  ferinpatel79@gmail.com
+                  {firebase.auth().currentUser.email}
                 </Caption>
               </View>
             </View>
@@ -160,6 +166,7 @@ const DrawerContent = (props) => {
         }}
       >
         <DrawerItem
+          onPress={() => firebase.auth().signOut()}
           labelStyle={{ color: themeStyle.textColor }}
           label="Sign Out"
           icon={({ size }) => (
@@ -167,7 +174,9 @@ const DrawerContent = (props) => {
               name="exit-to-app"
               color={themeStyle.textColor}
               size={size}
-              onPress={() => {}}
+              onPress={() => {
+                firebase.auth().signOut();
+              }}
             />
           )}
         />

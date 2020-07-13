@@ -3,11 +3,11 @@ import { MarkerAnimated } from "react-native-maps";
 
 const RenderMarker = ({ title, description, lat, long }) => {
   var imgUrl;
-  if (title === "Cow") {
+  if (title === "cow") {
     imgUrl = require("../images/cow.png");
-  } else if (title === "Buffalo") {
+  } else if (title === "buffalo") {
     imgUrl = require("../images/buffalo.png");
-  } else if (title === "Goat") {
+  } else if (title === "goat") {
     imgUrl = require("../images/goat.png");
   }
   return (
