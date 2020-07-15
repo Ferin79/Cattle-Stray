@@ -20,7 +20,7 @@ const Routes = () => {
             <Switch>
                 <Route path='/admin/dashboard' component={adminDashboard} />
                 <Route path='/admin/reports' component={adminReports} />
-                <Redirect to='/admin/dashboard' />
+                <Redirect to='/admin/reports' />
             </Switch>
         )
     }

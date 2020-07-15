@@ -63,11 +63,15 @@ const Header = () => {
   }
 
   return (
-    <Navbar bg="dark" variant="dark">
-      <Navbar.Brand href="#home">Cattle Stray {admin}</Navbar.Brand>
+    <Navbar bg="dark" expand="lg">      
+      <Navbar.Brand href="#home" className="changeNavColor">Cattle Stray {admin}</Navbar.Brand>
+      <Navbar.Toggle aria-controls="basic-navbar-nav" />
+      <Navbar.Collapse id="basic-navbar-nav">
       <Nav className="mr-auto">
+      
         {navLinks}
       </Nav>
+      </Navbar.Collapse>
     </Navbar>
   );
 };
