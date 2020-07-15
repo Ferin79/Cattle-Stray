@@ -67,7 +67,12 @@ const QuestionPage1 = ({ navigation }) => {
           <View
             style={{ backgroundColor: themeStyle.backgroundColor, margin: 25 }}
           >
-            <Surface style={{ backgroundColor: themeStyle.backgroundColor }}>
+            <Surface
+              style={{
+                backgroundColor: themeStyle.secondaryColor,
+                elevation: 5,
+              }}
+            >
               <Text
                 style={{
                   fontSize: 30,
@@ -93,14 +98,23 @@ const QuestionPage1 = ({ navigation }) => {
                 >
                   <Surface
                     style={{
+                      elevation: 5,
                       width: "80%",
                       backgroundColor:
                         ReportState.animalType === "cow"
                           ? themeStyle.primaryColor
-                          : "#FFF",
+                          : themeStyle.secondaryColor,
                     }}
                   >
-                    <Text style={{ fontSize: 20, padding: 15 }}>Cow</Text>
+                    <Text
+                      style={{
+                        fontSize: 20,
+                        padding: 15,
+                        color: themeStyle.textColor,
+                      }}
+                    >
+                      Cow
+                    </Text>
                   </Surface>
                 </TouchableWithoutFeedback>
 
@@ -111,14 +125,23 @@ const QuestionPage1 = ({ navigation }) => {
                 >
                   <Surface
                     style={{
+                      elevation: 5,
                       width: "80%",
                       backgroundColor:
                         ReportState.animalType === "buffalo"
                           ? themeStyle.primaryColor
-                          : "#FFF",
+                          : themeStyle.secondaryColor,
                     }}
                   >
-                    <Text style={{ fontSize: 20, padding: 15 }}>Buffalo</Text>
+                    <Text
+                      style={{
+                        fontSize: 20,
+                        padding: 15,
+                        color: themeStyle.textColor,
+                      }}
+                    >
+                      Buffalo
+                    </Text>
                   </Surface>
                 </TouchableWithoutFeedback>
 
@@ -129,14 +152,23 @@ const QuestionPage1 = ({ navigation }) => {
                 >
                   <Surface
                     style={{
+                      elevation: 5,
                       width: "80%",
                       backgroundColor:
                         ReportState.animalType === "goat"
                           ? themeStyle.primaryColor
-                          : "#FFF",
+                          : themeStyle.secondaryColor,
                     }}
                   >
-                    <Text style={{ fontSize: 20, padding: 15 }}>Goat</Text>
+                    <Text
+                      style={{
+                        fontSize: 20,
+                        padding: 15,
+                        color: themeStyle.textColor,
+                      }}
+                    >
+                      Goat
+                    </Text>
                   </Surface>
                 </TouchableWithoutFeedback>
 
@@ -147,14 +179,23 @@ const QuestionPage1 = ({ navigation }) => {
                 >
                   <Surface
                     style={{
+                      elevation: 5,
                       width: "80%",
                       backgroundColor:
                         ReportState.animalType === "other"
                           ? themeStyle.primaryColor
-                          : "#FFF",
+                          : themeStyle.secondaryColor,
                     }}
                   >
-                    <Text style={{ fontSize: 20, padding: 15 }}>Other</Text>
+                    <Text
+                      style={{
+                        fontSize: 20,
+                        padding: 15,
+                        color: themeStyle.textColor,
+                      }}
+                    >
+                      Other
+                    </Text>
                   </Surface>
                 </TouchableWithoutFeedback>
               </View>
@@ -166,7 +207,12 @@ const QuestionPage1 = ({ navigation }) => {
           <View
             style={{ backgroundColor: themeStyle.backgroundColor, margin: 25 }}
           >
-            <Surface style={{ backgroundColor: themeStyle.backgroundColor }}>
+            <Surface
+              style={{
+                backgroundColor: themeStyle.secondaryColor,
+                elevation: 5,
+              }}
+            >
               <Text
                 style={{
                   fontSize: 30,
@@ -192,14 +238,21 @@ const QuestionPage1 = ({ navigation }) => {
                 >
                   <Surface
                     style={{
+                      elevation: 5,
                       width: "80%",
                       backgroundColor:
                         ReportState.animalCondition === "normal"
                           ? themeStyle.primaryColor
-                          : "#FFF",
+                          : themeStyle.secondaryColor,
                     }}
                   >
-                    <Text style={{ fontSize: 20, padding: 15 }}>
+                    <Text
+                      style={{
+                        fontSize: 20,
+                        padding: 15,
+                        color: themeStyle.textColor,
+                      }}
+                    >
                       Normal Condition
                     </Text>
                   </Surface>
@@ -215,14 +268,21 @@ const QuestionPage1 = ({ navigation }) => {
                 >
                   <Surface
                     style={{
+                      elevation: 5,
                       width: "80%",
                       backgroundColor:
                         ReportState.animalCondition === "injured"
                           ? themeStyle.primaryColor
-                          : "#FFF",
+                          : themeStyle.secondaryColor,
                     }}
                   >
-                    <Text style={{ fontSize: 20, padding: 15 }}>
+                    <Text
+                      style={{
+                        fontSize: 20,
+                        padding: 15,
+                        color: themeStyle.textColor,
+                      }}
+                    >
                       Injured (Medical Condition)
                     </Text>
                   </Surface>
@@ -235,14 +295,21 @@ const QuestionPage1 = ({ navigation }) => {
                 >
                   <Surface
                     style={{
+                      elevation: 5,
                       width: "80%",
                       backgroundColor:
                         ReportState.animalCondition === "death"
                           ? themeStyle.primaryColor
-                          : "#FFF",
+                          : themeStyle.secondaryColor,
                     }}
                   >
-                    <Text style={{ fontSize: 20, padding: 15 }}>
+                    <Text
+                      style={{
+                        fontSize: 20,
+                        padding: 15,
+                        color: themeStyle.textColor,
+                      }}
+                    >
                       Death Condition
                     </Text>
                   </Surface>
@@ -255,14 +322,23 @@ const QuestionPage1 = ({ navigation }) => {
                 >
                   <Surface
                     style={{
+                      elevation: 5,
                       width: "80%",
                       backgroundColor:
                         ReportState.animalCondition === "other"
                           ? themeStyle.primaryColor
-                          : "#FFF",
+                          : themeStyle.secondaryColor,
                     }}
                   >
-                    <Text style={{ fontSize: 20, padding: 15 }}>Not Sure</Text>
+                    <Text
+                      style={{
+                        fontSize: 20,
+                        padding: 15,
+                        color: themeStyle.textColor,
+                      }}
+                    >
+                      Not Sure
+                    </Text>
                   </Surface>
                 </TouchableWithoutFeedback>
               </View>
@@ -274,7 +350,12 @@ const QuestionPage1 = ({ navigation }) => {
           <View
             style={{ backgroundColor: themeStyle.backgroundColor, margin: 25 }}
           >
-            <Surface style={{ backgroundColor: themeStyle.backgroundColor }}>
+            <Surface
+              style={{
+                backgroundColor: themeStyle.secondaryColor,
+                elevation: 5,
+              }}
+            >
               <Text
                 style={{
                   fontSize: 30,
@@ -315,7 +396,12 @@ const QuestionPage1 = ({ navigation }) => {
           <View
             style={{ backgroundColor: themeStyle.backgroundColor, margin: 25 }}
           >
-            <Surface style={{ backgroundColor: themeStyle.backgroundColor }}>
+            <Surface
+              style={{
+                backgroundColor: themeStyle.secondaryColor,
+                elevation: 5,
+              }}
+            >
               <Text
                 style={{
                   fontSize: 30,
@@ -342,6 +428,8 @@ const QuestionPage1 = ({ navigation }) => {
                       ? "checked"
                       : "unchecked"
                   }
+                  uncheckedColor={themeStyle.textColor}
+                  style={{ borderColor: themeStyle.textColor }}
                   onPress={() =>
                     ReportDispatch({ type: "SET_MOVING", payload: "yes" })
                   }

@@ -56,7 +56,12 @@ const StartPage = ({ navigation }) => {
           <Text style={{ fontSize: 35, color: themeStyle.textColor }}>
             New Report
           </Text>
-          <Text style={{ paddingVertical: 10, color: themeStyle.textColor }}>
+          <Text
+            style={{
+              paddingVertical: 10,
+              color: themeStyle.textSecondaryColor,
+            }}
+          >
             By reporting these questions, you can help solving the cattle on
             road and traffic issue.
           </Text>
@@ -77,9 +82,7 @@ const StartPage = ({ navigation }) => {
         }}
       >
         <TouchableOpacity onPress={() => navigation.navigate("QuestionPage1")}>
-          <Text style={{ color: themeStyle.backgroundColor, fontSize: 20 }}>
-            Start Reporting
-          </Text>
+          <Text style={{ color: "#FFF", fontSize: 20 }}>Start Reporting</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

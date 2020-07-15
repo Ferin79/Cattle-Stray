@@ -1,15 +1,10 @@
-import React, {
-  useEffect,
-  useContext,
-  useState,
-  useRef,
-  useLayoutEffect,
-} from "react";
-import { SafeAreaView, View, Dimensions } from "react-native";
-import { Searchbar, FAB, Banner } from "react-native-paper";
-import { GlobalContext } from "../state/RootReducer";
+import React, { useEffect, useContext, useState, useRef } from "react";
+import { SafeAreaView, View, Dimensions, Text, YellowBox } from "react-native";
+import { Searchbar, FAB } from "react-native-paper";
+import _ from "lodash";
 import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 import * as Location from "expo-location";
+import { GlobalContext } from "../state/RootReducer";
 import useTheme from "../hooks/useTheme";
 import useMapTheme from "../hooks/useMapTheme";
 import LoadingScreen from "../hooks/LoadingScreen";
@@ -21,6 +16,14 @@ const SCREEN_HEIGHT = Dimensions.get("window").height;
 const SCREEN_WIDTH = Dimensions.get("window").width;
 
 const Home = ({ navigation }) => {
+  YellowBox.ignoreWarnings(["Setting a timer"]);
+  const _console = _.clone(console);
+  console.warn = (message) => {
+    if (message.indexOf("Setting a timer") <= -1) {
+      _console.warn(message);
+    }
+  };
+
   const themeStyle = useTheme();
   const mapTheme = useMapTheme();
 
@@ -32,24 +35,13 @@ const Home = ({ navigation }) => {
   const [isMapLoading, setIsMapLoading] = useState(true);
   const [reportData, setReportData] = useState([]);
   const [radiusInKM, setRadiusInKM] = useState(1);
-  const [visible, setVisible] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
 
   const circleRef = useRef();
   let mapRef = useRef();
 
   const onChangeSearch = (query) => setSearchQuery(query);
-
-  useLayoutEffect(() => {
-    setTimeout(() => {
-      if (circleRef.current) {
-        circleRef.current.setNativeProps({
-          strokeColor: "#0AF",
-          fillColor: "rgba(0,170,255,0.2)",
-        });
-      }
-    }, 100);
-  }, [reportData]);
 
   const fetchReports = (location) => {
     var firebaseRef = firebase.firestore();
@@ -79,13 +71,15 @@ const Home = ({ navigation }) => {
     });
   };
 
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestPermissionsAsync();
-      if (status !== "granted") {
-        setErrorMsg("Permission to access location was denied");
-      }
+  const getUserLocation = async () => {
+    setErrorMsg("");
+    let { status } = await Location.requestPermissionsAsync();
+    if (status !== "granted") {
+      setErrorMsg("Permission to access location was denied");
+      return;
+    }
 
+    try {
       let location = await Location.getCurrentPositionAsync({});
       ReportDispatch({
         type: "LOAD_LOCATION",
@@ -96,11 +90,33 @@ const Home = ({ navigation }) => {
         },
       });
       fetchReports(location);
-    })();
-  }, [radiusInKM]);
+    } catch (error) {
+      setIsLoading(false);
+      setIsMapLoading(false);
+      setErrorMsg(error.message);
+    }
+  };
+
+  useEffect(() => {
+    getUserLocation();
+  }, []);
 
   if (isMapLoading) {
     return <LoadingScreen text="Loading..." />;
+  }
+  if (errorMsg) {
+    return (
+      <View
+        style={{
+          display: "flex",
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Text style={{ padding: 20 }}>{errorMsg}</Text>
+      </View>
+    );
   }
 
   return (
@@ -113,25 +129,6 @@ const Home = ({ navigation }) => {
     >
       {!isLoading && (
         <View>
-          <Banner
-            style={{ zIndex: 9999 }}
-            visible={visible}
-            actions={[
-              {
-                label: "OK",
-                onPress: () => setVisible(false),
-              },
-              {
-                label: "Change Now",
-                onPress: () => setVisible(false),
-              },
-            ]}
-          >
-            The Cattle Reports are only shown within the radius specified in
-            Settings. You can change the radius according to your Preferences.
-            Default Radius is 1 km.
-          </Banner>
-
           <MapView
             ref={(ref) => (mapRef = ref)}
             provider={PROVIDER_GOOGLE}
@@ -200,32 +197,11 @@ const Home = ({ navigation }) => {
           <FAB
             style={{
               position: "absolute",
-              top: SCREEN_HEIGHT * 0.7,
-              left: SCREEN_WIDTH * 0.8,
-              backgroundColor: themeStyle.accentColor,
-            }}
-            color={themeStyle.backgroundColor}
-            icon="navigation"
-            onPress={() =>
-              mapRef.animateToRegion(
-                {
-                  latitude: latitute,
-                  longitude: setLongitute,
-                  latitudeDelta: 0.001,
-                  longitudeDelta: 0.001,
-                },
-                1000
-              )
-            }
-          />
-          <FAB
-            style={{
-              position: "absolute",
               top: SCREEN_HEIGHT * 0.8,
               left: SCREEN_WIDTH * 0.8,
               backgroundColor: themeStyle.primaryColor,
             }}
-            color={themeStyle.backgroundColor}
+            color="#FFF"
             icon="plus"
             onPress={() => navigation.navigate("ReportDrawer")}
           />

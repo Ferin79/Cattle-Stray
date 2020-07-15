@@ -145,7 +145,6 @@ const ImagePicker = ({ navigation }) => {
   const snap = async () => {
     if (camera) {
       let photo = await camera.takePictureAsync();
-      console.log(photo);
       setImage(photo.uri);
       setPreviewImage(true);
       setOpenCamera(false);
@@ -393,7 +392,7 @@ const ImagePicker = ({ navigation }) => {
                 <Text
                   style={{
                     fontSize: 25,
-                    color: themeStyle.textColor,
+                    color: themeStyle.textSecondaryColor,
                   }}
                 >
                   Some Suggestion / Feedback / Description

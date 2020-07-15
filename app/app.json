@@ -15,10 +15,7 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true,
-      "config": {
-        "googleMapsApiKey": "AIzaSyCe66OVhbLjhVls27VDc8jKACUM6AyHNx8"
-      }
+      "supportsTablet": true
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -27,7 +24,7 @@
       "package": "com.ferinpatel.cattle",
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyCKAC0z5uc7fySLKK-DwwYgROIgnuOqZ5c"
+          "apiKey": "AIzaSyBT9g5ki0J5nFyiPANXTZ4f-il9miQ7iAg"
         }
       }
     }

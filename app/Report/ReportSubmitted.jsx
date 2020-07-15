@@ -2,9 +2,12 @@ import React, { useContext, useEffect } from "react";
 import { Button } from "react-native-paper";
 import { SafeAreaView, Image, Dimensions } from "react-native";
 import { GlobalContext } from "../state/RootReducer";
+import useTheme from "../hooks/useTheme";
 
 const ReportSubmitted = ({ navigation }) => {
   const { ReportDispatch } = useContext(GlobalContext);
+
+  const themeStyle = useTheme();
 
   useEffect(() => {
     ReportDispatch({ type: "CLEAR_ALL" });
@@ -15,7 +18,7 @@ const ReportSubmitted = ({ navigation }) => {
       style={{
         display: "flex",
         flex: 1,
-        backgroundColor: "#FFF",
+        backgroundColor: themeStyle.backgroundColor,
         justifyContent: "space-between",
         alignItems: "center",
       }}
@@ -29,7 +32,11 @@ const ReportSubmitted = ({ navigation }) => {
       />
       <Button
         mode="contained"
-        style={{ position: "absolute", top: "80%", backgroundColor: "#0af" }}
+        style={{
+          position: "absolute",
+          top: "80%",
+          backgroundColor: themeStyle.primaryColor,
+        }}
         onPress={() =>
           navigation.reset({
             index: 0,
