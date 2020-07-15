@@ -72,7 +72,13 @@ const LocationPicker = ({ navigation }) => {
           />
         ) : null}
       </MapView>
-      <Text style={{ margin: 10, fontSize: 20, color: themeStyle.textColor }}>
+      <Text
+        style={{
+          margin: 10,
+          fontSize: 18,
+          color: themeStyle.textSecondaryColor,
+        }}
+      >
         Tap on map to mark the location
       </Text>
 

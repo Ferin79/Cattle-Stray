@@ -18,8 +18,9 @@ import { MaterialCommunityIcons, Foundation } from "@expo/vector-icons";
 import useTheme from "../hooks/useTheme.js";
 import { GlobalContext } from "../state/RootReducer";
 import HomeStack from "./HomeStack";
-import SettingsStack from "./SettingsStack";
+import ProfileStack from "./ProfileStack";
 import ReportStack from "./ReportStack";
+import firebase from "../hooks/useFirebase";
 
 const DrawerScreen = createDrawerNavigator();
 
@@ -29,7 +30,7 @@ const Drawer = () => {
       drawerContent={(props) => <DrawerContent {...props} />}
     >
       <DrawerScreen.Screen name="HomeDrawer" component={HomeStack} />
-      <DrawerScreen.Screen name="SettingsDrawer" component={SettingsStack} />
+      <DrawerScreen.Screen name="ProfileDrawer" component={ProfileStack} />
       <DrawerScreen.Screen name="ReportDrawer" component={ReportStack} />
     </DrawerScreen.Navigator>
   );
@@ -40,7 +41,7 @@ const DrawerContent = (props) => {
   const themeStyle = useTheme();
 
   return (
-    <View style={{ flex: 1, backgroundColor: themeStyle.backgroundColor }}>
+    <View style={{ flex: 1, backgroundColor: themeStyle.sidebarColor }}>
       <DrawerContentScrollView {...props}>
         <View style={{ flex: 1 }}>
           <View style={{ paddingLeft: 20 }}>
@@ -50,11 +51,16 @@ const DrawerContent = (props) => {
                 size={50}
               />
               <View style={{ marginLeft: 15, flexDirection: "column" }}>
-                <Title style={{ color: themeStyle.textColor }}>
-                  Patel Ferin
+                <Title
+                  style={{
+                    color: themeStyle.textColor,
+                    textTransform: "capitalize",
+                  }}
+                >
+                  {firebase.auth().currentUser.displayName}
                 </Title>
                 <Caption style={{ color: themeStyle.textColor }}>
-                  ferinpatel79@gmail.com
+                  {firebase.auth().currentUser.email}
                 </Caption>
               </View>
             </View>
@@ -98,38 +104,24 @@ const DrawerContent = (props) => {
             />
 
             <DrawerItem
+              onPress={() => props.navigation.navigate("ProfileDrawer")}
               label="Profile"
               icon={({ size }) => (
                 <MaterialCommunityIcons
                   name="account-outline"
                   color={themeStyle.textColor}
                   size={size}
-                  onPress={() => {}}
+                  onPress={() => props.navigation.navigate("ProfileDrawer")}
                 />
               )}
-              labelStyle={{ color: themeStyle.textColor }}
-            />
-
-            <DrawerItem
-              label="Settings"
-              icon={({ size }) => (
-                <MaterialCommunityIcons
-                  name="settings-outline"
-                  color={themeStyle.textColor}
-                  size={size}
-                  onPress={() => {
-                    props.navigation.navigate("SettingsDrawer");
-                  }}
-                />
-              )}
-              onPress={() => {
-                props.navigation.navigate("SettingsDrawer");
-              }}
               labelStyle={{ color: themeStyle.textColor }}
             />
           </DrawerPaper.Section>
 
-          <DrawerPaper.Section title="Preferences" shouldRasterizeIOS>
+          <DrawerPaper.Section
+            title="Preferences"
+            theme={{ colors: { text: themeStyle.textSecondaryColor } }}
+          >
             <TouchableRipple
               onPress={() => ThemeDispatch({ type: "TOGGLE_THEME" })}
             >
@@ -160,6 +152,7 @@ const DrawerContent = (props) => {
         }}
       >
         <DrawerItem
+          onPress={() => firebase.auth().signOut()}
           labelStyle={{ color: themeStyle.textColor }}
           label="Sign Out"
           icon={({ size }) => (
@@ -167,7 +160,9 @@ const DrawerContent = (props) => {
               name="exit-to-app"
               color={themeStyle.textColor}
               size={size}
-              onPress={() => {}}
+              onPress={() => {
+                firebase.auth().signOut();
+              }}
             />
           )}
         />

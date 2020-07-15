@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Cattle Stray",
-    "slug": "app",
+    "slug": "cattle_stray",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -24,7 +24,7 @@
       "package": "com.ferinpatel.cattle",
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyCKAC0z5uc7fySLKK-DwwYgROIgnuOqZ5c"
+          "apiKey": "AIzaSyBT9g5ki0J5nFyiPANXTZ4f-il9miQ7iAg"
         }
       }
     }

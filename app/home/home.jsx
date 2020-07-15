@@ -1,23 +1,29 @@
-import React, { useEffect, useContext, useState } from "react";
-import {
-  SafeAreaView,
-  View,
-  Dimensions,
-  PanResponder,
-  Animated,
-} from "react-native";
+import React, { useEffect, useContext, useState, useRef } from "react";
+import { SafeAreaView, View, Dimensions, Text, YellowBox } from "react-native";
 import { Searchbar, FAB } from "react-native-paper";
-import { GlobalContext } from "../state/RootReducer";
+import _ from "lodash";
 import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 import * as Location from "expo-location";
+import { GlobalContext } from "../state/RootReducer";
 import useTheme from "../hooks/useTheme";
 import useMapTheme from "../hooks/useMapTheme";
 import LoadingScreen from "../hooks/LoadingScreen";
+import firebase from "../hooks/useFirebase";
+import * as geofirestore from "geofirestore";
+import RenderMarker from "./RenderMarker";
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 const SCREEN_WIDTH = Dimensions.get("window").width;
 
 const Home = ({ navigation }) => {
+  YellowBox.ignoreWarnings(["Setting a timer"]);
+  const _console = _.clone(console);
+  console.warn = (message) => {
+    if (message.indexOf("Setting a timer") <= -1) {
+      _console.warn(message);
+    }
+  };
+
   const themeStyle = useTheme();
   const mapTheme = useMapTheme();
 
@@ -27,64 +33,54 @@ const Home = ({ navigation }) => {
   const [longitute, setLongitute] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isMapLoading, setIsMapLoading] = useState(true);
+  const [reportData, setReportData] = useState([]);
+  const [radiusInKM, setRadiusInKM] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
 
-  const [searchQuery, setSearchQuery] = React.useState("");
+  const circleRef = useRef();
+  let mapRef = useRef();
 
   const onChangeSearch = (query) => setSearchQuery(query);
 
-  const pan = useState(
-    new Animated.ValueXY({ x: 0, y: SCREEN_HEIGHT - 200 })
-  )[0];
+  const fetchReports = (location) => {
+    var firebaseRef = firebase.firestore();
+    const GeoFirestore = geofirestore.initializeApp(firebaseRef);
+    const geocollection = GeoFirestore.collection("reports");
 
-  const panResponder = useState(
-    PanResponder.create({
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderGrant: () => {
-        pan.extractOffset();
-        return true;
-      },
-      onPanResponderMove: (e, gestureState) => {
-        pan.setValue({ x: 0, y: gestureState.dy });
-      },
-      onPanResponderRelease: (e, gestureState) => {
-        console.log("MOVE Y: " + gestureState.moveY);
-        console.log("DY: " + gestureState.dy);
-        if (gestureState.moveY < 200) {
-          Animated.spring(pan.y, {
-            toValue: 0,
-            tension: 1,
-            useNativeDriver: true,
-          }).start();
-        } else if (gestureState.dy < 0) {
-          Animated.spring(pan.y, {
-            toValue: -SCREEN_HEIGHT + 200,
-            tension: 1,
-            useNativeDriver: true,
-          }).start();
-        } else if (gestureState.dy > 0) {
-          Animated.spring(pan.y, {
-            toValue: SCREEN_HEIGHT - 200,
-            tension: 1,
-            useNativeDriver: true,
-          }).start();
-        }
-      },
-    })
-  )[0];
+    // Create a GeoQuery based on a location
+    const query = geocollection.near({
+      center: new firebase.firestore.GeoPoint(
+        location.coords.latitude,
+        location.coords.longitude
+      ),
+      radius: radiusInKM,
+    });
 
-  const animatedHeight = {
-    transform: pan.getTranslateTransform(),
+    // Get query (as Promise)
+    query.onSnapshot((value) => {
+      const data = [];
+      value.docs.forEach((doc) => {
+        data.push(doc.data());
+      });
+      setReportData([...data]);
+      setLatitute(location.coords.latitude);
+      setLongitute(location.coords.longitude);
+      setIsLoading(false);
+      setIsMapLoading(false);
+    });
   };
 
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestPermissionsAsync();
-      if (status !== "granted") {
-        setErrorMsg("Permission to access location was denied");
-      }
+  const getUserLocation = async () => {
+    setErrorMsg("");
+    let { status } = await Location.requestPermissionsAsync();
+    if (status !== "granted") {
+      setErrorMsg("Permission to access location was denied");
+      return;
+    }
 
+    try {
       let location = await Location.getCurrentPositionAsync({});
-      console.log(location);
       ReportDispatch({
         type: "LOAD_LOCATION",
         payload: {
@@ -93,15 +89,34 @@ const Home = ({ navigation }) => {
           accuracy: location.coords.accuracy,
         },
       });
-      setLatitute(location.coords.latitude);
-      setLongitute(location.coords.longitude);
+      fetchReports(location);
+    } catch (error) {
       setIsLoading(false);
       setIsMapLoading(false);
-    })();
+      setErrorMsg(error.message);
+    }
+  };
+
+  useEffect(() => {
+    getUserLocation();
   }, []);
 
   if (isMapLoading) {
     return <LoadingScreen text="Loading..." />;
+  }
+  if (errorMsg) {
+    return (
+      <View
+        style={{
+          display: "flex",
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Text style={{ padding: 20 }}>{errorMsg}</Text>
+      </View>
+    );
   }
 
   return (
@@ -115,6 +130,7 @@ const Home = ({ navigation }) => {
       {!isLoading && (
         <View>
           <MapView
+            ref={(ref) => (mapRef = ref)}
             provider={PROVIDER_GOOGLE}
             customMapStyle={mapTheme}
             loadingEnabled
@@ -128,10 +144,33 @@ const Home = ({ navigation }) => {
             initialRegion={{
               latitude: latitute,
               longitude: longitute,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
+              latitudeDelta: 0.02,
+              longitudeDelta: 0.02,
             }}
-          />
+          >
+            <MapView.Circle
+              ref={circleRef}
+              center={{
+                latitude: latitute,
+                longitude: longitute,
+              }}
+              radius={radiusInKM * 1000}
+              strokeColor="#0AF"
+              fillColor="rgba(0,170,255,0.2)"
+            />
+            {reportData.length &&
+              reportData.map((item, index) => {
+                return (
+                  <RenderMarker
+                    key={index}
+                    title={item.animalType}
+                    description={item.description}
+                    lat={item.animalMovingCoords.U}
+                    long={item.animalMovingCoords.k}
+                  />
+                );
+              })}
+          </MapView>
 
           <Searchbar
             placeholder="Search"
@@ -162,32 +201,10 @@ const Home = ({ navigation }) => {
               left: SCREEN_WIDTH * 0.8,
               backgroundColor: themeStyle.primaryColor,
             }}
-            color={themeStyle.backgroundColor}
+            color="#FFF"
             icon="plus"
             onPress={() => navigation.navigate("ReportDrawer")}
           />
-
-          {/* <Animated.View
-            style={[
-              animatedHeight,
-              {
-                position: "absolute",
-                right: 0,
-                left: 0,
-                width: SCREEN_WIDTH,
-                height: SCREEN_HEIGHT,
-                backgroundColor: "#0af",
-                borderTopLeftRadius: 25,
-                borderTopRightRadius: 25,
-                zIndex: 10,
-              },
-            ]}
-            {...panResponder.panHandlers}
-          >
-            <View>
-              <Text>Hi</Text>
-            </View>
-          </Animated.View> */}
         </View>
       )}
     </SafeAreaView>

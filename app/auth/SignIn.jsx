@@ -231,9 +231,10 @@ const SignIn = () => {
                     backgroundColor: themeStyle.backgroundColor,
                   }}
                   keyboardType="email-address"
+                  underlineColor={themeStyle.textColor}
                   theme={{
                     colors: {
-                      placeholder: themeStyle.textColor,
+                      placeholder: themeStyle.textSecondaryColor,
                       text: themeStyle.textColor,
                     },
                   }}
@@ -249,9 +250,10 @@ const SignIn = () => {
                     backgroundColor: themeStyle.backgroundColor,
                     marginTop: 25,
                   }}
+                  underlineColor={themeStyle.textColor}
                   theme={{
                     colors: {
-                      placeholder: themeStyle.textColor,
+                      placeholder: themeStyle.textSecondaryColor,
                       text: themeStyle.textColor,
                     },
                   }}
@@ -288,7 +290,7 @@ const SignIn = () => {
                 <View
                   style={{
                     padding: 10,
-                    backgroundColor: themeStyle.accentColor,
+                    backgroundColor: themeStyle.primaryColor,
                     borderRadius: 10,
                   }}
                 >
@@ -358,9 +360,10 @@ const SignIn = () => {
                       color: themeStyle.textColor,
                       backgroundColor: themeStyle.backgroundColor,
                     }}
+                    underlineColor={themeStyle.textColor}
                     theme={{
                       colors: {
-                        placeholder: themeStyle.textColor,
+                        placeholder: themeStyle.textSecondaryColor,
                         text: themeStyle.textColor,
                       },
                     }}
@@ -376,9 +379,10 @@ const SignIn = () => {
                       color: themeStyle.textColor,
                       backgroundColor: themeStyle.backgroundColor,
                     }}
+                    underlineColor={themeStyle.textColor}
                     theme={{
                       colors: {
-                        placeholder: themeStyle.textColor,
+                        placeholder: themeStyle.textSecondaryColor,
                         text: themeStyle.textColor,
                       },
                     }}
@@ -396,9 +400,10 @@ const SignIn = () => {
                     backgroundColor: themeStyle.backgroundColor,
                     marginTop: 10,
                   }}
+                  underlineColor={themeStyle.textColor}
                   theme={{
                     colors: {
-                      placeholder: themeStyle.textColor,
+                      placeholder: themeStyle.textSecondaryColor,
                       text: themeStyle.textColor,
                     },
                   }}
@@ -415,9 +420,10 @@ const SignIn = () => {
                     backgroundColor: themeStyle.backgroundColor,
                     marginTop: 10,
                   }}
+                  underlineColor={themeStyle.textColor}
                   theme={{
                     colors: {
-                      placeholder: themeStyle.textColor,
+                      placeholder: themeStyle.textSecondaryColor,
                       text: themeStyle.textColor,
                     },
                   }}
@@ -436,9 +442,10 @@ const SignIn = () => {
                     backgroundColor: themeStyle.backgroundColor,
                     marginTop: 10,
                   }}
+                  underlineColor={themeStyle.textColor}
                   theme={{
                     colors: {
-                      placeholder: themeStyle.textColor,
+                      placeholder: themeStyle.textSecondaryColor,
                       text: themeStyle.textColor,
                     },
                   }}
@@ -459,7 +466,7 @@ const SignIn = () => {
               <View
                 style={{
                   padding: 10,
-                  backgroundColor: themeStyle.accentColor,
+                  backgroundColor: themeStyle.primaryColor,
                   borderRadius: 10,
                   width: 60,
                 }}

@@ -19,8 +19,13 @@ import { GlobalContext } from "../state/RootReducer";
 import useTheme from "../hooks/useTheme";
 import firebase from "../hooks/useFirebase";
 import * as Progress from "react-native-progress";
+import * as geofirestore from "geofirestore";
 
 const ImagePicker = ({ navigation }) => {
+  var firebaseRef = firebase.firestore();
+  const GeoFirestore = geofirestore.initializeApp(firebaseRef);
+  const geocollection = GeoFirestore.collection("reports");
+
   const themeStyle = useTheme();
 
   const { ReportState } = useContext(GlobalContext);
@@ -86,21 +91,33 @@ const ImagePicker = ({ navigation }) => {
         console.log(error);
       },
       function () {
-        console.log(uploadTask.snapshot.ref.name);
         uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
           console.log("File available at", downloadURL);
-          firebase
-            .firestore()
-            .collection("reports")
+
+          geocollection
             .add({
               animalType: ReportState.animalType,
               animalCondition: ReportState.animalCondition,
               animalCount: ReportState.animalCount,
               animalIsMoving: ReportState.animalIsMoving,
               animalImageUrl: downloadURL,
-              animalMovingCoords: ReportState.animalMovingCoords,
-              userCoords: ReportState.userCoords,
+              animalMovingCoords: new firebase.firestore.GeoPoint(
+                ReportState.animalMovingCoords.latitude,
+                ReportState.animalMovingCoords.longitude
+              ),
+              coordinates: new firebase.firestore.GeoPoint(
+                ReportState.animalMovingCoords.latitude,
+                ReportState.animalMovingCoords.longitude
+              ),
+              userCoords: new firebase.firestore.GeoPoint(
+                ReportState.userCoords.latitude,
+                ReportState.userCoords.longitude
+              ),
               description: desc,
+              upvotes: [],
+              downvotes: [],
+              comments: [],
+              uid: firebase.auth().currentUser.uid,
               email: firebase.auth().currentUser.email,
               createdAt: firebase.firestore.Timestamp.now(),
             })
@@ -111,7 +128,11 @@ const ImagePicker = ({ navigation }) => {
                 routes: [{ name: "ReportSubmitted" }],
               });
             })
-            .catch((error) => console.log(error));
+            .catch((error) => {
+              setIsLoading(false);
+              Alert.alert("Oops", "Something went wrong, Try again...");
+              console.log(error);
+            });
         });
       }
     );
@@ -124,7 +145,6 @@ const ImagePicker = ({ navigation }) => {
   const snap = async () => {
     if (camera) {
       let photo = await camera.takePictureAsync();
-      console.log(photo);
       setImage(photo.uri);
       setPreviewImage(true);
       setOpenCamera(false);
@@ -372,7 +392,7 @@ const ImagePicker = ({ navigation }) => {
                 <Text
                   style={{
                     fontSize: 25,
-                    color: themeStyle.textColor,
+                    color: themeStyle.textSecondaryColor,
                   }}
                 >
                   Some Suggestion / Feedback / Description
