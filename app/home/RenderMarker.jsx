@@ -1,7 +1,7 @@
 import React from "react";
 import { MarkerAnimated } from "react-native-maps";
 
-const RenderMarker = ({ title, description, lat, long }) => {
+const RenderMarker = ({ title, description, lat, long, handleOnPress }) => {
   var imgUrl;
   if (title === "cow") {
     imgUrl = require("../images/cow.png");
@@ -12,13 +12,18 @@ const RenderMarker = ({ title, description, lat, long }) => {
   }
   return (
     <MarkerAnimated
-      title={title}
-      description={description}
+      title={title === "other" ? "Animal" : title}
+      description={`${description} ${
+        title === "other" ? "Animal" : title
+      } was located here`}
       coordinate={{
         latitude: parseFloat(lat),
         longitude: parseFloat(long),
       }}
       image={imgUrl}
+      onPress={() => {
+        handleOnPress();
+      }}
     />
   );
 };

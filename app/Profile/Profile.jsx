@@ -57,7 +57,7 @@ const Profile = ({ navigation }) => {
             fontSize: 30,
             marginLeft: 30,
             fontWeight: "600",
-            color: themeStyle.accentColor,
+            color: themeStyle.textSecondaryColor,
           }}
         >
           My Profile
