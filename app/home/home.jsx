@@ -1,21 +1,33 @@
-import React, { useEffect, useContext, useState, useRef } from "react";
-import { SafeAreaView, View, Dimensions, Text, YellowBox } from "react-native";
-import { Searchbar, FAB } from "react-native-paper";
 import _ from "lodash";
+import Constants from "expo-constants";
+import React, { useEffect, useContext, useState, useRef } from "react";
+import {
+  SafeAreaView,
+  View,
+  Dimensions,
+  Text,
+  YellowBox,
+  Image,
+} from "react-native";
+import { Searchbar, FAB, Card, Button } from "react-native-paper";
 import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 import * as Location from "expo-location";
+import BottomSheet from "react-native-bottomsheet-reanimated";
+import * as geofirestore from "geofirestore";
+import Lightbox from "react-native-lightbox";
+import * as Notifications from "expo-notifications";
+import * as Permissions from "expo-permissions";
 import { GlobalContext } from "../state/RootReducer";
 import useTheme from "../hooks/useTheme";
 import useMapTheme from "../hooks/useMapTheme";
 import LoadingScreen from "../hooks/LoadingScreen";
 import firebase from "../hooks/useFirebase";
-import * as geofirestore from "geofirestore";
 import RenderMarker from "./RenderMarker";
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 const SCREEN_WIDTH = Dimensions.get("window").width;
 
-const Home = ({ navigation }) => {
+const Home = ({ navigation, navigator }) => {
   YellowBox.ignoreWarnings(["Setting a timer"]);
   const _console = _.clone(console);
   console.warn = (message) => {
@@ -37,11 +49,17 @@ const Home = ({ navigation }) => {
   const [radiusInKM, setRadiusInKM] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [selectedAnimal, setSelectedAnimal] = useState(null);
 
   const circleRef = useRef();
   let mapRef = useRef();
 
-  const onChangeSearch = (query) => setSearchQuery(query);
+  const onChangeSearch = (query) => {
+    if (query.trim() === "") {
+      setSelectedAnimal(null);
+    }
+    setSearchQuery(query);
+  };
 
   const fetchReports = (location) => {
     var firebaseRef = firebase.firestore();
@@ -97,8 +115,56 @@ const Home = ({ navigation }) => {
     }
   };
 
+  const getNotificationPermission = () => {
+    registerForPushNotificationsAsync().then((token) =>
+      firebase
+        .firestore()
+        .doc(`/notificationsToken/${firebase.auth().currentUser.uid}`)
+        .set({
+          token: token,
+          uid: firebase.auth().currentUser.uid,
+          email: firebase.auth().currentUser.email,
+        })
+    );
+  };
+
+  async function registerForPushNotificationsAsync() {
+    let token;
+    if (Constants.isDevice) {
+      const { status: existingStatus } = await Permissions.getAsync(
+        Permissions.NOTIFICATIONS
+      );
+      let finalStatus = existingStatus;
+      if (existingStatus !== "granted") {
+        const { status } = await Permissions.askAsync(
+          Permissions.NOTIFICATIONS
+        );
+        finalStatus = status;
+      }
+      if (finalStatus !== "granted") {
+        alert("Failed to get push token for push notification!");
+        return;
+      }
+      token = (await Notifications.getExpoPushTokenAsync()).data;
+    } else {
+      alert("Must use physical device for Push Notifications");
+    }
+
+    if (Platform.OS === "android") {
+      Notifications.setNotificationChannelAsync("default", {
+        name: "default",
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: "#FF231F7C",
+      });
+    }
+
+    return token;
+  }
+
   useEffect(() => {
     getUserLocation();
+    getNotificationPermission();
   }, []);
 
   if (isMapLoading) {
@@ -164,22 +230,26 @@ const Home = ({ navigation }) => {
                   <RenderMarker
                     key={index}
                     title={item.animalType}
-                    description={item.description}
+                    description={item.animalCount}
                     lat={item.animalMovingCoords.U}
                     long={item.animalMovingCoords.k}
+                    handleOnPress={() => {
+                      setSelectedAnimal({ ...item });
+                      setSearchQuery(item.animalType);
+                    }}
                   />
                 );
               })}
           </MapView>
 
           <Searchbar
-            placeholder="Search"
             onChangeText={onChangeSearch}
+            placeholder="Search"
             value={searchQuery}
             style={{
               backgroundColor: themeStyle.backgroundColor,
               position: "absolute",
-              top: 10,
+              top: "1%",
               margin: 10,
               color: themeStyle.textColor,
             }}
@@ -190,8 +260,8 @@ const Home = ({ navigation }) => {
               },
             }}
             icon="menu"
-            iconColor={themeStyle.textColor}
             onIconPress={() => navigation.toggleDrawer()}
+            iconColor={themeStyle.textColor}
           />
 
           <FAB
@@ -205,6 +275,126 @@ const Home = ({ navigation }) => {
             icon="plus"
             onPress={() => navigation.navigate("ReportDrawer")}
           />
+
+          {selectedAnimal && (
+            <BottomSheet
+              bottomSheerColor="#FFFFFF"
+              initialPosition={"30%"} //200, 300
+              snapPoints={["30%", "100%"]}
+              isBackDropDismisByPress={true}
+              isRoundBorderWithTipHeader={true}
+              containerStyle={{
+                backgroundColor: themeStyle.secondaryColor,
+                zIndex: 99,
+              }}
+              header={
+                <View>
+                  <Text
+                    style={{
+                      fontSize: 30,
+                      textTransform: "capitalize",
+                      color: themeStyle.textColor,
+                    }}
+                  >
+                    {selectedAnimal.animalType === "other"
+                      ? "Animal"
+                      : selectedAnimal.animalType}
+                  </Text>
+                </View>
+              }
+              body={
+                <View
+                  style={{
+                    marginHorizontal: 30,
+                    display: "flex",
+                    height: SCREEN_HEIGHT * 0.8,
+                    justifyContent: "space-evenly",
+                    alignItems: "flex-start",
+                  }}
+                >
+                  <View>
+                    <Text
+                      style={{
+                        color: themeStyle.textColor,
+                        marginBottom: 10,
+                        textTransform: "capitalize",
+                      }}
+                    >
+                      Animal Count: {selectedAnimal.animalCount}
+                    </Text>
+                    <Text
+                      style={{
+                        color: themeStyle.textColor,
+                        marginBottom: 10,
+                        textTransform: "capitalize",
+                      }}
+                    >
+                      Animal Condition: {selectedAnimal.animalCondition}
+                    </Text>
+                  </View>
+
+                  <View style={{ marginTop: 50 }}>
+                    <Text
+                      style={{ color: themeStyle.textColor, marginBottom: 10 }}
+                    >
+                      Description: {selectedAnimal.description}
+                    </Text>
+
+                    <Text
+                      style={{
+                        color: themeStyle.textColor,
+                        marginBottom: 10,
+                        textTransform: "capitalize",
+                      }}
+                    >
+                      Was{" "}
+                      {selectedAnimal.animalType === "other"
+                        ? "Animal"
+                        : selectedAnimal.animalType}{" "}
+                      moving ? : {selectedAnimal.animalIsMoving}
+                    </Text>
+                  </View>
+
+                  <View>
+                    <Lightbox navigator={navigator} style={{ marginTop: 30 }}>
+                      <Image
+                        style={{
+                          height: 200,
+                          width: SCREEN_WIDTH * 0.85,
+                        }}
+                        source={{
+                          uri: selectedAnimal.animalImageUrl,
+                        }}
+                      />
+                    </Lightbox>
+                  </View>
+
+                  <View>
+                    <Card.Actions>
+                      <Button color={themeStyle.textColor} icon="arrow-up-bold">
+                        {selectedAnimal.upvotes.length}
+                      </Button>
+                      <Button
+                        color={themeStyle.textColor}
+                        icon="arrow-down-bold"
+                      >
+                        {selectedAnimal.downvotes.length}
+                      </Button>
+                      <Button color={themeStyle.textColor} icon="comment">
+                        {selectedAnimal.comments.length}
+                      </Button>
+                    </Card.Actions>
+                  </View>
+
+                  <View>
+                    <Text style={{ color: themeStyle.textSecondaryColor }}>
+                      Added by: {selectedAnimal.email}
+                    </Text>
+                  </View>
+                </View>
+              }
+            />
+          )}
         </View>
       )}
     </SafeAreaView>

@@ -90,9 +90,7 @@ const SignIn = () => {
     }
     setIsLoading(true);
     handleSignUp(email, password, firstname, lastname)
-      .then(() => {
-        setIsLoading(false);
-      })
+      .then(() => {})
       .catch((error) => {
         console.log(error);
         setErrorText(error);
@@ -111,10 +109,7 @@ const SignIn = () => {
 
     setIsLoading(true);
     handleSignIn(email, password)
-      .then((user) => {
-        console.log(user);
-        setIsLoading(false);
-      })
+      .then(() => {})
       .catch((error) => {
         console.log(error);
         setErrorText(error);
