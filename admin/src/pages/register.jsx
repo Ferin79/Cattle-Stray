@@ -31,15 +31,7 @@ export default function Register() {
 
     firebase
       .auth()
-      .createUserWithEmailAndPassword(email, password)
-      .catch((error) => {
-        console.log(error);
-        if (error.code === "auth/network-request-failed") {
-          toast.error("Network connectivity issue");
-        } else {
-          toast.error(error.message);
-        }
-      })
+      .createUserWithEmailAndPassword(email, password)      
       .then((response) => {
         const email = response.user.email;
         const id = response.user.uid;
@@ -50,6 +42,14 @@ export default function Register() {
           lastname: "",
           createdAt: firebase.firestore.Timestamp.now(),
         });
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error.code === "auth/network-request-failed") {
+          toast.error("Network connectivity issue");
+        } else {
+          toast.error(error.message);
+        }
       });
   };
   return (

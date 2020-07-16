@@ -14,10 +14,12 @@ export function AuthProvider({ children }) {
       if (user) {        
         firebase.firestore().doc(`users/${user.uid}`).get()
           .then((snapshot) => {
-            console.log(snapshot.data().role);
+            console.log(snapshot.data());
             setCurrentUser(snapshot.data());
             setRole(snapshot.data().role);
             console.log(snapshot.data().role)
+          }).catch((error) => {
+            console.log(error)
           });
       } else {
         setCurrentUser(null);

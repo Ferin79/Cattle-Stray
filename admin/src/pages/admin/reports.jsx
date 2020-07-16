@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useContext } from "react";
 import firebase from "../../data/firebase";
-import { Image, Table, Col, Container, Button } from "react-bootstrap";
+import { Image, Table, Container, Button } from "react-bootstrap";
+import { NavLink } from "react-router-dom";
+import { Context } from "../../data/context";
 
 export default function Reports() {
-  const [reports, setReports] = useState([]);
+  const { reports, setReports } = useContext(Context);
 
   useEffect(() => {
     // fetch(
@@ -71,7 +73,9 @@ export default function Reports() {
           <td>{report.downvotes}</td>
           <td>
             <Button variant="info" style={{ margin: 4 }}>
-              View
+              <NavLink param to={`/admin/report/${report.id}`} className="changeNavColor">
+                View
+              </NavLink>
             </Button>
             <Button variant="danger">Delete</Button>
           </td>
