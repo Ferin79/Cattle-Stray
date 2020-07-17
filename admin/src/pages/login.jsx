@@ -31,7 +31,7 @@ export default function Login() {
 
   }
   return (
-    <Container className="justify-content-md-center col-3">
+    <Container className="justify-content-md-center">
       <h1>Login</h1>
       <Form onSubmit={(e) => onRegister(e)}>
         <Form.Group controlId="email">

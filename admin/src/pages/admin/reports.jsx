@@ -73,7 +73,7 @@ export default function Reports() {
           <td>{report.downvotes}</td>
           <td>
             <Button variant="info" style={{ margin: 4 }}>
-              <NavLink param to={`/admin/report/${report.id}`} className="changeNavColor">
+              <NavLink  to={`/admin/report/${report.id}`} className="changeNavColor">
                 View
               </NavLink>
             </Button>

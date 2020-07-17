@@ -1,9 +1,13 @@
-import React, {useEffect, useState} from "react"
+import React, { useEffect, useState } from "react"
 import { compose, withProps } from "recompose"
-import { withScriptjs, withGoogleMap, GoogleMap, Marker} from "react-google-maps"
+import { withScriptjs, withGoogleMap, GoogleMap, Marker } from "react-google-maps"
 import { MarkerWithLabel } from "react-google-maps/lib/components/addons/MarkerWithLabel"
 import firebase from "../../data/firebase";
 
+const options = {
+    disableDefaultUI: true,
+    zoomControl: true
+}
 
 const MyMapComponent = compose(
     // AIzaSyCe66OVhbLjhVls27VDc8jKACUM6AyHNx8
@@ -16,51 +20,55 @@ const MyMapComponent = compose(
     withScriptjs,
     withGoogleMap
 )((props) =>
+    <>
+    <h1 className="mapTitle">Cattle Stray 🐄</h1>
     <GoogleMap
-        defaultZoom={8}
         defaultCenter={{ lat: -34.397, lng: 150.644 }}
         center={props.markerCoords}
-        zoom={props.markerCoords ? 16:8}
+        zoom={props.markerCoords ? 16 : 8}
+        options={options}
+        onClick={(event) => console.log(event)}
     >
-        
-        {props.markerCoords && <Marker icon={{colour: "blue"}} position={{ lat: props.markerCoords.lat, lng: props.markerCoords.lng }} onClick={props.onMarkerClick} />}
+
+        {props.markerCoords && <Marker icon={{ colour: "blue" }} position={{ lat: props.markerCoords.lat, lng: props.markerCoords.lng }} onClick={props.onMarkerClick} />}
     </GoogleMap>
+    </>
 )
 
 
-export default function ReportDetails({match}) {    
-    
+export default function ReportDetails({ match }) {
+
     const [report, setReport] = useState({});
-    const [coordinates, setCoordinates] = useState({});    
+    const [coordinates, setCoordinates] = useState({ lat: 21.170240, lng: 72.831062 });
     const [isMarkerShown, setIsMarkerShown] = useState(false);
     useEffect(() => {
-        getReport();
-        console.log(match.params.reportId);     
+        // getReport();
+        // console.log(match.params.reportId);     
     }, [setReport, setCoordinates])
     const getReport = () => {
-        firebase.firestore().collection("reports").doc(match.params.reportId).get()
-            .then((doc) => {
-                const lat = doc.data().coordinates.latitude;
-                const lng = doc.data().coordinates.longitude;
-                setReport(doc.data());                
-                setCoordinates({lat,lng})
-                showMarker();
-            }).catch((error) => {
-                console.log(error.message);
-            })
+        // firebase.firestore().collection("reports").doc(match.params.reportId).get()
+        //     .then((doc) => {
+        //         const lat = doc.data().coordinates.latitude;
+        //         const lng = doc.data().coordinates.longitude;
+        //         setReport(doc.data());                
+        //         setCoordinates({lat,lng})
+        //         showMarker();
+        //     }).catch((error) => {
+        //         console.log(error.message);
+        //     })
     }
     const handleMarkerClick = () => {
         setIsMarkerShown(false)
         showMarker()
     }
-    const showMarker = () => {   
-        setTimeout(() => {            
-            setIsMarkerShown(true)        
-        }, 500);     
+    const showMarker = () => {
+        setTimeout(() => {
+            setIsMarkerShown(true)
+        }, 500);
     }
 
 
-    
+
 
 
     return (

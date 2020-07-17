@@ -8,3 +8,15 @@
   color: white !important;
   margin: 10px;
 }
+
+.mapTitle{
+  position: absolute;
+  z-index: 2;
+  top: 1rem;
+  left: 1rem;
+  color: white;
+  background: grey;
+  border-style: solid;
+  border-color: grey;
+  border-radius: 10px;
+}

@@ -30,8 +30,8 @@ const Routes = () => {
         return (    
             <Switch>
                 <Route path='/dashboard' component={dashboard} />
-                <Route path='/reports' component={report} />
-                <Redirect to='/dashboard' />
+                <Route path='/report' component={report} />
+                <Redirect to='/report' />
             </Switch>
         )
     } else {     
