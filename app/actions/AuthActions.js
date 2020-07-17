@@ -6,7 +6,6 @@ export const handleSignUp = (email, password, firstname, lastname) => {
       .auth()
       .createUserWithEmailAndPassword(email, password)
       .then((data) => {
-        console.log(data.user.uid);
         firebase
           .firestore()
           .doc(`/users/${data.user.uid}`)
@@ -15,6 +14,8 @@ export const handleSignUp = (email, password, firstname, lastname) => {
             lastname,
             email,
             role: "user",
+            photoUrl:
+              "https://firebasestorage.googleapis.com/v0/b/cattle-stray.appspot.com/o/dummyProfile%2Fperson.png?alt=media&token=a29add43-a17a-4d8b-a8be-71cb0d57c981",
             createdAt: firebase.firestore.Timestamp.now(),
           })
           .then(() => {
@@ -22,6 +23,8 @@ export const handleSignUp = (email, password, firstname, lastname) => {
               .auth()
               .currentUser.updateProfile({
                 displayName: `${firstname} ${lastname}`,
+                photoURL:
+                  "https://firebasestorage.googleapis.com/v0/b/cattle-stray.appspot.com/o/dummyProfile%2Fperson.png?alt=media&token=a29add43-a17a-4d8b-a8be-71cb0d57c981",
               })
               .then(() => {
                 resolve(data);

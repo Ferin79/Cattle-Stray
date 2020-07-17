@@ -22,12 +22,12 @@
     },
     "android": {
       "package": "com.ferinpatel.cattle",
-      "useNextNotificationsApi": true,
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyBT9g5ki0J5nFyiPANXTZ4f-il9miQ7iAg"
         }
       }
-    }
+    },
+    "description": ""
   }
 }

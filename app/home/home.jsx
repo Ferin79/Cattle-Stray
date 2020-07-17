@@ -26,6 +26,7 @@ import RenderMarker from "./RenderMarker";
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 const SCREEN_WIDTH = Dimensions.get("window").width;
+let token = "";
 
 const Home = ({ navigation, navigator }) => {
   YellowBox.ignoreWarnings(["Setting a timer"]);
@@ -44,7 +45,6 @@ const Home = ({ navigation, navigator }) => {
   const [latitute, setLatitute] = useState(0);
   const [longitute, setLongitute] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [isMapLoading, setIsMapLoading] = useState(true);
   const [reportData, setReportData] = useState([]);
   const [radiusInKM, setRadiusInKM] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
@@ -79,53 +79,15 @@ const Home = ({ navigation, navigator }) => {
     query.onSnapshot((value) => {
       const data = [];
       value.docs.forEach((doc) => {
-        data.push(doc.data());
+        if (!doc.data().isClosed) {
+          data.push(doc.data());
+        }
       });
       setReportData([...data]);
       setLatitute(location.coords.latitude);
       setLongitute(location.coords.longitude);
       setIsLoading(false);
-      setIsMapLoading(false);
     });
-  };
-
-  const getUserLocation = async () => {
-    setErrorMsg("");
-    let { status } = await Location.requestPermissionsAsync();
-    if (status !== "granted") {
-      setErrorMsg("Permission to access location was denied");
-      return;
-    }
-
-    try {
-      let location = await Location.getCurrentPositionAsync({});
-      ReportDispatch({
-        type: "LOAD_LOCATION",
-        payload: {
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-          accuracy: location.coords.accuracy,
-        },
-      });
-      fetchReports(location);
-    } catch (error) {
-      setIsLoading(false);
-      setIsMapLoading(false);
-      setErrorMsg(error.message);
-    }
-  };
-
-  const getNotificationPermission = () => {
-    registerForPushNotificationsAsync().then((token) =>
-      firebase
-        .firestore()
-        .doc(`/notificationsToken/${firebase.auth().currentUser.uid}`)
-        .set({
-          token: token,
-          uid: firebase.auth().currentUser.uid,
-          email: firebase.auth().currentUser.email,
-        })
-    );
   };
 
   async function registerForPushNotificationsAsync() {
@@ -146,6 +108,7 @@ const Home = ({ navigation, navigator }) => {
         return;
       }
       token = (await Notifications.getExpoPushTokenAsync()).data;
+      console.log(token);
     } else {
       alert("Must use physical device for Push Notifications");
     }
@@ -162,12 +125,48 @@ const Home = ({ navigation, navigator }) => {
     return token;
   }
 
+  const getUserLocation = async () => {
+    setErrorMsg("");
+    try {
+      let { status } = await Location.requestPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
+        return;
+      }
+      let location = await Location.getCurrentPositionAsync({});
+      ReportDispatch({
+        type: "LOAD_LOCATION",
+        payload: {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          accuracy: location.coords.accuracy,
+        },
+      });
+      fetchReports(location);
+    } catch (error) {
+      console.log(error);
+      setErrorMsg(error.message);
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     getUserLocation();
-    getNotificationPermission();
+    registerForPushNotificationsAsync().then((token) =>
+      firebase
+        .firestore()
+        .doc(`/notificationTokens/${firebase.auth().currentUser.uid}`)
+        .set({
+          email: firebase.auth().currentUser.email,
+          token,
+          uid: firebase.auth().currentUser.uid,
+        })
+        .then()
+        .catch((error) => console.log(error))
+    );
   }, []);
 
-  if (isMapLoading) {
+  if (isLoading) {
     return <LoadingScreen text="Loading..." />;
   }
   if (errorMsg) {
@@ -224,22 +223,21 @@ const Home = ({ navigation, navigator }) => {
               strokeColor="#0AF"
               fillColor="rgba(0,170,255,0.2)"
             />
-            {reportData.length &&
-              reportData.map((item, index) => {
-                return (
-                  <RenderMarker
-                    key={index}
-                    title={item.animalType}
-                    description={item.animalCount}
-                    lat={item.animalMovingCoords.U}
-                    long={item.animalMovingCoords.k}
-                    handleOnPress={() => {
-                      setSelectedAnimal({ ...item });
-                      setSearchQuery(item.animalType);
-                    }}
-                  />
-                );
-              })}
+            {reportData.map((item, index) => {
+              return (
+                <RenderMarker
+                  key={index}
+                  title={item.animalType}
+                  description={item.animalCount}
+                  lat={item.animalMovingCoords.U}
+                  long={item.animalMovingCoords.k}
+                  handleOnPress={() => {
+                    setSelectedAnimal({ ...item });
+                    setSearchQuery(item.animalType);
+                  }}
+                />
+              );
+            })}
           </MapView>
 
           <Searchbar
@@ -249,7 +247,7 @@ const Home = ({ navigation, navigator }) => {
             style={{
               backgroundColor: themeStyle.backgroundColor,
               position: "absolute",
-              top: "1%",
+              top: 10,
               margin: 10,
               color: themeStyle.textColor,
             }}
@@ -296,9 +294,11 @@ const Home = ({ navigation, navigator }) => {
                       color: themeStyle.textColor,
                     }}
                   >
-                    {selectedAnimal.animalType === "other"
-                      ? "Animal"
-                      : selectedAnimal.animalType}
+                    <Text>
+                      {selectedAnimal.animalType === "other"
+                        ? "Animal"
+                        : selectedAnimal.animalType}
+                    </Text>
                   </Text>
                 </View>
               }

@@ -1,5 +1,5 @@
 import React from "react";
-import { MarkerAnimated } from "react-native-maps";
+import { Marker } from "react-native-maps";
 
 const RenderMarker = ({ title, description, lat, long, handleOnPress }) => {
   var imgUrl;
@@ -11,11 +11,9 @@ const RenderMarker = ({ title, description, lat, long, handleOnPress }) => {
     imgUrl = require("../images/goat.png");
   }
   return (
-    <MarkerAnimated
-      title={title === "other" ? "Animal" : title}
-      description={`${description} ${
-        title === "other" ? "Animal" : title
-      } was located here`}
+    <Marker
+      title={title}
+      description={description}
       coordinate={{
         latitude: parseFloat(lat),
         longitude: parseFloat(long),

@@ -35,6 +35,11 @@ const SignIn = () => {
   const [errorText, setErrorText] = useState("");
 
   const TapSignUpAnimation = () => {
+    setEmail("");
+    setFirstname("");
+    setLastname("");
+    setPassword("");
+    setPasswordAgain("");
     Animated.sequence([
       Animated.timing(SignInSlide, {
         toValue: -1000,
@@ -49,6 +54,11 @@ const SignIn = () => {
     ]).start();
   };
   const TapSignInAnimation = () => {
+    setEmail("");
+    setFirstname("");
+    setLastname("");
+    setPassword("");
+    setPasswordAgain("");
     Animated.sequence([
       Animated.timing(SignUpSlide, {
         toValue: 1000,
@@ -90,10 +100,13 @@ const SignIn = () => {
     }
     setIsLoading(true);
     handleSignUp(email, password, firstname, lastname)
-      .then(() => {})
+      .then((user) => {
+        console.log(user);
+      })
       .catch((error) => {
         console.log(error);
         setErrorText(error);
+        setIsLoading(false);
       });
   };
   const handleSignInValide = () => {
@@ -112,6 +125,7 @@ const SignIn = () => {
       .then(() => {})
       .catch((error) => {
         console.log(error);
+        setIsLoading(false);
         setErrorText(error);
       });
   };

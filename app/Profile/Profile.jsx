@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import {
   SafeAreaView,
   View,
@@ -14,7 +14,6 @@ import {
   Foundation,
   MaterialIcons,
 } from "@expo/vector-icons";
-import { GlobalContext } from "../state/RootReducer";
 import useTheme from "../hooks/useTheme";
 import firebase from "../hooks/useFirebase";
 
@@ -23,8 +22,6 @@ const SCREEN_WIDTH = Dimensions.get("window").width;
 
 const Profile = ({ navigation }) => {
   const themeStyle = useTheme();
-
-  const { ThemeState } = useContext(GlobalContext);
 
   return (
     <SafeAreaView style={{ backgroundColor: themeStyle.backgroundColor }}>
@@ -73,7 +70,7 @@ const Profile = ({ navigation }) => {
         >
           <Avatar.Image
             size={150}
-            source={{ uri: "https://placeimg.com/640/480/any" }}
+            source={{ uri: firebase.auth().currentUser.photoURL }}
           />
 
           <Title style={{ marginVertical: 3, color: themeStyle.textColor }}>
