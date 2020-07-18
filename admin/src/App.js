@@ -9,7 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   return (
-    <div className="App" style={{ backgroundColor: "grey", height: "980px" }}>
+    <div className="App" style={{ backgroundColor: "grey", flex:1 }}>
       <ContextProvider>
         <AuthProvider>
           <Router>
