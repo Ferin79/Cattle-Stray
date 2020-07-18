@@ -117,6 +117,7 @@ const ImagePicker = ({ navigation }) => {
               upvotes: [],
               downvotes: [],
               comments: [],
+              isClosed: false,
               uid: firebase.auth().currentUser.uid,
               email: firebase.auth().currentUser.email,
               createdAt: firebase.firestore.Timestamp.now(),

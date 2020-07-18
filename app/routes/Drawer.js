@@ -14,7 +14,11 @@ import {
   Switch,
 } from "react-native-paper";
 import { View } from "react-native";
-import { MaterialCommunityIcons, Foundation } from "@expo/vector-icons";
+import {
+  MaterialCommunityIcons,
+  Foundation,
+  FontAwesome5,
+} from "@expo/vector-icons";
 import useTheme from "../hooks/useTheme.js";
 import { GlobalContext } from "../state/RootReducer";
 import HomeStack from "./HomeStack";
@@ -47,7 +51,11 @@ const DrawerContent = (props) => {
           <View style={{ paddingLeft: 20 }}>
             <View style={{ flexDirection: "row", marginTop: 15 }}>
               <Avatar.Image
-                source={{ uri: "https://placeimg.com/640/480/any" }}
+                source={{
+                  uri: firebase.auth().currentUser.photoURL
+                    ? firebase.auth().currentUser.photoURL
+                    : "https://firebasestorage.googleapis.com/v0/b/cattle-stray.appspot.com/o/dummyProfile%2Fperson.png?alt=media&token=a29add43-a17a-4d8b-a8be-71cb0d57c981",
+                }}
                 size={50}
               />
               <View style={{ marginLeft: 15, flexDirection: "column" }}>
@@ -81,6 +89,24 @@ const DrawerContent = (props) => {
               )}
               onPress={() => {
                 props.navigation.navigate("HomeDrawer");
+              }}
+              labelStyle={{ color: themeStyle.textColor }}
+            />
+
+            <DrawerItem
+              label="Explore"
+              icon={({ size }) => (
+                <FontAwesome5
+                  name="globe"
+                  color={themeStyle.textColor}
+                  size={size}
+                  onPress={() => {
+                    props.navigation.navigate("FeedStack");
+                  }}
+                />
+              )}
+              onPress={() => {
+                props.navigation.navigate("FeedStack");
               }}
               labelStyle={{ color: themeStyle.textColor }}
             />

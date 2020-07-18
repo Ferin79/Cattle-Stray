@@ -6,6 +6,7 @@ import useTheme from "../hooks/useTheme";
 import firebase from "../hooks/useFirebase";
 import ViewReport from "./ViewReport";
 import LoadingScreen from "../hooks/LoadingScreen";
+import { handleVote } from "../actions/VoteActions";
 
 const ListReports = ({ navigation }) => {
   const themeStyle = useTheme();
@@ -19,18 +20,13 @@ const ListReports = ({ navigation }) => {
       .collection("reports")
       .where("uid", "==", firebase.auth().currentUser.uid)
       .orderBy("createdAt", "desc")
-      .get()
-      .then((docs) => {
+      .onSnapshot((docs) => {
         const data = [];
         docs.forEach((doc) => {
           data.push({ ...doc.data(), id: doc.id });
         });
         setReportsData([...data]);
         setIsLoading(false);
-      })
-      .catch((error) => {
-        setIsLoading(false);
-        console.log(error);
       });
   };
 
@@ -75,7 +71,12 @@ const ListReports = ({ navigation }) => {
         data={reportsData}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <ViewReport item={item} themeStyle={themeStyle} />
+          <ViewReport
+            item={item}
+            themeStyle={themeStyle}
+            handleVote={handleVote}
+            navigation={navigation}
+          />
         )}
         refreshing={isLoading}
         onRefresh={() => fetchReports()}

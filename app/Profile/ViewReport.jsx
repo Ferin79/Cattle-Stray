@@ -1,16 +1,46 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Avatar,
   Card,
   Paragraph,
   Subheading,
   Button,
+  ActivityIndicator,
 } from "react-native-paper";
+import firebase from "../hooks/useFirebase";
 
-const ViewReport = ({ item, themeStyle }) => {
+const ViewReport = ({ item, themeStyle, handleVote, navigation }) => {
   const LeftContent = (props) => (
     <Avatar.Icon {...props} icon="information-outline" />
   );
+
+  const [isUpvoted, setIsUpvoted] = useState(false);
+  const [isDownVoted, setIsDownVoted] = useState(false);
+
+  const [upvoteLoading, setUpvoteLoading] = useState(false);
+  const [downvoteLoading, setDownvoteLoading] = useState(false);
+
+  useEffect(() => {
+    const upvotes = item.upvotes;
+    const downvotes = item.downvotes;
+
+    upvotes.forEach((item) => {
+      if (item === firebase.auth().currentUser.uid) {
+        setIsUpvoted(true);
+      } else {
+        setIsUpvoted(false);
+      }
+    });
+
+    downvotes.forEach((item) => {
+      if (item === firebase.auth().currentUser.uid) {
+        setIsDownVoted(true);
+      } else {
+        setIsDownVoted(false);
+      }
+    });
+  }, [item]);
+
   return (
     <Card
       style={{
@@ -46,13 +76,49 @@ const ViewReport = ({ item, themeStyle }) => {
 
       <Card.Cover source={{ uri: item.animalImageUrl }} />
       <Card.Actions>
-        <Button color={themeStyle.textColor} icon="arrow-up-bold">
-          {item.upvotes.length}
-        </Button>
-        <Button color={themeStyle.textColor} icon="arrow-down-bold">
-          {item.downvotes.length}
-        </Button>
-        <Button color={themeStyle.textColor} icon="comment">
+        {upvoteLoading ? (
+          <ActivityIndicator size="small" />
+        ) : (
+          <Button
+            onPress={() => {
+              setUpvoteLoading(true);
+              handleVote(
+                item.id,
+                firebase.auth().currentUser.uid,
+                "upvote"
+              ).finally(() => setUpvoteLoading(false));
+            }}
+            color={isUpvoted ? "#0AF" : themeStyle.textColor}
+            icon="arrow-up-bold"
+          >
+            {item.upvotes.length}
+          </Button>
+        )}
+        {downvoteLoading ? (
+          <ActivityIndicator size="small" />
+        ) : (
+          <Button
+            onPress={() => {
+              setDownvoteLoading(true);
+              handleVote(
+                item.id,
+                firebase.auth().currentUser.uid,
+                "downvote"
+              ).finally(() => setDownvoteLoading(false));
+            }}
+            color={isDownVoted ? "red" : themeStyle.textColor}
+            icon="arrow-down-bold"
+          >
+            {item.downvotes.length}
+          </Button>
+        )}
+        <Button
+          onPress={() => {
+            navigation.navigate("CommentStack", { docId: item.id });
+          }}
+          color={themeStyle.textColor}
+          icon="comment"
+        >
           {item.comments.length}
         </Button>
       </Card.Actions>

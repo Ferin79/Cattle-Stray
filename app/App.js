@@ -45,10 +45,10 @@ export default function App() {
   return (
     <SafeAreaView style={SafeViewAndroid.AndroidSafeArea}>
       <ContextProvider>
+        <StatusBar style="auto" />
         <NavigationContainer>
           {isLogin ? <Drawer /> : <AuthStack />}
         </NavigationContainer>
-        <StatusBar style="auto" />
       </ContextProvider>
     </SafeAreaView>
   );
