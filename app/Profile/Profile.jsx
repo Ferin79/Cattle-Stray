@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   SafeAreaView,
   View,
@@ -6,6 +6,7 @@ import {
   Dimensions,
   ScrollView,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { Avatar, Title, Caption, Surface } from "react-native-paper";
 import {
@@ -14,6 +15,8 @@ import {
   Foundation,
   MaterialIcons,
 } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-community/async-storage";
+import { GlobalContext } from "../state/RootReducer";
 import useTheme from "../hooks/useTheme";
 import firebase from "../hooks/useFirebase";
 
@@ -22,6 +25,33 @@ const SCREEN_WIDTH = Dimensions.get("window").width;
 
 const Profile = ({ navigation }) => {
   const themeStyle = useTheme();
+
+  const { Radius, setRadius } = useContext(GlobalContext);
+
+  const handleSetRadius = () => {
+    Alert.prompt("Set Radius", `Current Radius is ${Radius} km`, [
+      {
+        text: "Cancel",
+        onPress: () => {},
+        style: "cancel",
+      },
+      {
+        text: "Done",
+        onPress: async (data) => {
+          if (!isNaN(data)) {
+            try {
+              await AsyncStorage.setItem("@radius", data);
+              setRadius(data);
+            } catch (e) {
+              console.log(e);
+            }
+          } else {
+            handleSetRadius();
+          }
+        },
+      },
+    ]);
+  };
 
   return (
     <SafeAreaView style={{ backgroundColor: themeStyle.backgroundColor }}>
@@ -39,7 +69,12 @@ const Profile = ({ navigation }) => {
             name="ios-arrow-round-back"
             size={50}
             color={themeStyle.textColor}
-            onPress={() => navigation.goBack()}
+            onPress={() =>
+              navigation.reset({
+                index: 0,
+                routes: [{ name: "HomeDrawer" }],
+              })
+            }
           />
           <MaterialCommunityIcons
             name="dots-vertical"
@@ -139,7 +174,43 @@ const Profile = ({ navigation }) => {
                 </View>
               </TouchableOpacity>
 
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  handleSetRadius();
+                }}
+              >
+                <View
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-start",
+                    alignItems: "center",
+                    flexDirection: "row",
+                    width: SCREEN_WIDTH,
+                    marginHorizontal: 50,
+                    marginVertical: 20,
+                    backgroundColor: "",
+                  }}
+                >
+                  <MaterialCommunityIcons
+                    name="map-marker-radius"
+                    size={35}
+                    color={themeStyle.textColor}
+                  />
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      marginLeft: 30,
+                      color: themeStyle.textColor,
+                    }}
+                  >
+                    Edit Radius
+                  </Text>
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => navigation.navigate("EditProfileStack")}
+              >
                 <View
                   style={{
                     display: "flex",
@@ -165,6 +236,52 @@ const Profile = ({ navigation }) => {
                     }}
                   >
                     Edit Profile
+                  </Text>
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() =>
+                  firebase
+                    .auth()
+                    .sendPasswordResetEmail(firebase.auth().currentUser.email)
+                    .then(() => {
+                      Alert.alert(
+                        "Success",
+                        "Password Rest Link Has been sent to your email"
+                      );
+                    })
+                    .catch((error) => {
+                      console.log(error);
+                      Alert.alert("Failed", error.message);
+                    })
+                }
+              >
+                <View
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-start",
+                    alignItems: "center",
+                    flexDirection: "row",
+                    width: SCREEN_WIDTH,
+                    marginHorizontal: 50,
+                    marginVertical: 20,
+                    backgroundColor: "",
+                  }}
+                >
+                  <MaterialCommunityIcons
+                    name="lock-reset"
+                    size={35}
+                    color={themeStyle.textColor}
+                  />
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      marginLeft: 30,
+                      color: themeStyle.textColor,
+                    }}
+                  >
+                    Reset Password
                   </Text>
                 </View>
               </TouchableOpacity>

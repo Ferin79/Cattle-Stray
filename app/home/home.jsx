@@ -1,5 +1,6 @@
 import _ from "lodash";
 import Constants from "expo-constants";
+import AsyncStorage from "@react-native-community/async-storage";
 import React, { useEffect, useContext, useState, useRef } from "react";
 import {
   SafeAreaView,
@@ -40,13 +41,14 @@ const Home = ({ navigation, navigator }) => {
   const themeStyle = useTheme();
   const mapTheme = useMapTheme();
 
-  const { ReportDispatch } = useContext(GlobalContext);
+  const { ReportDispatch, Radius, setRadius, ThemeDispatch } = useContext(
+    GlobalContext
+  );
 
   const [latitute, setLatitute] = useState(0);
   const [longitute, setLongitute] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [reportData, setReportData] = useState([]);
-  const [radiusInKM, setRadiusInKM] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [selectedAnimal, setSelectedAnimal] = useState(null);
@@ -72,7 +74,7 @@ const Home = ({ navigation, navigator }) => {
         location.coords.latitude,
         location.coords.longitude
       ),
-      radius: radiusInKM,
+      radius: Number(Radius),
     });
 
     // Get query (as Promise)
@@ -150,8 +152,23 @@ const Home = ({ navigation, navigator }) => {
     }
   };
 
+  const getRadius = async () => {
+    try {
+      const value = await AsyncStorage.getItem("@radius");
+      if (value !== null) {
+        setRadius(value);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   useEffect(() => {
     getUserLocation();
+    getRadius();
+  }, [Radius]);
+
+  useEffect(() => {
     registerForPushNotificationsAsync().then((token) =>
       firebase
         .firestore()
@@ -164,6 +181,20 @@ const Home = ({ navigation, navigator }) => {
         .then()
         .catch((error) => console.log(error))
     );
+    const fetchDarkMode = async () => {
+      try {
+        const value = await AsyncStorage.getItem("@darkMode");
+        if (JSON.parse(value)) {
+          ThemeDispatch({ type: "START_DARK_MODE" });
+        } else {
+          ThemeDispatch({ type: "END_DARK_MODE" });
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    };
+
+    fetchDarkMode();
   }, []);
 
   if (isLoading) {
@@ -219,7 +250,7 @@ const Home = ({ navigation, navigator }) => {
                 latitude: latitute,
                 longitude: longitute,
               }}
-              radius={radiusInKM * 1000}
+              radius={Number(Radius) * 1000}
               strokeColor="#0AF"
               fillColor="rgba(0,170,255,0.2)"
             />

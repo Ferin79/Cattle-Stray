@@ -4,6 +4,7 @@ import Profile from "../Profile/Profile";
 import ListReports from "../Profile/ListReports";
 import ViewComments from "../home/ViewComments";
 import useTheme from "../hooks/useTheme";
+import EditProfile from "../Profile/EditProfile";
 
 const ProfileStackScreen = createStackNavigator();
 
@@ -29,6 +30,13 @@ const ProfileStack = () => {
           headerTitle: "Comments",
           headerBackTitle: "Back",
           headerTitleAlign: "center",
+        }}
+      />
+      <ProfileStackScreen.Screen
+        component={EditProfile}
+        name="EditProfileStack"
+        options={{
+          header: () => null,
         }}
       />
     </ProfileStackScreen.Navigator>
