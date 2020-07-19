@@ -43,16 +43,16 @@ export default function Reports() {
         }
     }
 
-    const onMapClick = useCallback(
+    const onMapClick = 
         (event) => {
             setCattleLocation({
                 lat: event.latLng.lat(),
                 lng: event.latLng.lng()
             })
             playAudio();
-        },
-        [animalType],
-    )
+        }
+        
+    
 
     const [errorText, setErrorText] = useState('');
 

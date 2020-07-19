@@ -21,17 +21,17 @@ const MyMapComponent = compose(
     withGoogleMap
 )((props) =>
     <>
-    <GoogleMap
-        defaultCenter={{ lat: -34.397, lng: 150.644 }}
-        center={props.markerCoords}
-        zoom={props.markerCoords ? 16 : 8}
-        options={options}
-        onClick={(event) => console.log(event)}
-    >
-    <h1 className="mapDetailTitle">Cattle Stray 🐄</h1>
+        <GoogleMap
+            defaultCenter={{ lat: -34.397, lng: 150.644 }}
+            center={props.markerCoords}
+            zoom={props.markerCoords ? 16 : 8}
+            options={options}
+            onClick={(event) => console.log(event)}
+        >
+            <h1 className="mapDetailTitle">Cattle Stray 🐄</h1>
 
-        {props.markerCoords && <Marker icon={{ colour: "blue" }} position={{ lat: props.markerCoords.lat, lng: props.markerCoords.lng }} onClick={props.onMarkerClick} />}
-    </GoogleMap>
+            {props.markerCoords && <Marker icon={{ colour: "blue" }} position={{ lat: props.markerCoords.lat, lng: props.markerCoords.lng }} onClick={props.onMarkerClick} />}
+        </GoogleMap>
     </>
 )
 
@@ -72,12 +72,12 @@ export default function ReportDetails({ match }) {
 
 
     return (
-    <>
-        <MyMapComponent
-            isMarkerShown={isMarkerShown}
-            onMarkerClick={handleMarkerClick}
-            markerCoords={coordinates}
-        />
+        <>
+            <MyMapComponent
+                isMarkerShown={isMarkerShown}
+                onMarkerClick={handleMarkerClick}
+                markerCoords={coordinates}
+            />
         </>
     )
 }
