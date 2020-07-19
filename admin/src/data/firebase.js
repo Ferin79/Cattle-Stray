@@ -1,4 +1,5 @@
 import firebase from "firebase";
+import "firebase/firestore";
 var firebaseConfig = {
   apiKey: "AIzaSyAUbEG1L49COARLWsivHYPc1lmTU5hIxd4",
   authDomain: "cattle-stray.firebaseapp.com",
@@ -11,4 +12,4 @@ var firebaseConfig = {
 };
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
-export default firebase
+export default firebase;

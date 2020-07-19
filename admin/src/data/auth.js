@@ -7,26 +7,32 @@ export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(false);
-  const { setRole } = useContext(Context);
+  const { setRole, setIsLoading } = useContext(Context);
 
   useEffect(() => {
+    setIsLoading(true);
     firebase.auth().onAuthStateChanged((user) => {
-      if (user) {        
-        firebase.firestore().doc(`users/${user.uid}`).get()
+      if (user) {
+        firebase
+          .firestore()
+          .doc(`users/${user.uid}`)
+          .get()
           .then((snapshot) => {
-            console.log(snapshot.data());
             setCurrentUser(snapshot.data());
             setRole(snapshot.data().role);
-            console.log(snapshot.data().role)
-          }).catch((error) => {
-            console.log(error)
+          })
+          .catch((error) => {
+            console.log(error);
+          })
+          .finally(() => {
+            setIsLoading(false);
           });
       } else {
+        setIsLoading(false);
         setCurrentUser(null);
       }
     });
-
-  }, [setCurrentUser, setRole]);
+  }, [setCurrentUser, setRole, setIsLoading]);
 
   return (
     <AuthContext.Provider value={{ currentUser }}>

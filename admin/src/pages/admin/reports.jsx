@@ -1,11 +1,59 @@
 import React, { useEffect, useContext } from "react";
 import firebase from "../../data/firebase";
-import { Image, Table, Container, Button, Row, Col } from "react-bootstrap";
+import Container from "react-bootstrap/Container";
+import Button from "react-bootstrap/Button";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import Image from "react-bootstrap/Image";
+import Table from "react-bootstrap/Table";
 import { NavLink } from "react-router-dom";
 import { Context } from "../../data/context";
 
 export default function Reports() {
   const { reports, setReports } = useContext(Context);
+
+  const sendNotification = async (token, title, description) => {
+    const message = {
+      to: [token],
+      sound: "default",
+      title: title,
+      body: description,
+    };
+    await fetch("https://exp.host/--/api/v2/push/send", {
+      method: "POST",
+      body: JSON.stringify(message),
+    });
+  };
+
+  const handleReportReject = (id, type) => {
+    firebase
+      .firestore()
+      .collection("notificationTokens")
+      .where("uid", "==", id)
+      .get()
+      .then((docs) => {
+        if (!docs.empty) {
+          let token = "";
+          docs.forEach((doc) => {
+            token = doc.data().token;
+          });
+
+          let notificationDesc = "";
+          if (type === "rejected") {
+            notificationDesc = "Your report has been rejected";
+          } else if (type === "resolved") {
+            notificationDesc = "Your report has been approved";
+          } else if (type === "underProcess") {
+            notificationDesc = "Your report is in under process";
+          }
+
+          if (notificationDesc.trim() !== "") {
+            sendNotification(token, "Report Status", notificationDesc);
+          }
+        }
+      })
+      .catch((error) => console.log(error));
+  };
 
   useEffect(() => {
     // fetch(
@@ -30,87 +78,118 @@ export default function Reports() {
     //       });
 
     //   });
-    firebase.firestore().collection("reports").orderBy("createdAt", "desc").get()
-      .then((snapshot) => {
+    firebase
+      .firestore()
+      .collection("reports")
+      .orderBy("createdAt", "desc")
+      .onSnapshot((docs) => {
         let reports = [];
-        snapshot.docs.forEach((doc) => {
-          let d = doc.data().createdAt.toDate();
-          const time =
-            [d.getDate(), d.getMonth() + 1, d.getFullYear()].join("/") +
-            " " +
-            [d.getHours(), d.getMinutes(), d.getSeconds()].join(":");
-          reports.push({ ...doc.data(), id: doc.id, time });
+        docs.forEach((doc) => {
+          reports.push({ ...doc.data(), id: doc.id });
         });
         setReports(reports);
       });
   }, [setReports]);
 
-  let tableRows;
-  if (reports.length > 0) {
-    let count = 1;
-    tableRows = reports.map((report) => {
-      let injuredStyle = {};
-      if (report.animalCondition === "injured" || report.animalCondition === "death") {
-        injuredStyle = { color: "red" };
-      }
-      return (
-        <tr>
-          <td>{count++}</td>
-          <td>
-            <Image
-              height="120px"
-              width="120px"
-              src={report.animalImageUrl}
-              rounded
-            />
-          </td>
-          <td>{report.time}</td>
-          <td style={injuredStyle}>{report.animalCondition}</td>
-          <td>{report.animalCount}</td>
-          <td>{report.animalIsMoving}</td>
-          <td>{report.description}</td>
-          <td>{report.upvotes.length}</td>
-          <td>{report.downvotes.length}</td>
-          <td>
-            <Row style={{ margin: 4 }}>
-              <Button variant="info" >
-                <NavLink to={`/admin/report/${report.id}`} className="changeNavColor">
-                  View
-              </NavLink>
-              </Button>
-            </Row>
-            <Row style={{ margin: 4 }}>
-              <Button variant="success">Process request</Button>
-            </Row>
-            <Row style={{ margin: 4 }}>
-              <Button variant="danger">Reject</Button>
-            </Row>
-          </td>
-        </tr>
-      );
-    });
-  }
-
   return (
-    <Container className="col-12">
-      <h1>Admin Reports</h1>
-      <Table striped bordered hover variant="dark">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Image</th>
-            <th>Time</th>
-            <th>Condition</th>
-            <th>Count</th>
-            <th>Moving</th>
-            <th>Description</th>
-            <th>Up Votes</th>
-            <th>Down Votes</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>{tableRows}</tbody>
-      </Table>
+    <Container fluid>
+      <Row className="d-flex justify-content-center align-items-center mt-5 mb-5">
+        <Col lg={true}>
+          <h1>Admin Reports</h1>
+          <Table striped bordered hover responsive variant="dark">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Image</th>
+                <th>Time</th>
+                <th>Condition</th>
+                <th>Count</th>
+                <th>Moving</th>
+                <th>Description</th>
+                <th>Up Votes</th>
+                <th>Down Votes</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {reports.length &&
+                reports.map((report, index) => {
+                  let injuredStyle = {};
+                  if (
+                    report.animalCondition === "injured" ||
+                    report.animalCondition === "death" ||
+                    report.animalCondition === "Injured" ||
+                    report.animalCondition === "Death"
+                  ) {
+                    injuredStyle = { color: "red" };
+                  }
+                  return (
+                    <tr>
+                      <td>{++index}</td>
+                      <td>
+                        <Image
+                          height="150px"
+                          width="150px"
+                          src={report.animalImageUrl}
+                          rounded
+                        />
+                      </td>
+                      <td>{report.createdAt.toDate().toLocaleString()}</td>
+                      <td style={injuredStyle}>{report.animalCondition}</td>
+                      <td>{report.animalCount}</td>
+                      <td>{report.animalIsMoving}</td>
+                      <td>{report.description}</td>
+                      <td>{report.upvotes.length}</td>
+                      <td>{report.downvotes.length}</td>
+                      <td className="d-flex flex-row flex-wrap justify-content-space-evenly align-items-center">
+                        <Row style={{ margin: 4 }}>
+                          <Button variant="outline-info">
+                            <NavLink
+                              to={`/admin/report/${report.id}`}
+                              className="changeNavColor"
+                            >
+                              View
+                            </NavLink>
+                          </Button>
+                        </Row>
+                        <Row style={{ margin: 4 }}>
+                          <Button
+                            variant="outline-success"
+                            onClick={() =>
+                              handleReportReject(report.uid, "underProcess")
+                            }
+                          >
+                            Process request
+                          </Button>
+                        </Row>
+                        <Row style={{ margin: 4 }}>
+                          <Button
+                            variant="outline-danger"
+                            onClick={() =>
+                              handleReportReject(report.uid, "rejected")
+                            }
+                          >
+                            Reject
+                          </Button>
+                        </Row>
+                        <Row style={{ margin: 4 }}>
+                          <Button
+                            variant="outline-primary"
+                            onClick={() =>
+                              handleReportReject(report.uid, "resolved")
+                            }
+                          >
+                            Resolve
+                          </Button>
+                        </Row>
+                      </td>
+                    </tr>
+                  );
+                })}
+            </tbody>
+          </Table>
+        </Col>
+      </Row>
     </Container>
   );
 }

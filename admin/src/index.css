@@ -1,4 +1,15 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap");
+* {
+  margin: 0;
+  font-family: "Montserrat", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
 .changeNavColor {
   text-decoration: none !important;
   color: white !important;
@@ -9,7 +20,7 @@
   margin: 10px;
 }
 
-.mapTitle{
+.mapTitle {
   position: absolute;
   z-index: 2;
   top: 1rem;
@@ -20,7 +31,7 @@
   border-color: grey;
   border-radius: 10px;
 }
-.mapDetailTitle{
+.mapDetailTitle {
   position: absolute;
   z-index: 2;
   top: 6rem;

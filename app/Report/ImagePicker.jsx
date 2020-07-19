@@ -68,7 +68,7 @@ const ImagePicker = ({ navigation }) => {
   const handleFinalSubmit = async () => {
     setIsLoading(true);
     const fileBlob = await uriToBlob(image);
-    var storageRef = firebase.storage().ref(`${Date.now()}`);
+    var storageRef = firebase.storage().ref(`reports/${Date.now()}`);
     var uploadTask = storageRef.put(fileBlob);
     uploadTask.on(
       "state_changed",
@@ -117,7 +117,9 @@ const ImagePicker = ({ navigation }) => {
               upvotes: [],
               downvotes: [],
               comments: [],
-              isClosed: false,
+              isUnderProcess: false,
+              isResolved: false,
+              isRejected: false,
               uid: firebase.auth().currentUser.uid,
               email: firebase.auth().currentUser.email,
               createdAt: firebase.firestore.Timestamp.now(),
