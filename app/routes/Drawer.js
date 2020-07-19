@@ -4,6 +4,7 @@ import {
   DrawerContentScrollView,
   DrawerItem,
 } from "@react-navigation/drawer";
+import AsyncStorage from "@react-native-community/async-storage";
 import {
   Avatar,
   Title,
@@ -149,7 +150,21 @@ const DrawerContent = (props) => {
             theme={{ colors: { text: themeStyle.textSecondaryColor } }}
           >
             <TouchableRipple
-              onPress={() => ThemeDispatch({ type: "TOGGLE_THEME" })}
+              onPress={async () => {
+                try {
+                  await AsyncStorage.setItem(
+                    "@darkMode",
+                    JSON.stringify(ThemeState.lightTheme)
+                  );
+                } catch (e) {
+                  console.log(e);
+                }
+                if (ThemeState.lightTheme) {
+                  ThemeDispatch({ type: "START_DARK_MODE" });
+                } else {
+                  ThemeDispatch({ type: "END_DARK_MODE" });
+                }
+              }}
             >
               <View
                 style={{
@@ -163,7 +178,21 @@ const DrawerContent = (props) => {
                 <Text style={{ color: themeStyle.textColor }}>Dark Theme</Text>
                 <Switch
                   value={!ThemeState.lightTheme}
-                  onValueChange={() => ThemeDispatch({ type: "TOGGLE_THEME" })}
+                  onValueChange={async () => {
+                    try {
+                      await AsyncStorage.setItem(
+                        "@darkMode",
+                        JSON.stringify(ThemeState.lightTheme)
+                      );
+                    } catch (e) {
+                      console.log(e);
+                    }
+                    if (ThemeState.lightTheme) {
+                      ThemeDispatch({ type: "START_DARK_MODE" });
+                    } else {
+                      ThemeDispatch({ type: "END_DARK_MODE" });
+                    }
+                  }}
                 />
               </View>
             </TouchableRipple>
