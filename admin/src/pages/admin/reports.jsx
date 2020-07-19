@@ -1,6 +1,6 @@
 import React, { useEffect, useContext } from "react";
 import firebase from "../../data/firebase";
-import { Image, Table, Container, Button } from "react-bootstrap";
+import { Image, Table, Container, Button, Row, Col } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
 import { Context } from "../../data/context";
 
@@ -58,8 +58,8 @@ export default function Reports() {
           <td>{count++}</td>
           <td>
             <Image
-              height="100px"
-              width="100px"
+              height="120px"
+              width="120px"
               src={report.animalImageUrl}
               rounded
             />
@@ -69,15 +69,22 @@ export default function Reports() {
           <td>{report.animalCount}</td>
           <td>{report.animalIsMoving}</td>
           <td>{report.description}</td>
-          <td>{report.upvotes}</td>
-          <td>{report.downvotes}</td>
+          <td>{report.upvotes.length}</td>
+          <td>{report.downvotes.length}</td>
           <td>
-            <Button variant="info" style={{ margin: 4 }}>
-              <NavLink  to={`/admin/report/${report.id}`} className="changeNavColor">
-                View
+            <Row style={{ margin: 4 }}>
+              <Button variant="info" >
+                <NavLink to={`/admin/report/${report.id}`} className="changeNavColor">
+                  View
               </NavLink>
-            </Button>
-            <Button variant="danger">Delete</Button>
+              </Button>
+            </Row>
+            <Row style={{ margin: 4 }}>
+              <Button variant="success">Process request</Button>
+            </Row>
+            <Row style={{ margin: 4 }}>
+              <Button variant="danger">Reject</Button>
+            </Row>
           </td>
         </tr>
       );

@@ -20,3 +20,14 @@
   border-color: grey;
   border-radius: 10px;
 }
+.mapDetailTitle{
+  position: absolute;
+  z-index: 2;
+  top: 6rem;
+  left: 2rem;
+  color: white;
+  background: grey;
+  border-style: solid;
+  border-color: grey;
+  border-radius: 10px;
+}

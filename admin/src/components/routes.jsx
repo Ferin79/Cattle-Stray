@@ -6,6 +6,7 @@ import dashboard from "../pages/dashboard";
 import adminDashboard from "../pages/admin/dashboard";
 import adminReports from "../pages/admin/reports";
 import report from "../pages/report";
+import profile from "../pages/profile";
 import adminReportDetails from "../pages/admin/reportDetails";
 import { AuthContext } from "../data/auth";
 import { Context } from "../data/context";
@@ -31,6 +32,7 @@ const Routes = () => {
             <Switch>
                 <Route path='/dashboard' component={dashboard} />
                 <Route path='/report' component={report} />
+                <Route path='/profile' component={profile} />
                 <Redirect to='/report' />
             </Switch>
         )

@@ -7,7 +7,7 @@ import { Context } from "../data/context";
 import firebase from "../data/firebase";
 import Loading from "../components/LoadingScreen";
 const mapContainerStyle = {
-    width: '80vw',
+    width: '70vw',
     height: '70vh'
 }
 

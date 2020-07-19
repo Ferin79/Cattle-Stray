@@ -44,6 +44,11 @@ const Header = () => {
           Reports
           </NavLink>
         </Nav.Link>
+        <Nav.Link>
+          <NavLink to="/profile" className="changeNavColor">
+          Profile
+          </NavLink>
+        </Nav.Link>
           <Button onClick={() => firebase.auth().signOut()} variant="outline-danger">
             Logout
           </Button>
