@@ -33,14 +33,43 @@ export const handleVote = (id, userId, type) => {
         }
 
         if (type === "upvote") {
+          console.log("Called upvoted");
           if (!isUpvoted) {
+            console.log("Adding Upvote and adding 5");
             upvotes.push(userId);
+            firebase
+              .firestore()
+              .doc(`/users/${doc.data().uid}`)
+              .update({
+                points: firebase.firestore.FieldValue.increment(5),
+              });
+          } else {
+            console.log("Removing 5");
+            firebase
+              .firestore()
+              .doc(`/users/${doc.data().uid}`)
+              .update({
+                points: firebase.firestore.FieldValue.increment(-5),
+              });
           }
         }
 
         if (type === "downvote") {
           if (!isDownVoted) {
             downvotes.push(userId);
+            firebase
+              .firestore()
+              .doc(`/users/${doc.data().uid}`)
+              .update({
+                points: firebase.firestore.FieldValue.increment(-5),
+              });
+          } else {
+            firebase
+              .firestore()
+              .doc(`/users/${doc.data().uid}`)
+              .update({
+                points: firebase.firestore.FieldValue.increment(5),
+              });
           }
         }
 

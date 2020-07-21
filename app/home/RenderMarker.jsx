@@ -13,7 +13,7 @@ const RenderMarker = ({ title, description, lat, long, handleOnPress }) => {
   return (
     <Marker
       title={title}
-      description={description}
+      description={`Last seen at ${description}`}
       coordinate={{
         latitude: parseFloat(lat),
         longitude: parseFloat(long),

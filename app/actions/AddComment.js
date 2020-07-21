@@ -12,7 +12,7 @@ export const handleAddComment = (id, text) => {
           userId: firebase.auth().currentUser.uid,
           message: text,
           createdAt: firebase.firestore.Timestamp.now(),
-          photoURL: firebase.auth().currentUser.photoURL,
+          photoUrl: firebase.auth().currentUser.photoURL,
         });
         firebase
           .firestore()

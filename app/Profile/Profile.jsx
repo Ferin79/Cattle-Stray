@@ -69,15 +69,10 @@ const Profile = ({ navigation }) => {
             name="ios-arrow-round-back"
             size={50}
             color={themeStyle.textColor}
-            onPress={() =>
-              navigation.reset({
-                index: 0,
-                routes: [{ name: "HomeDrawer" }],
-              })
-            }
+            onPress={() => navigation.goBack()}
           />
           <MaterialCommunityIcons
-            name="dots-vertical"
+            name="menu"
             size={35}
             color={themeStyle.textColor}
             onPress={() => navigation.toggleDrawer()}

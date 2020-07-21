@@ -1,10 +1,9 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
   DrawerItem,
 } from "@react-navigation/drawer";
-import AsyncStorage from "@react-native-community/async-storage";
 import {
   Avatar,
   Title,
@@ -15,6 +14,7 @@ import {
   Switch,
 } from "react-native-paper";
 import { View } from "react-native";
+import AsyncStorage from "@react-native-community/async-storage";
 import {
   MaterialCommunityIcons,
   Foundation,
@@ -45,6 +45,21 @@ const DrawerContent = (props) => {
   const { ThemeState, ThemeDispatch } = useContext(GlobalContext);
   const themeStyle = useTheme();
 
+  const [userPoints, setUserPoints] = useState(0);
+
+  useEffect(() => {
+    firebase
+      .firestore()
+      .doc(`/users/${firebase.auth().currentUser.uid}`)
+      .onSnapshot((doc) => {
+        try {
+          setUserPoints(doc.data().points ? doc.data().points : 0);
+        } catch (error) {
+          console.log(error);
+        }
+      });
+  }, []);
+
   return (
     <View style={{ flex: 1, backgroundColor: themeStyle.sidebarColor }}>
       <DrawerContentScrollView {...props}>
@@ -55,7 +70,7 @@ const DrawerContent = (props) => {
                 source={{
                   uri: firebase.auth().currentUser.photoURL
                     ? firebase.auth().currentUser.photoURL
-                    : "https://firebasestorage.googleapis.com/v0/b/cattle-stray.appspot.com/o/dummyProfile%2Fperson.png?alt=media&token=a29add43-a17a-4d8b-a8be-71cb0d57c981",
+                    : "https://firebasestorage.googleapis.com/v0/b/cattle-stray.appspot.com/o/dummyProfile%2Fperson.png?alt=media&token=226129bb-3586-4d1d-852c-9a8e54ba248e",
                 }}
                 size={50}
               />
@@ -72,6 +87,29 @@ const DrawerContent = (props) => {
                   {firebase.auth().currentUser.email}
                 </Caption>
               </View>
+            </View>
+            <View
+              style={{
+                display: "flex",
+                justifyContent: "flex-start",
+                flexDirection: "row",
+                marginHorizontal: 60,
+                marginTop: 20,
+              }}
+            >
+              <Text
+                style={{
+                  fontWeight: "bold",
+                  marginRight: 10,
+                  fontSize: 18,
+                  color: themeStyle.textColor,
+                }}
+              >
+                {userPoints}
+              </Text>
+              <Text style={{ color: themeStyle.textSecondaryColor }}>
+                Points
+              </Text>
             </View>
           </View>
 
@@ -207,7 +245,12 @@ const DrawerContent = (props) => {
         }}
       >
         <DrawerItem
-          onPress={() => firebase.auth().signOut()}
+          onPress={() =>
+            firebase
+              .auth()
+              .signOut()
+              .catch((error) => console.log(error))
+          }
           labelStyle={{ color: themeStyle.textColor }}
           label="Sign Out"
           icon={({ size }) => (
@@ -216,7 +259,10 @@ const DrawerContent = (props) => {
               color={themeStyle.textColor}
               size={size}
               onPress={() => {
-                firebase.auth().signOut();
+                firebase
+                  .auth()
+                  .signOut()
+                  .catch((error) => console.log(error));
               }}
             />
           )}

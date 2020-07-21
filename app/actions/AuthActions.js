@@ -13,9 +13,11 @@ export const handleSignUp = (email, password, firstname, lastname) => {
             firstname,
             lastname,
             email,
+            uid: data.user.uid,
             role: "user",
+            points: 0,
             photoUrl:
-              "https://firebasestorage.googleapis.com/v0/b/cattle-stray.appspot.com/o/dummyProfile%2Fperson.png?alt=media&token=a29add43-a17a-4d8b-a8be-71cb0d57c981",
+              "https://firebasestorage.googleapis.com/v0/b/cattle-stray.appspot.com/o/dummyProfile%2Fperson.png?alt=media&token=226129bb-3586-4d1d-852c-9a8e54ba248e",
             createdAt: firebase.firestore.Timestamp.now(),
           })
           .then(() => {
@@ -24,7 +26,7 @@ export const handleSignUp = (email, password, firstname, lastname) => {
               .currentUser.updateProfile({
                 displayName: `${firstname} ${lastname}`,
                 photoURL:
-                  "https://firebasestorage.googleapis.com/v0/b/cattle-stray.appspot.com/o/dummyProfile%2Fperson.png?alt=media&token=a29add43-a17a-4d8b-a8be-71cb0d57c981",
+                  "https://firebasestorage.googleapis.com/v0/b/cattle-stray.appspot.com/o/dummyProfile%2Fperson.png?alt=media&token=226129bb-3586-4d1d-852c-9a8e54ba248e",
               })
               .then(() => {
                 resolve(data);

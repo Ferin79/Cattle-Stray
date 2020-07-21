@@ -1,5 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
-import { SafeAreaView, View, FlatList } from "react-native";
+import {
+  SafeAreaView,
+  View,
+  FlatList,
+  Alert,
+  Text,
+  Dimensions,
+} from "react-native";
 import { Surface, Title } from "react-native-paper";
 import * as geofirestore from "geofirestore";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -11,40 +18,70 @@ import useTheme from "../hooks/useTheme";
 import { handleVote } from "../actions/VoteActions";
 
 const Feed = ({ navigation }) => {
-  const { ReportState } = useContext(GlobalContext);
+  const { ReportState, Radius } = useContext(GlobalContext);
 
   const themeStyle = useTheme();
 
   const [isLoading, setIsLoading] = useState(true);
-  const [radiusInKM, setRadiusInKM] = useState(1);
   const [feedData, setFeedData] = useState([]);
 
   const fetchFeedData = () => {
-    setIsLoading(true);
-    var firebaseRef = firebase.firestore();
-    const GeoFirestore = geofirestore.initializeApp(firebaseRef);
-    const geocollection = GeoFirestore.collection("reports");
+    try {
+      setIsLoading(true);
+      let users = [];
 
-    // Create a GeoQuery based on a location
-    const query = geocollection.near({
-      center: new firebase.firestore.GeoPoint(
-        ReportState.userCoords.latitude,
-        ReportState.userCoords.longitude
-      ),
-      radius: radiusInKM,
-    });
+      var firebaseRef = firebase.firestore();
+      const GeoFirestore = geofirestore.initializeApp(firebaseRef);
+      const geocollection = GeoFirestore.collection("reports");
 
-    // Get query (as Promise)
-    query.onSnapshot((value) => {
-      const data = [];
-      value.docs.forEach((doc) => {
-        if (!doc.data().isClosed) {
-          data.push({ ...doc.data(), id: doc.id });
-        }
-      });
-      setFeedData([...data]);
-      setIsLoading(false);
-    });
+      firebase
+        .firestore()
+        .collection("users")
+        .get()
+        .then((docs) => {
+          docs.forEach((doc) => {
+            users.push({ ...doc.data() });
+          });
+        })
+        .then(() => {
+          const query = geocollection.near({
+            center: new firebase.firestore.GeoPoint(
+              ReportState.userCoords.latitude,
+              ReportState.userCoords.longitude
+            ),
+            radius: Number(Radius),
+          });
+
+          query.onSnapshot((value) => {
+            const data = [];
+            value.docs.forEach((doc) => {
+              if (!doc.data().isRejected) {
+                users.forEach((item) => {
+                  if (doc.data().uid === item.uid) {
+                    data.push({
+                      ...doc.data(),
+                      id: doc.id,
+                      displayName: `${item.firstname} ${item.lastname}`,
+                      points: item.points,
+                      photoUrl: item.photoUrl,
+                    });
+                  }
+                });
+              }
+            });
+            setFeedData([...data]);
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Somthing Went Wrong", error.message);
+    }
   };
 
   useEffect(() => {
@@ -78,7 +115,7 @@ const Feed = ({ navigation }) => {
           />
           <Title style={{ color: themeStyle.textColor }}>Reports</Title>
           <MaterialCommunityIcons
-            name="dots-vertical"
+            name="menu"
             size={35}
             color={themeStyle.textColor}
             onPress={() => navigation.toggleDrawer()}
@@ -96,6 +133,21 @@ const Feed = ({ navigation }) => {
               handleVote={handleVote}
               navigation={navigation}
             />
+          )}
+          ListFooterComponent={() => <View style={{ height: 100 }} />}
+          ListEmptyComponent={() => (
+            <View
+              style={{
+                display: "flex",
+                height: Dimensions.get("window").height * 0.8,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ color: themeStyle.textColor, fontSize: 20 }}>
+                No Reports to Show
+              </Text>
+            </View>
           )}
         />
       </View>

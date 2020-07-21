@@ -1,7 +1,7 @@
+import React, { useEffect, useContext, useState, useRef } from "react";
 import _ from "lodash";
 import Constants from "expo-constants";
 import AsyncStorage from "@react-native-community/async-storage";
-import React, { useEffect, useContext, useState, useRef } from "react";
 import {
   SafeAreaView,
   View,
@@ -9,15 +9,16 @@ import {
   Text,
   YellowBox,
   Image,
+  Alert,
 } from "react-native";
 import { Searchbar, FAB, Card, Button } from "react-native-paper";
 import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 import * as Location from "expo-location";
 import BottomSheet from "react-native-bottomsheet-reanimated";
 import * as geofirestore from "geofirestore";
-import Lightbox from "react-native-lightbox";
 import * as Notifications from "expo-notifications";
 import * as Permissions from "expo-permissions";
+import Lightbox from "../hooks/useLightbox";
 import { GlobalContext } from "../state/RootReducer";
 import useTheme from "../hooks/useTheme";
 import useMapTheme from "../hooks/useMapTheme";
@@ -64,32 +65,60 @@ const Home = ({ navigation, navigator }) => {
   };
 
   const fetchReports = (location) => {
-    var firebaseRef = firebase.firestore();
-    const GeoFirestore = geofirestore.initializeApp(firebaseRef);
-    const geocollection = GeoFirestore.collection("reports");
+    try {
+      setIsLoading(true);
+      let users = [];
 
-    // Create a GeoQuery based on a location
-    const query = geocollection.near({
-      center: new firebase.firestore.GeoPoint(
-        location.coords.latitude,
-        location.coords.longitude
-      ),
-      radius: Number(Radius),
-    });
+      var firebaseRef = firebase.firestore();
+      const GeoFirestore = geofirestore.initializeApp(firebaseRef);
+      const geocollection = GeoFirestore.collection("reports");
 
-    // Get query (as Promise)
-    query.onSnapshot((value) => {
-      const data = [];
-      value.docs.forEach((doc) => {
-        if (!doc.data().isClosed) {
-          data.push(doc.data());
-        }
-      });
-      setReportData([...data]);
-      setLatitute(location.coords.latitude);
-      setLongitute(location.coords.longitude);
-      setIsLoading(false);
-    });
+      firebase
+        .firestore()
+        .collection("users")
+        .get()
+        .then((docs) => {
+          docs.forEach((doc) => {
+            users.push({ ...doc.data() });
+          });
+        })
+        .then(() => {
+          const query = geocollection.near({
+            center: new firebase.firestore.GeoPoint(
+              location.coords.latitude,
+              location.coords.longitude
+            ),
+            radius: Number(Radius),
+          });
+
+          query.onSnapshot((value) => {
+            const data = [];
+            value.docs.forEach((doc) => {
+              if (!doc.data().isRejected) {
+                users.forEach((item) => {
+                  if (doc.data().uid === item.uid) {
+                    data.push({
+                      ...doc.data(),
+                      id: doc.id,
+                      displayName: `${item.firstname} ${item.lastname}`,
+                    });
+                  }
+                });
+              }
+            });
+            setReportData([...data]);
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Somthing Went Wrong", error.message);
+    }
   };
 
   async function registerForPushNotificationsAsync() {
@@ -144,6 +173,8 @@ const Home = ({ navigation, navigator }) => {
           accuracy: location.coords.accuracy,
         },
       });
+      setLatitute(location.coords.latitude);
+      setLongitute(location.coords.longitude);
       fetchReports(location);
     } catch (error) {
       console.log(error);
@@ -259,7 +290,9 @@ const Home = ({ navigation, navigator }) => {
                 <RenderMarker
                   key={index}
                   title={item.animalType}
-                  description={item.animalCount}
+                  description={new Date(
+                    item.createdAt.toDate()
+                  ).toLocaleString()}
                   lat={item.animalMovingCoords.U}
                   long={item.animalMovingCoords.k}
                   handleOnPress={() => {
@@ -402,16 +435,33 @@ const Home = ({ navigation, navigator }) => {
 
                   <View>
                     <Card.Actions>
-                      <Button color={themeStyle.textColor} icon="arrow-up-bold">
-                        {selectedAnimal.upvotes.length}
-                      </Button>
+                      {!(
+                        selectedAnimal.uid === firebase.auth().currentUser.uid
+                      ) && (
+                        <>
+                          <Button
+                            color={themeStyle.textColor}
+                            icon="arrow-up-bold"
+                          >
+                            {selectedAnimal.upvotes.length}
+                          </Button>
+                          <Button
+                            color={themeStyle.textColor}
+                            icon="arrow-down-bold"
+                          >
+                            {selectedAnimal.downvotes.length}
+                          </Button>
+                        </>
+                      )}
                       <Button
                         color={themeStyle.textColor}
-                        icon="arrow-down-bold"
+                        icon="comment"
+                        onPress={() => {
+                          navigation.navigate("CommentStack", {
+                            docId: selectedAnimal.id,
+                          });
+                        }}
                       >
-                        {selectedAnimal.downvotes.length}
-                      </Button>
-                      <Button color={themeStyle.textColor} icon="comment">
                         {selectedAnimal.comments.length}
                       </Button>
                     </Card.Actions>
@@ -419,7 +469,7 @@ const Home = ({ navigation, navigator }) => {
 
                   <View>
                     <Text style={{ color: themeStyle.textSecondaryColor }}>
-                      Added by: {selectedAnimal.email}
+                      Added by: {selectedAnimal.displayName}
                     </Text>
                   </View>
                 </View>

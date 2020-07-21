@@ -40,6 +40,7 @@ const SignIn = () => {
     setLastname("");
     setPassword("");
     setPasswordAgain("");
+    setErrorText("");
     Animated.sequence([
       Animated.timing(SignInSlide, {
         toValue: -1000,
@@ -59,6 +60,7 @@ const SignIn = () => {
     setLastname("");
     setPassword("");
     setPasswordAgain("");
+    setErrorText("");
     Animated.sequence([
       Animated.timing(SignUpSlide, {
         toValue: 1000,

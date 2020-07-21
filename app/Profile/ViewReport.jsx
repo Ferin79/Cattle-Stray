@@ -6,13 +6,118 @@ import {
   Subheading,
   Button,
   ActivityIndicator,
+  Title,
 } from "react-native-paper";
+import Lightbox from "../hooks/useLightbox";
 import firebase from "../hooks/useFirebase";
+import { View } from "react-native";
 
-const ViewReport = ({ item, themeStyle, handleVote, navigation }) => {
-  const LeftContent = (props) => (
-    <Avatar.Icon {...props} icon="information-outline" />
+const ViewReport = ({
+  item,
+  themeStyle,
+  handleVote,
+  navigation,
+  navigator,
+}) => {
+  const LeftContent = () => (
+    <Avatar.Image size={50} source={{ uri: item.photoUrl }} />
   );
+
+  const RightContent = () => {
+    if (item.isResolved) {
+      return (
+        <View
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            marginRight: 10,
+          }}
+        >
+          <Avatar.Icon
+            size={30}
+            color="#fff"
+            style={{ backgroundColor: "#0AF" }}
+            icon="check-all"
+          />
+          <Paragraph
+            style={{ fontSize: 12, color: themeStyle.textSecondaryColor }}
+          >
+            Resolved
+          </Paragraph>
+        </View>
+      );
+    } else if (item.isRejected) {
+      return (
+        <View
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            marginRight: 10,
+          }}
+        >
+          <Avatar.Icon
+            size={30}
+            color="#fff"
+            style={{ backgroundColor: "red" }}
+            icon="account-remove"
+          />
+          <Paragraph
+            style={{ fontSize: 12, color: themeStyle.textSecondaryColor }}
+          >
+            Rejected
+          </Paragraph>
+        </View>
+      );
+    } else if (item.isUnderProcess) {
+      return (
+        <View
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            marginRight: 10,
+          }}
+        >
+          <Avatar.Icon
+            size={30}
+            color="#fff"
+            style={{ backgroundColor: "green" }}
+            icon="all-inclusive"
+          />
+          <Paragraph
+            style={{ fontSize: 12, color: themeStyle.textSecondaryColor }}
+          >
+            Processing
+          </Paragraph>
+        </View>
+      );
+    } else {
+      return (
+        <View
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            marginRight: 10,
+          }}
+        >
+          <Avatar.Icon
+            size={30}
+            color="#fff"
+            style={{ backgroundColor: "gold" }}
+            icon="check"
+          />
+          <Paragraph
+            style={{ fontSize: 12, color: themeStyle.textSecondaryColor }}
+          >
+            Submiitted
+          </Paragraph>
+        </View>
+      );
+    }
+  };
 
   const [isUpvoted, setIsUpvoted] = useState(false);
   const [isDownVoted, setIsDownVoted] = useState(false);
@@ -51,19 +156,30 @@ const ViewReport = ({ item, themeStyle, handleVote, navigation }) => {
       }}
     >
       <Card.Title
-        title={item.animalType}
-        subtitle={`Count: ${item.animalCount}`}
-        left={LeftContent}
+        title={item.displayName}
+        subtitle={`Points: ${item.points}`}
+        left={() => <LeftContent />}
         titleStyle={{
           color: themeStyle.textColor,
           textTransform: "capitalize",
         }}
+        right={() => <RightContent />}
         subtitleStyle={{
           color: themeStyle.textSecondaryColor,
           textTransform: "capitalize",
         }}
       />
       <Card.Content>
+        <Title
+          style={{ color: themeStyle.textColor, textTransform: "capitalize" }}
+        >
+          {item.animalType}
+        </Title>
+        <Paragraph
+          style={{ color: themeStyle.textColor, textTransform: "capitalize" }}
+        >
+          Count: {item.animalCount}
+        </Paragraph>
         <Subheading
           style={{ color: themeStyle.textColor, textTransform: "capitalize" }}
         >
@@ -72,46 +188,58 @@ const ViewReport = ({ item, themeStyle, handleVote, navigation }) => {
         <Paragraph style={{ color: themeStyle.textColor }}>
           Description: {item.description}
         </Paragraph>
+        <Paragraph
+          style={{ color: themeStyle.textSecondaryColor, fontSize: 12 }}
+        >
+          Last Seen: {new Date(item.createdAt.toDate()).toLocaleString()}
+        </Paragraph>
       </Card.Content>
 
-      <Card.Cover source={{ uri: item.animalImageUrl }} />
+      <Lightbox navigator={navigator}>
+        <Card.Cover source={{ uri: item.animalImageUrl }} />
+      </Lightbox>
       <Card.Actions>
-        {upvoteLoading ? (
-          <ActivityIndicator size="small" />
-        ) : (
-          <Button
-            onPress={() => {
-              setUpvoteLoading(true);
-              handleVote(
-                item.id,
-                firebase.auth().currentUser.uid,
-                "upvote"
-              ).finally(() => setUpvoteLoading(false));
-            }}
-            color={isUpvoted ? "#0AF" : themeStyle.textColor}
-            icon="arrow-up-bold"
-          >
-            {item.upvotes.length}
-          </Button>
+        {!(item.uid === firebase.auth().currentUser.uid) && (
+          <>
+            {upvoteLoading ? (
+              <ActivityIndicator size="small" />
+            ) : (
+              <Button
+                onPress={() => {
+                  setUpvoteLoading(true);
+                  handleVote(
+                    item.id,
+                    firebase.auth().currentUser.uid,
+                    "upvote"
+                  ).finally(() => setUpvoteLoading(false));
+                }}
+                color={isUpvoted ? "#0AF" : themeStyle.textColor}
+                icon="arrow-up-bold"
+              >
+                {item.upvotes.length}
+              </Button>
+            )}
+            {downvoteLoading ? (
+              <ActivityIndicator size="small" />
+            ) : (
+              <Button
+                onPress={() => {
+                  setDownvoteLoading(true);
+                  handleVote(
+                    item.id,
+                    firebase.auth().currentUser.uid,
+                    "downvote"
+                  ).finally(() => setDownvoteLoading(false));
+                }}
+                color={isDownVoted ? "red" : themeStyle.textColor}
+                icon="arrow-down-bold"
+              >
+                {item.downvotes.length}
+              </Button>
+            )}
+          </>
         )}
-        {downvoteLoading ? (
-          <ActivityIndicator size="small" />
-        ) : (
-          <Button
-            onPress={() => {
-              setDownvoteLoading(true);
-              handleVote(
-                item.id,
-                firebase.auth().currentUser.uid,
-                "downvote"
-              ).finally(() => setDownvoteLoading(false));
-            }}
-            color={isDownVoted ? "red" : themeStyle.textColor}
-            icon="arrow-down-bold"
-          >
-            {item.downvotes.length}
-          </Button>
-        )}
+
         <Button
           onPress={() => {
             navigation.navigate("CommentStack", { docId: item.id });
@@ -122,6 +250,15 @@ const ViewReport = ({ item, themeStyle, handleVote, navigation }) => {
           {item.comments.length}
         </Button>
       </Card.Actions>
+      <Paragraph
+        style={{
+          fontSize: 12,
+          color: themeStyle.textSecondaryColor,
+          marginLeft: 20,
+        }}
+      >
+        Report ID: {item.id}
+      </Paragraph>
     </Card>
   );
 };
