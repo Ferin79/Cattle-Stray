@@ -96,12 +96,14 @@ const Home = ({ navigation, navigator }) => {
             value.docs.forEach((doc) => {
               if (!doc.data().isRejected) {
                 users.forEach((item) => {
-                  if (doc.data().uid === item.uid) {
-                    data.push({
-                      ...doc.data(),
-                      id: doc.id,
-                      displayName: `${item.firstname} ${item.lastname}`,
-                    });
+                  if (!doc.data().isRejected && !doc.data().isResolved) {
+                    if (doc.data().uid === item.uid) {
+                      data.push({
+                        ...doc.data(),
+                        id: doc.id,
+                        displayName: `${item.firstname} ${item.lastname}`,
+                      });
+                    }
                   }
                 });
               }
