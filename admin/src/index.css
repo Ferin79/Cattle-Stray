@@ -42,3 +42,6 @@ code {
   border-color: grey;
   border-radius: 10px;
 }
+.addHoverEffect {
+  cursor: pointer;
+}
