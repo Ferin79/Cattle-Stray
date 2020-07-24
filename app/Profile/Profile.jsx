@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import {
   SafeAreaView,
   View,
@@ -16,6 +16,7 @@ import {
   MaterialIcons,
 } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-community/async-storage";
+import DialogInput from "react-native-dialog-input";
 import { GlobalContext } from "../state/RootReducer";
 import useTheme from "../hooks/useTheme";
 import firebase from "../hooks/useFirebase";
@@ -27,6 +28,7 @@ const Profile = ({ navigation }) => {
   const themeStyle = useTheme();
 
   const { Radius, setRadius } = useContext(GlobalContext);
+  const [isDialogVisible, setIsDialogVisible] = useState(false);
 
   const handleSetRadius = () => {
     Alert.prompt("Set Radius", `Current Radius is ${Radius} km`, [
@@ -171,7 +173,7 @@ const Profile = ({ navigation }) => {
 
               <TouchableOpacity
                 onPress={() => {
-                  handleSetRadius();
+                  setIsDialogVisible(true);
                 }}
               >
                 <View
@@ -283,6 +285,26 @@ const Profile = ({ navigation }) => {
             </View>
           </Surface>
         </View>
+
+        <DialogInput
+          isDialogVisible={isDialogVisible}
+          title={"Edit Radius"}
+          message={`Default Radius is 1 km. Current Radius is ${Radius} Km`}
+          hintInput={"Radius in KM"}
+          textInputProps={{
+            keyboardType: "numeric",
+          }}
+          submitInput={async (inputText) => {
+            try {
+              await AsyncStorage.setItem("@radius", inputText);
+              setRadius(inputText);
+              setIsDialogVisible(false);
+            } catch (e) {
+              console.log(e);
+            }
+          }}
+          closeDialog={() => setIsDialogVisible(false)}
+        ></DialogInput>
       </ScrollView>
     </SafeAreaView>
   );
