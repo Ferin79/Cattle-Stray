@@ -45,3 +45,10 @@ code {
 .addHoverEffect {
   cursor: pointer;
 }
+
+.upvotes {
+  color: green;
+}
+.downvotes{
+  color: red;
+}

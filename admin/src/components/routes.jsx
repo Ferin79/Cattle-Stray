@@ -26,7 +26,7 @@ const Routes = () => {
         />
         <Route path="/admin/reports" component={adminReports} />
         <Route path="/admin/report/:reportId" component={adminReportDetails} />
-        <Redirect to="/admin/dashboard" />
+        <Redirect to="/admin/reports" />
       </Switch>
     );
   } else if (currentUser) {
