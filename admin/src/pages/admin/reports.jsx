@@ -262,7 +262,7 @@ export default function Reports() {
                       injuredStyle = { color: "red" };
                     }
                     return (
-                      <tr>
+                      <tr key={index}>
                         <td>{++index}</td>
                         <td>
                           <Image

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { compose, withProps } from "recompose";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
@@ -6,12 +6,15 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Image from "react-bootstrap/Image";
 import Card from "react-bootstrap/Card";
+import Form from "react-bootstrap/Form";
+import Spinner from "react-bootstrap/Spinner";
 import {
   withScriptjs,
   withGoogleMap,
   GoogleMap,
   Marker,
 } from "react-google-maps";
+import { animateScroll } from "react-scroll";
 import firebase from "../../data/firebase";
 
 const options = {
@@ -54,12 +57,16 @@ const MyMapComponent = compose(
 ));
 
 export default function ReportDetails({ match }) {
-  const [report, setReport] = useState({});
+  const [report, setReport] = useState([]);
   const [coordinates, setCoordinates] = useState({
     lat: 21.17024,
     lng: 72.831062,
   });
   const [isMarkerShown, setIsMarkerShown] = useState(false);
+  const [message, setMessage] = useState("");
+  const [isMessageSending, setIsMessageSending] = useState(false);
+
+  const commentBoxRef = useRef();
 
   const sendNotification = async (token, title, description) => {
     try {
@@ -164,6 +171,9 @@ export default function ReportDetails({ match }) {
         setReport({ ...doc.data(), id: doc.id });
         setCoordinates({ lat, lng });
         showMarker();
+        animateScroll.scrollToBottom({
+          containerId: "commentBox",
+        });
       });
   }, [match.params.reportId]);
 
@@ -184,8 +194,11 @@ export default function ReportDetails({ match }) {
     description,
     upvotes,
     downvotes,
-    image;
+    image,
+    comments = [];
+
   let injuredStyle = {};
+
   if (report.uid) {
     image = report.animalImageUrl;
     animalType = report.animalType;
@@ -195,6 +208,7 @@ export default function ReportDetails({ match }) {
     description = report.description;
     upvotes = report.upvotes.length;
     downvotes = report.downvotes.length;
+    comments = report.comments;
     if (
       animalCondition === "injured" ||
       animalCondition === "death" ||
@@ -242,53 +256,148 @@ export default function ReportDetails({ match }) {
     </Button>
   );
   return (
-    <Container className="mt-5 mb-5">
-      <Card>
-        <Card.Header as="h2">Report Details</Card.Header>
-        <Card.Body>
-          <Container>
-            <Row>
-              <Col>
+    <Container fluid>
+      <Row className="mt-5 mb-5">
+        <Col sm="12" md="12" lg="8" xl="8">
+          <Card>
+            <Card.Header as="h2">Report Details</Card.Header>
+            <Card.Body>
+              <div className="d-flex justify-content-between align-items-center">
                 <p>
                   Report date :{" "}
                   {report.createdAt
                     ? report.createdAt.toDate().toLocaleString()
                     : ""}
                 </p>
-              </Col>
-              <Col md="auto">
-                {Button_processRequest}
-                {Button_resolvedRequest}
-                {Button_rejectRequest}
-              </Col>
-            </Row>
+                <div md="auto">
+                  {Button_processRequest}
+                  {Button_resolvedRequest}
+                  {Button_rejectRequest}
+                </div>
+              </div>
 
-            <h5> Animal : {animalType}</h5>
-            <h5 style={injuredStyle}> Condition : {animalCondition}</h5>
+              <h5> Animal : {animalType}</h5>
+              <h5 style={injuredStyle}> Condition : {animalCondition}</h5>
 
-            <h4 className="mt-5">Report Location</h4>
-            <MyMapComponent
-              isMarkerShown={isMarkerShown}
-              onMarkerClick={handleMarkerClick}
-              markerCoords={coordinates}
-            />
-            <Row xs={2} md={4} lg={9} className="mt-3 mb-3">
-              <Col>
-                <h6 className="upvotes"> Upvotes : {upvotes}</h6>
-              </Col>
-              <Col>
-                <h6 className="downvotes"> Downvotes : {downvotes}</h6>
-              </Col>
-            </Row>
-            <h5> Approx number of animals : {animalCount}</h5>
-            <h5> Status : {animalIsMoving}</h5>
-            {description && <h5> Description : {description}</h5>}
-            <a href={image}>
-              <Image src={image} height={500} width={500} className="mt-3" />
-            </a>
-          </Container>
-        </Card.Body>
-      </Card>
+              <h4 className="mt-5">Report Location</h4>
+              <MyMapComponent
+                isMarkerShown={isMarkerShown}
+                onMarkerClick={handleMarkerClick}
+                markerCoords={coordinates}
+              />
+              <Row xs={2} md={4} lg={9} className="mt-3 mb-3">
+                <Col>
+                  <h6 className="upvotes"> Upvotes : {upvotes}</h6>
+                </Col>
+                <Col>
+                  <h6 className="downvotes"> Downvotes : {downvotes}</h6>
+                </Col>
+              </Row>
+              <h5> Approx number of animals : {animalCount}</h5>
+              <h5> Status : {animalIsMoving}</h5>
+              {description && <h5> Description : {description}</h5>}
+              <a href={image}>
+                <Image src={image} height={500} width={500} className="mt-3" />
+              </a>
+            </Card.Body>
+          </Card>
+        </Col>
+
+        <Col sm="12" md="12" lg="4" xl="4">
+          <Card>
+            <div
+              ref={commentBoxRef}
+              id="commentBox"
+              style={{
+                maxHeight: 500,
+                overflowY: "scroll",
+              }}
+            >
+              {comments.length > 0 &&
+                comments.map((comment, index) => {
+                  return (
+                    <div
+                      className="d-flex border-bottom p-3 align-items-center"
+                      key={index}
+                    >
+                      <Image
+                        height={50}
+                        width={50}
+                        src={comment.photoUrl}
+                        roundedCircle
+                      />
+                      <div className="ml-5">
+                        <h6>{comment.message}</h6>
+                        <p>{comment.createdAt.toDate().toLocaleString()}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          </Card>
+          <Form className="d-flex justify-content-between align-items-center">
+            <Form.Group controlId="formBasicEmail">
+              <Form.Label>Message</Form.Label>
+              <Form.Control
+                type="test"
+                placeholder="Type Message"
+                value={message}
+                onChange={(event) => setMessage(event.target.value)}
+              />
+            </Form.Group>
+            {isMessageSending ? (
+              <Spinner animation="border" variant="primary" />
+            ) : (
+              <Button
+                variant="primary"
+                type="submit"
+                onClick={(event) => {
+                  event.preventDefault();
+                  if (message.trim() === "") {
+                    alert("Message cannot be empty");
+                    return;
+                  }
+                  setIsMessageSending(true);
+                  firebase
+                    .firestore()
+                    .doc(`/reports/${report.id}`)
+                    .get()
+                    .then((doc) => {
+                      const comments = doc.data().comments;
+                      comments.push({
+                        userId: firebase.auth().currentUser.uid,
+                        message: message,
+                        createdAt: firebase.firestore.Timestamp.now(),
+                        photoUrl: firebase.auth().currentUser.photoURL,
+                      });
+                      firebase
+                        .firestore()
+                        .doc(`/reports/${report.id}`)
+                        .update({
+                          comments: comments,
+                        })
+                        .then(() => {
+                          animateScroll.scrollToBottom({
+                            containerId: "commentBox",
+                          });
+                          setMessage("");
+                        });
+                    })
+                    .catch((error) => {
+                      console.log()(error.message);
+                      alert("Adding Comment Failed");
+                    })
+                    .finally(() => {
+                      setIsMessageSending(false);
+                    });
+                }}
+              >
+                Send
+              </Button>
+            )}
+          </Form>
+        </Col>
+      </Row>
     </Container>
   );
 }
