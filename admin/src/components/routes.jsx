@@ -8,6 +8,7 @@ import adminReports from "../pages/admin/reports";
 import report from "../pages/report";
 import profile from "../pages/profile";
 import adminReportDetails from "../pages/admin/reportDetails";
+import manageOrganization from "../pages/admin/manageOrganization";
 import { AuthContext } from "../data/auth";
 import { Context } from "../data/context";
 import ViewReportByLocation from "../pages/admin/ViewReportByLocation";
@@ -26,16 +27,16 @@ const Routes = () => {
         />
         <Route path="/admin/reports" component={adminReports} />
         <Route path="/admin/report/:reportId" component={adminReportDetails} />
+        <Route path="/admin/organization" component={manageOrganization} />
         <Redirect to="/admin/reports" />
       </Switch>
     );
-  } else if (currentUser) {
+  } else if (currentUser && role === "organization") {
     return (
       <Switch>
-        <Route path="/dashboard" component={dashboard} />
-        <Route path="/report" component={report} />
+        <Route path="/dashboard" component={dashboard} />        
         <Route path="/profile" component={profile} />
-        <Redirect to="/report" />
+        <Redirect to="/dashboard" />
       </Switch>
     );
   } else {

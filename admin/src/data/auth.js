@@ -13,6 +13,7 @@ export function AuthProvider({ children }) {
     setIsLoading(true);
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
+        console.log(user.uid);
         firebase
           .firestore()
           .doc(`users/${user.uid}`)

@@ -1,4 +1,5 @@
-const firebase = require("firebase-admin");
+const firebase = require("firebase");
+const firebase_admin = require("firebase-admin");
 const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors")({ origin: true });
@@ -14,6 +15,7 @@ var firebaseConfig = {
   measurementId: "G-9NQ6FMZYQ7"
 };
 // Initialize Firebase
+firebase_admin.initializeApp(firebaseConfig);
 firebase.initializeApp(firebaseConfig);
 
 const app = express();
@@ -53,6 +55,41 @@ exports.expressGetReports = (request, response) => {
   });  
 };
 
+// Express fun - Add Organization
+exports.addOrganization = (request, response) => {  
+
+  const { email, password, name, type } = request.body;
+  const role = "organization";
+
+  firebase.auth()
+    .createUserWithEmailAndPassword(email, password)
+    .then((data) => {
+      const uid = data.user.uid
+      const createdAt = firebase.firestore.Timestamp.now()
+      return firebase.firestore().collection("users").add({
+        name,
+        email,
+        type,
+        uid,
+        role,
+        createdAt
+      })
+    })
+    .then(() => {
+      return response.status(200).json({
+        success: true,        
+      });
+    })
+    .catch((error) => {
+      console.log(error);
+      response.status(500).json({
+        success: false,
+        error: error.message,
+      });
+    });
+};
+
+app.post("/addOrganization", this.addOrganization);
 app.get("/getReports", this.expressGetReports);
 
 exports.api = functions.https.onRequest(app);
