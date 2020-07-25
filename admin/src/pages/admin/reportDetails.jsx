@@ -5,9 +5,6 @@ import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Image from "react-bootstrap/Image";
-import Table from "react-bootstrap/Table";
-import Tabs from "react-bootstrap/Tabs";
-import Tab from "react-bootstrap/Tab";
 import Card from "react-bootstrap/Card";
 import {
   withScriptjs,
@@ -15,7 +12,6 @@ import {
   GoogleMap,
   Marker,
 } from "react-google-maps";
-import { MarkerWithLabel } from "react-google-maps/lib/components/addons/MarkerWithLabel";
 import firebase from "../../data/firebase";
 
 const options = {
@@ -58,14 +54,12 @@ const MyMapComponent = compose(
 ));
 
 export default function ReportDetails({ match }) {
-
   const [report, setReport] = useState({});
   const [coordinates, setCoordinates] = useState({
     lat: 21.17024,
     lng: 72.831062,
   });
   const [isMarkerShown, setIsMarkerShown] = useState(false);
-
 
   const sendNotification = async (token, title, description) => {
     try {
@@ -159,21 +153,20 @@ export default function ReportDetails({ match }) {
     }
   };
 
-
-
   useEffect(() => {
-    getReport();
-    console.log(match.params.reportId);
-  }, [setReport, setCoordinates]);
-  const getReport = () => {
-    firebase.firestore().collection("reports").doc(match.params.reportId).onSnapshot((doc) => {
-      const lat = doc.data().coordinates.latitude;
-      const lng = doc.data().coordinates.longitude;
-      setReport({ ...doc.data(), id: doc.id });
-      setCoordinates({ lat, lng })
-      showMarker();
-    })
-  };
+    firebase
+      .firestore()
+      .collection("reports")
+      .doc(match.params.reportId)
+      .onSnapshot((doc) => {
+        const lat = doc.data().coordinates.latitude;
+        const lng = doc.data().coordinates.longitude;
+        setReport({ ...doc.data(), id: doc.id });
+        setCoordinates({ lat, lng });
+        showMarker();
+      });
+  }, [match.params.reportId]);
+
   const handleMarkerClick = () => {
     setIsMarkerShown(false);
     showMarker();
@@ -184,17 +177,24 @@ export default function ReportDetails({ match }) {
     }, 500);
   };
 
-  let animalType, animalIsMoving, animalCondition, animalCount, description, upvotes, downvotes, image
+  let animalType,
+    animalIsMoving,
+    animalCondition,
+    animalCount,
+    description,
+    upvotes,
+    downvotes,
+    image;
   let injuredStyle = {};
   if (report.uid) {
-    image = report.animalImageUrl
-    animalType = report.animalType
-    animalCondition = report.animalCondition
-    animalCount = report.animalCount
-    animalIsMoving = report.animalIsMoving ? "Moving" : "Stable"
-    description = report.description
-    upvotes = report.upvotes.length
-    downvotes = report.downvotes.length
+    image = report.animalImageUrl;
+    animalType = report.animalType;
+    animalCondition = report.animalCondition;
+    animalCount = report.animalCount;
+    animalIsMoving = report.animalIsMoving ? "Moving" : "Stable";
+    description = report.description;
+    upvotes = report.upvotes.length;
+    downvotes = report.downvotes.length;
     if (
       animalCondition === "injured" ||
       animalCondition === "death" ||
@@ -209,80 +209,90 @@ export default function ReportDetails({ match }) {
     <Button
       variant="outline-success"
       disabled={report.isUnderProcess ? true : false}
-      onClick={() => { handleReportReject(report.uid, "underProcess", report.id) }}
+      onClick={() => {
+        handleReportReject(report.uid, "underProcess", report.id);
+      }}
       style={buttonStyles}
     >
       Process Request
     </Button>
-  )
+  );
 
-  let Button_rejectRequest =
+  let Button_rejectRequest = (
     <Button
       variant="outline-danger"
-      onClick={() => { handleReportReject(report.uid, "rejected", report.id) }}
+      onClick={() => {
+        handleReportReject(report.uid, "rejected", report.id);
+      }}
       style={buttonStyles}
     >
       Reject
     </Button>
+  );
 
-  let Button_resolvedRequest =
+  let Button_resolvedRequest = (
     <Button
       variant="outline-info"
-      onClick={() => { handleReportReject(report.uid, "resolved", report.id) }}
+      onClick={() => {
+        handleReportReject(report.uid, "resolved", report.id);
+      }}
       style={buttonStyles}
     >
-      Resolved
+      Resolve
     </Button>
+  );
   return (
-    <>
+    <Container className="mt-5 mb-5">
+      <Card>
+        <Card.Header as="h2">Report Details</Card.Header>
+        <Card.Body>
+          <Container>
+            <Row>
+              <Col>
+                <p>
+                  Report date :{" "}
+                  {report.createdAt
+                    ? report.createdAt.toDate().toLocaleString()
+                    : ""}
+                </p>
+              </Col>
+              <Col md="auto">
+                {Button_processRequest}
+                {Button_resolvedRequest}
+                {Button_rejectRequest}
+              </Col>
+            </Row>
 
-      <Container>
+            <h5> Animal : {animalType}</h5>
+            <h5 style={injuredStyle}> Condition : {animalCondition}</h5>
 
-        <Card>
-          <Card.Header as="h2">Report Details</Card.Header>
-          <Card.Body>
-
-            <Container>
-              <Row>
-                <Col><h4> Report date : {report.createdAt ? report.createdAt.toDate().toLocaleString() : ""}</h4></Col>
-                <Col md="auto">
-                  {Button_processRequest}
-                  {Button_resolvedRequest}
-                  {Button_rejectRequest}
-                </Col>
-              </Row>
-
-              <h4 style={injuredStyle}> Condition : {animalCondition}</h4>
-              <h4> Animal : {animalType}</h4>
-
-              <h2>Report Location</h2>
-              <MyMapComponent
-                isMarkerShown={isMarkerShown}
-                onMarkerClick={handleMarkerClick}
-                markerCoords={coordinates}
-              />
-              <Row xs={2} md={4} lg={9}>
-                <Col><h4 className="upvotes"> Upvotes : {upvotes}</h4></Col>
-                <Col><h4 className="downvotes"> Downvotes : {downvotes}</h4></Col>
-              </Row>
-              <h4> Approx number of animals : {animalCount}</h4>
-              <h4> Status : {animalIsMoving}</h4>
-              <h4> Description : {description}</h4>
-              <h4>Image : </h4>
-              <Image src={image} height={600} />
-            </Container>
-
-          </Card.Body>
-        </Card>
-
-
-
-      </Container>
-
-    </>
+            <h4 className="mt-5">Report Location</h4>
+            <MyMapComponent
+              isMarkerShown={isMarkerShown}
+              onMarkerClick={handleMarkerClick}
+              markerCoords={coordinates}
+            />
+            <Row xs={2} md={4} lg={9} className="mt-3 mb-3">
+              <Col>
+                <h6 className="upvotes"> Upvotes : {upvotes}</h6>
+              </Col>
+              <Col>
+                <h6 className="downvotes"> Downvotes : {downvotes}</h6>
+              </Col>
+            </Row>
+            <h5> Approx number of animals : {animalCount}</h5>
+            <h5> Status : {animalIsMoving}</h5>
+            {description && <h5> Description : {description}</h5>}
+            <a href={image}>
+              <Image src={image} height={500} width={500} className="mt-3" />
+            </a>
+          </Container>
+        </Card.Body>
+      </Card>
+    </Container>
   );
 }
 
 const buttonStyles = {
-  marginLeft: 8
-}
+  marginLeft: 8,
+};

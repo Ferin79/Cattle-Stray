@@ -14,9 +14,14 @@ import {
   Circle,
   TrafficLayer,
 } from "react-google-maps";
+import Autocomplete from "react-google-autocomplete";
+import Geocode from "react-geocode";
 import { Context } from "../../data/context";
 import * as geofirestore from "geofirestore";
 import firebase from "../../data/firebase";
+
+Geocode.setApiKey("AIzaSyCQhpaJ_cJAxcimwxdRbM6P6cjlfxDHwLw");
+Geocode.enableDebug();
 
 const ViewReportByLocation = () => {
   const { role } = useContext(Context);
@@ -77,19 +82,19 @@ const ViewReportByLocation = () => {
       googleMapURL:
         "https://maps.googleapis.com/maps/api/js?key=AIzaSyDgxTYG7n4gf5qpLdeA_pC_RcTQAc7wdWk&v=3.exp&libraries=geometry,drawing,places",
       loadingElement: <div style={{ height: `100%` }} />,
-      containerElement: <div style={{ height: `800px` }} />,
+      containerElement: <div style={{ height: `700px` }} />,
       mapElement: <div style={{ height: `100%` }} />,
     }),
     withScriptjs,
     withGoogleMap
   )((props) => (
-    <>
+    <div style={{ position: "relative" }}>
       <GoogleMap
         defaultCenter={{ lat: -34.397, lng: 150.644 }}
         center={onTapCoordinates ? onTapCoordinates : coordinates}
         zoom={15}
         options={{
-          disableDefaultUI: true,
+          disableDefaultUI: false,
           zoomControl: true,
         }}
         onClick={(event) => {
@@ -100,6 +105,27 @@ const ViewReportByLocation = () => {
           fetchReports(event.latLng.lat(), event.latLng.lng(), radius);
         }}
       >
+        <Autocomplete
+          style={{
+            width: "20%",
+            height: "50px",
+            marginTop: "10px",
+          }}
+          onPlaceSelected={(place) => {
+            if (place.geometry.location.lat()) {
+              setOnTapCoordinates({
+                lat: place.geometry.location.lat(),
+                lng: place.geometry.location.lng(),
+              });
+              fetchReports(
+                place.geometry.location.lat(),
+                place.geometry.location.lng(),
+                radius
+              );
+            }
+          }}
+          types={["(regions)"]}
+        />
         {onTapCoordinates && (
           <Marker
             position={onTapCoordinates}
@@ -151,7 +177,7 @@ const ViewReportByLocation = () => {
 
         <TrafficLayer autoUpdate />
       </GoogleMap>
-    </>
+    </div>
   ));
 
   if (role !== "admin") {
@@ -161,6 +187,7 @@ const ViewReportByLocation = () => {
       </div>
     );
   }
+
   return (
     <Container fluid>
       <Row className="mt-5">
@@ -176,7 +203,14 @@ const ViewReportByLocation = () => {
           >
             <h5>Tap on map to see Reports</h5>
 
-            <Form>
+            <Form
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
               <Form.Group controlId="formBasicEmail">
                 <Form.Label>Radius</Form.Label>
                 <Form.Control
@@ -205,7 +239,7 @@ const ViewReportByLocation = () => {
 
       <Row className="mt-5 mb-5">
         <Col>
-          {reports.length && (
+          {reports.length > 0 && (
             <Card style={{ width: "18rem" }}>
               <Card.Header></Card.Header>
               <Card.Body>

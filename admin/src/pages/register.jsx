@@ -49,9 +49,17 @@ export default function Register() {
         firebase.firestore().collection("users").doc(id).set({
           role: "user",
           email,
-          firstname: "",
-          lastname: "",
+          firstname: firstName,
+          lastname: lastName,
+          photoUrl:
+            "https://firebasestorage.googleapis.com/v0/b/cattle-stray.appspot.com/o/dummyProfile%2Fperson.png?alt=media&token=226129bb-3586-4d1d-852c-9a8e54ba248e",
           createdAt: firebase.firestore.Timestamp.now(),
+        });
+
+        firebase.auth().currentUser.updateProfile({
+          displayName: `${firstName} ${lastName}`,
+          photoURL:
+            "https://firebasestorage.googleapis.com/v0/b/cattle-stray.appspot.com/o/dummyProfile%2Fperson.png?alt=media&token=226129bb-3586-4d1d-852c-9a8e54ba248e",
         });
       })
       .catch((error) => {

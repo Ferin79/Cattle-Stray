@@ -365,8 +365,8 @@ export default function Reports() {
               <Card.Img
                 variant="top"
                 src={selectedItem.animalImageUrl}
-                height={200}
-                width={200}
+                height={250}
+                width={250}
               />
               <Card.Body>
                 <Card.Title style={{ textTransform: "capitalize" }}>
@@ -387,7 +387,7 @@ export default function Reports() {
                     <Row style={{ margin: 4 }}>
                       <Button variant="outline-info">
                         <NavLink to={`/admin/report/${selectedItem.id}`}>
-                          View
+                          View More
                         </NavLink>
                       </Button>
                     </Row>

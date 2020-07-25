@@ -67,6 +67,20 @@ const Dashboard = () => {
             <Image src={require("../../images/company.png")} rounded />
             <h5>Edit Organization</h5>
           </Col>
+
+          <Col
+            onClick={() => history.push("/profile")}
+            className="addHoverEffect"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Image src={require("../../images/admin.png")} rounded />
+            <h5>Edit Profile</h5>
+          </Col>
         </Col>
       </Row>
     </Container>
