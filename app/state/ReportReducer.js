@@ -2,6 +2,7 @@ import { useReducer } from "react";
 
 const ReportReducer = () => {
   const initialState = {
+    reportType: "general",
     userCoords: {
       latitude: "",
       longitude: "",
@@ -15,6 +16,7 @@ const ReportReducer = () => {
       latitude: "",
       longitude: "",
     },
+    animalGI: "",
   };
   const reducer = (state, action) => {
     switch (action.type) {
@@ -26,6 +28,10 @@ const ReportReducer = () => {
             longitude: action.payload.longitude,
           },
         };
+
+      case "SET_REPORT_TYPE":
+        return { ...state, reportType: action.payload };
+
       case "SET_TYPE":
         return { ...state, animalType: action.payload };
 
@@ -46,6 +52,9 @@ const ReportReducer = () => {
             longitude: action.payload.longitude,
           },
         };
+
+      case "SET_GI":
+        return { ...state, animalGI: action.payload };
 
       case "CLEAR_ALL":
         return {

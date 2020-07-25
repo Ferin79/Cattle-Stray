@@ -5,6 +5,7 @@ import QuestionPage1 from "../Report/questionPage1";
 import LocationPicker from "../Report/LocationPicker";
 import ImagePicker from "../Report/ImagePicker";
 import ReportSubmitted from "../Report/ReportSubmitted";
+import ReportType from "../Report/ReportType";
 
 const ReportStackScreen = createStackNavigator();
 
@@ -34,6 +35,11 @@ const ReportStack = () => {
       <ReportStackScreen.Screen
         name="ReportSubmitted"
         component={ReportSubmitted}
+        options={{ header: () => null }}
+      />
+      <ReportStackScreen.Screen
+        name="PickReportType"
+        component={ReportType}
         options={{ header: () => null }}
       />
     </ReportStackScreen.Navigator>

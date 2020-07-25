@@ -96,7 +96,11 @@ const Home = ({ navigation, navigator }) => {
             value.docs.forEach((doc) => {
               if (!doc.data().isRejected) {
                 users.forEach((item) => {
-                  if (!doc.data().isRejected && !doc.data().isResolved) {
+                  if (
+                    !doc.data().isRejected &&
+                    !doc.data().isResolved &&
+                    doc.data().reportType !== "health"
+                  ) {
                     if (doc.data().uid === item.uid) {
                       data.push({
                         ...doc.data(),

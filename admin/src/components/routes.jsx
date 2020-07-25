@@ -12,6 +12,7 @@ import manageOrganization from "../pages/admin/manageOrganization";
 import { AuthContext } from "../data/auth";
 import { Context } from "../data/context";
 import ViewReportByLocation from "../pages/admin/ViewReportByLocation";
+import Profile from "../pages/admin/profile";
 
 const Routes = () => {
   const { currentUser } = useContext(AuthContext);
@@ -28,6 +29,7 @@ const Routes = () => {
         <Route path="/admin/reports" component={adminReports} />
         <Route path="/admin/report/:reportId" component={adminReportDetails} />
         <Route path="/admin/organization" component={manageOrganization} />
+        <Route path="/profile" component={Profile} />
         <Redirect to="/admin/reports" />
       </Switch>
     );

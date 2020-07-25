@@ -1,19 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { compose, withProps } from "recompose";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Image from "react-bootstrap/Image";
-
 import Card from "react-bootstrap/Card";
+import Form from "react-bootstrap/Form";
+import Spinner from "react-bootstrap/Spinner";
 import {
   withScriptjs,
   withGoogleMap,
   GoogleMap,
   Marker,
 } from "react-google-maps";
-import { MarkerWithLabel } from "react-google-maps/lib/components/addons/MarkerWithLabel";
+import { animateScroll } from "react-scroll";
 import firebase from "../../data/firebase";
 
 const options = {
@@ -56,14 +57,16 @@ const MyMapComponent = compose(
 ));
 
 export default function ReportDetails({ match }) {
-
-  const [report, setReport] = useState({});
+  const [report, setReport] = useState([]);
   const [coordinates, setCoordinates] = useState({
     lat: 21.17024,
     lng: 72.831062,
   });
   const [isMarkerShown, setIsMarkerShown] = useState(false);
+  const [message, setMessage] = useState("");
+  const [isMessageSending, setIsMessageSending] = useState(false);
 
+  const commentBoxRef = useRef();
 
   const sendNotification = async (token, title, description) => {
     try {
@@ -157,21 +160,23 @@ export default function ReportDetails({ match }) {
     }
   };
 
-
-
   useEffect(() => {
-    getReport();
-    console.log(match.params.reportId);
-  }, [setReport, setCoordinates]);
-  const getReport = () => {
-    firebase.firestore().collection("reports").doc(match.params.reportId).onSnapshot((doc) => {
-      const lat = doc.data().coordinates.latitude;
-      const lng = doc.data().coordinates.longitude;
-      setReport({ ...doc.data(), id: doc.id });
-      setCoordinates({ lat, lng })
-      showMarker();
-    })
-  };
+    firebase
+      .firestore()
+      .collection("reports")
+      .doc(match.params.reportId)
+      .onSnapshot((doc) => {
+        const lat = doc.data().coordinates.latitude;
+        const lng = doc.data().coordinates.longitude;
+        setReport({ ...doc.data(), id: doc.id });
+        setCoordinates({ lat, lng });
+        showMarker();
+        animateScroll.scrollToBottom({
+          containerId: "commentBox",
+        });
+      });
+  }, [match.params.reportId]);
+
   const handleMarkerClick = () => {
     setIsMarkerShown(false);
     showMarker();
@@ -182,17 +187,28 @@ export default function ReportDetails({ match }) {
     }, 500);
   };
 
-  let animalType, animalIsMoving, animalCondition, animalCount, description, upvotes, downvotes, image
+  let animalType,
+    animalIsMoving,
+    animalCondition,
+    animalCount,
+    description,
+    upvotes,
+    downvotes,
+    image,
+    comments = [];
+
   let injuredStyle = {};
+
   if (report.uid) {
-    image = report.animalImageUrl
-    animalType = report.animalType
-    animalCondition = report.animalCondition
-    animalCount = report.animalCount
-    animalIsMoving = report.animalIsMoving ? "Moving" : "Stable"
-    description = report.description
-    upvotes = report.upvotes.length
-    downvotes = report.downvotes.length
+    image = report.animalImageUrl;
+    animalType = report.animalType;
+    animalCondition = report.animalCondition;
+    animalCount = report.animalCount;
+    animalIsMoving = report.animalIsMoving ? "Moving" : "Stable";
+    description = report.description;
+    upvotes = report.upvotes.length;
+    downvotes = report.downvotes.length;
+    comments = report.comments;
     if (
       animalCondition === "injured" ||
       animalCondition === "death" ||
@@ -207,80 +223,185 @@ export default function ReportDetails({ match }) {
     <Button
       variant="outline-success"
       disabled={report.isUnderProcess ? true : false}
-      onClick={() => { handleReportReject(report.uid, "underProcess", report.id) }}
+      onClick={() => {
+        handleReportReject(report.uid, "underProcess", report.id);
+      }}
       style={buttonStyles}
     >
       Process Request
     </Button>
-  )
+  );
 
-  let Button_rejectRequest =
+  let Button_rejectRequest = (
     <Button
       variant="outline-danger"
-      onClick={() => { handleReportReject(report.uid, "rejected", report.id) }}
+      onClick={() => {
+        handleReportReject(report.uid, "rejected", report.id);
+      }}
       style={buttonStyles}
     >
       Reject
     </Button>
+  );
 
-  let Button_resolvedRequest =
+  let Button_resolvedRequest = (
     <Button
       variant="outline-info"
-      onClick={() => { handleReportReject(report.uid, "resolved", report.id) }}
+      onClick={() => {
+        handleReportReject(report.uid, "resolved", report.id);
+      }}
       style={buttonStyles}
     >
-      Resolved
+      Resolve
     </Button>
+  );
   return (
-    <>
-
-      <Container>
-
-        <Card>
-          <Card.Header as="h2">Report Details</Card.Header>
-          <Card.Body>
-
-            <Container>
-              <Row>
-                <Col><h4> Report date : {report.createdAt ? report.createdAt.toDate().toLocaleString() : ""}</h4></Col>
-                <Col md="auto">
+    <Container fluid>
+      <Row className="mt-5 mb-5">
+        <Col sm="12" md="12" lg="8" xl="8">
+          <Card>
+            <Card.Header as="h2">Report Details</Card.Header>
+            <Card.Body>
+              <div className="d-flex justify-content-between align-items-center">
+                <p>
+                  Report date :{" "}
+                  {report.createdAt
+                    ? report.createdAt.toDate().toLocaleString()
+                    : ""}
+                </p>
+                <div md="auto">
                   {Button_processRequest}
                   {Button_resolvedRequest}
                   {Button_rejectRequest}
-                </Col>
-              </Row>
+                </div>
+              </div>
 
-              <h4 style={injuredStyle}> Condition : {animalCondition}</h4>
-              <h4> Animal : {animalType}</h4>
+              <h5> Animal : {animalType}</h5>
+              <h5 style={injuredStyle}> Condition : {animalCondition}</h5>
 
-              <h2>Report Location</h2>
+              <h4 className="mt-5">Report Location</h4>
               <MyMapComponent
                 isMarkerShown={isMarkerShown}
                 onMarkerClick={handleMarkerClick}
                 markerCoords={coordinates}
               />
-              <Row xs={2} md={4} lg={9}>
-                <Col><h4 className="upvotes"> Upvotes : {upvotes}</h4></Col>
-                <Col><h4 className="downvotes"> Downvotes : {downvotes}</h4></Col>
+              <Row xs={2} md={4} lg={9} className="mt-3 mb-3">
+                <Col>
+                  <h6 className="upvotes"> Upvotes : {upvotes}</h6>
+                </Col>
+                <Col>
+                  <h6 className="downvotes"> Downvotes : {downvotes}</h6>
+                </Col>
               </Row>
-              <h4> Approx number of animals : {animalCount}</h4>
-              <h4> Status : {animalIsMoving}</h4>
-              <h4> Description : {description}</h4>
-              <h4>Image : </h4>
-              <Image src={image} height={600} />
-            </Container>
+              <h5> Approx number of animals : {animalCount}</h5>
+              <h5> Status : {animalIsMoving}</h5>
+              {description && <h5> Description : {description}</h5>}
+              <a href={image}>
+                <Image src={image} height={500} width={500} className="mt-3" />
+              </a>
+            </Card.Body>
+          </Card>
+        </Col>
 
-          </Card.Body>
-        </Card>
-
-
-
-      </Container>
-
-    </>
+        <Col sm="12" md="12" lg="4" xl="4">
+          <Card>
+            <div
+              ref={commentBoxRef}
+              id="commentBox"
+              style={{
+                maxHeight: 500,
+                overflowY: "scroll",
+              }}
+            >
+              {comments.length > 0 &&
+                comments.map((comment, index) => {
+                  return (
+                    <div
+                      className="d-flex border-bottom p-3 align-items-center"
+                      key={index}
+                    >
+                      <Image
+                        height={50}
+                        width={50}
+                        src={comment.photoUrl}
+                        roundedCircle
+                      />
+                      <div className="ml-5">
+                        <h6>{comment.message}</h6>
+                        <p>{comment.createdAt.toDate().toLocaleString()}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          </Card>
+          <Form className="d-flex justify-content-between align-items-center">
+            <Form.Group controlId="formBasicEmail">
+              <Form.Label>Message</Form.Label>
+              <Form.Control
+                type="test"
+                placeholder="Type Message"
+                value={message}
+                onChange={(event) => setMessage(event.target.value)}
+              />
+            </Form.Group>
+            {isMessageSending ? (
+              <Spinner animation="border" variant="primary" />
+            ) : (
+              <Button
+                variant="primary"
+                type="submit"
+                onClick={(event) => {
+                  event.preventDefault();
+                  if (message.trim() === "") {
+                    alert("Message cannot be empty");
+                    return;
+                  }
+                  setIsMessageSending(true);
+                  firebase
+                    .firestore()
+                    .doc(`/reports/${report.id}`)
+                    .get()
+                    .then((doc) => {
+                      const comments = doc.data().comments;
+                      comments.push({
+                        userId: firebase.auth().currentUser.uid,
+                        message: message,
+                        createdAt: firebase.firestore.Timestamp.now(),
+                        photoUrl: firebase.auth().currentUser.photoURL,
+                      });
+                      firebase
+                        .firestore()
+                        .doc(`/reports/${report.id}`)
+                        .update({
+                          comments: comments,
+                        })
+                        .then(() => {
+                          animateScroll.scrollToBottom({
+                            containerId: "commentBox",
+                          });
+                          setMessage("");
+                        });
+                    })
+                    .catch((error) => {
+                      console.log()(error.message);
+                      alert("Adding Comment Failed");
+                    })
+                    .finally(() => {
+                      setIsMessageSending(false);
+                    });
+                }}
+              >
+                Send
+              </Button>
+            )}
+          </Form>
+        </Col>
+      </Row>
+    </Container>
   );
 }
 
 const buttonStyles = {
-  marginLeft: 8
-}
+  marginLeft: 8,
+};

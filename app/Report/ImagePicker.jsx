@@ -12,6 +12,8 @@ import {
   Alert,
   ScrollView,
 } from "react-native";
+import RNTextDetector from "react-native-text-detector";
+import { Surface, TextInput as PaperTextInput } from "react-native-paper";
 import { Camera } from "expo-camera";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { Button } from "react-native-paper";
@@ -40,6 +42,8 @@ const ImagePicker = ({ navigation }) => {
   const [image, setImage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [percentage, setPercentage] = useState(0);
+  const [GIError, setGIError] = useState(false);
+  const [GINumber, setGINumber] = useState("");
 
   var camera = null;
 
@@ -63,6 +67,31 @@ const ImagePicker = ({ navigation }) => {
 
       xhr.send(null);
     });
+  };
+
+  const handlevalidation = () => {
+    if (GINumber.trim() === "") {
+      Alert.alert(
+        "Confirm",
+        "Are you sure? you want to submit without entering GI number ?",
+        [
+          {
+            text: "Edit",
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel",
+          },
+          {
+            text: "Yes, Sure",
+            onPress: () => {
+              handleFinalSubmit();
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    } else {
+      handleFinalSubmit();
+    }
   };
 
   const handleFinalSubmit = async () => {
@@ -96,6 +125,8 @@ const ImagePicker = ({ navigation }) => {
 
           geocollection
             .add({
+              reportType: ReportState.reportType,
+              animalGI: GINumber,
               animalType: ReportState.animalType,
               animalCondition: ReportState.animalCondition,
               animalCount: ReportState.animalCount,
@@ -146,11 +177,25 @@ const ImagePicker = ({ navigation }) => {
   }, []);
 
   const snap = async () => {
+    setGIError(false);
     if (camera) {
       let photo = await camera.takePictureAsync();
       setImage(photo.uri);
       setPreviewImage(true);
       setOpenCamera(false);
+      const uri = photo.uri;
+      try {
+        const options = {
+          quality: 0.8,
+          base64: true,
+          skipProcessing: true,
+        };
+        const visionResp = await RNTextDetector.detectFromUri(uri);
+        console.log("visionResp", visionResp);
+      } catch (e) {
+        setGIError(true);
+        console.log(e.message);
+      }
     }
   };
 
@@ -215,9 +260,8 @@ const ImagePicker = ({ navigation }) => {
             name="ios-close"
             size={50}
             style={{
-              position: "absolute",
-              top: "3%",
-              left: "5%",
+              zIndex: 9999,
+              margin: 15,
             }}
             color="#FFF"
             onPress={() => {
@@ -345,11 +389,11 @@ const ImagePicker = ({ navigation }) => {
         >
           <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
             <View>
-              <View style={{ margin: 20 }}>
+              <View style={{ marginTop: 20, marginLeft: 20 }}>
                 <Text
                   style={{
-                    fontSize: 30,
-                    fontWeight: "600",
+                    fontSize: 25,
+                    fontWeight: "500",
                     color: themeStyle.textColor,
                   }}
                 >
@@ -365,8 +409,19 @@ const ImagePicker = ({ navigation }) => {
                   }}
                   onPress={() => setOpenCamera(true)}
                 >
-                  Take Pics | Open Camera
+                  Take Photo | Open Camera
                 </Button>
+                <Text
+                  style={{
+                    color: themeStyle.textSecondaryColor,
+                    marginHorizontal: 20,
+                    marginBottom: 10,
+                    fontSize: 12,
+                  }}
+                >
+                  Take Photo in such a way that GI tags on animal is clearly
+                  visible.
+                </Text>
                 {isPhotoSelected ? (
                   <View>
                     <Text
@@ -391,6 +446,60 @@ const ImagePicker = ({ navigation }) => {
                   </View>
                 )}
               </View>
+
+              <View>
+                <Surface
+                  style={{
+                    backgroundColor: themeStyle.secondaryColor,
+                    elevation: 5,
+                    marginTop: 20,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      marginHorizontal: 20,
+                      color: themeStyle.textSecondaryColor,
+                    }}
+                  >
+                    GI number will be automatically detected from image, if it
+                    is incorrect then edit GI number below.
+                  </Text>
+                  <PaperTextInput
+                    keyboardType="default"
+                    keyboardAppearance="dark"
+                    mode="outlined"
+                    label="GI Number"
+                    value={GINumber}
+                    placeholder="Example: GOA-12345"
+                    onChangeText={(event) => setGINumber(event)}
+                    style={{
+                      margin: 20,
+                      backgroundColor: themeStyle.backgroundColor,
+                    }}
+                    theme={{
+                      colors: {
+                        placeholder: themeStyle.textColor,
+                        text: themeStyle.textColor,
+                      },
+                    }}
+                  />
+                  {GIError && (
+                    <Text
+                      style={{
+                        fontSize: 12,
+                        color: "red",
+                        marginHorizontal: 20,
+                        marginBottom: 5,
+                      }}
+                    >
+                      * GI number recognization failed. Please enter GI number
+                      manually.
+                    </Text>
+                  )}
+                </Surface>
+              </View>
+
               <View style={{ padding: 25 }}>
                 <Text
                   style={{
@@ -420,7 +529,7 @@ const ImagePicker = ({ navigation }) => {
               <Button
                 mode="contained"
                 style={{ margin: 20, backgroundColor: themeStyle.primaryColor }}
-                onPress={() => handleFinalSubmit()}
+                onPress={() => handlevalidation()}
               >
                 Finish
               </Button>
