@@ -7,6 +7,7 @@ import {
   TouchableWithoutFeedback,
   Alert,
   Keyboard,
+  TouchableOpacity,
 } from "react-native";
 import * as Progress from "react-native-progress";
 import { GlobalContext } from "../state/RootReducer";
@@ -434,9 +435,15 @@ const QuestionPage1 = ({ navigation }) => {
                     ReportDispatch({ type: "SET_MOVING", payload: "yes" })
                   }
                 />
-                <Text style={{ fontSize: 20, color: themeStyle.textColor }}>
-                  Yes
-                </Text>
+                <TouchableOpacity
+                  onPress={() =>
+                    ReportDispatch({ type: "SET_MOVING", payload: "yes" })
+                  }
+                >
+                  <Text style={{ fontSize: 20, color: themeStyle.textColor }}>
+                    Yes
+                  </Text>
+                </TouchableOpacity>
               </View>
               <View
                 style={{
@@ -454,13 +461,21 @@ const QuestionPage1 = ({ navigation }) => {
                       ? "checked"
                       : "unchecked"
                   }
+                  uncheckedColor={themeStyle.textColor}
+                  style={{ borderColor: themeStyle.textColor }}
                   onPress={() =>
                     ReportDispatch({ type: "SET_MOVING", payload: "no" })
                   }
                 />
-                <Text style={{ fontSize: 20, color: themeStyle.textColor }}>
-                  No
-                </Text>
+                <TouchableOpacity
+                  onPress={() =>
+                    ReportDispatch({ type: "SET_MOVING", payload: "no" })
+                  }
+                >
+                  <Text style={{ fontSize: 20, color: themeStyle.textColor }}>
+                    No
+                  </Text>
+                </TouchableOpacity>
               </View>
             </Surface>
           </View>
