@@ -2,11 +2,26 @@ import React, { useState, useEffect } from 'react'
 import { Table, Col, Row, Button, Container, Form, Spinner } from "react-bootstrap";
 import { ToastContainer, toast } from "react-toastify";
 import firebase from "../../data/firebase";
+import LoadingScreen from '../../components/LoadingScreen';
 
 export default function ManageOrganization() {
     const [isComponentLoading, setIsComponentLoading] = useState(false);
+    const [deleteLoadingId, setDeleteLoadingId] = useState(null)
     const [errorText, setErrorText] = useState("");
     const [organizations, setOrganizations] = useState([]);
+
+    const deleteOrganization = (id) => {
+        setDeleteLoadingId(id)
+        const deleteFunction = firebase.functions().httpsCallable("deleteOrganization")
+        deleteFunction({ id })
+        .catch((error) => {
+            console.log(error.message);
+        })
+        .then((response) => {
+            console.log(response);
+            setDeleteLoadingId(null)
+        })
+    }
 
     const addOrganization = (e) => {
         e.preventDefault();
@@ -36,6 +51,7 @@ export default function ManageOrganization() {
             return;
         }
 
+        setIsComponentLoading(true)
 
         fetch(
             "https://us-central1-cattle-stray.cloudfunctions.net/api/addOrganization",
@@ -77,7 +93,8 @@ export default function ManageOrganization() {
                 });
                 setOrganizations(org);
                 console.log(org);
-            })
+            })            
+
     }, [setOrganizations])
 
     let organizationRows;
@@ -90,7 +107,9 @@ export default function ManageOrganization() {
                     <td>{org.name}</td>
                     <td>{org.type}</td>
                     <td>{org.email}</td>
-                    <td> <Button variant="danger">Delete</Button> </td>
+                    <td> 
+                        {deleteLoadingId == org.id ? <Spinner animation="border" variant="primary" /> : <Button variant="danger" onClick={() => {deleteOrganization(org.id)}}>Delete</Button>}
+                    </td>
                 </tr>
             )
         })

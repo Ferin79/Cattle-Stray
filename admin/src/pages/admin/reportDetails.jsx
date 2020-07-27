@@ -160,6 +160,47 @@ export default function ReportDetails({ match }) {
     }
   };
 
+  const submitComent = (event) => {
+    event.preventDefault();
+    if (message.trim() === "") {
+      alert("Message cannot be empty");
+      return;
+    }
+    setIsMessageSending(true);
+    firebase
+      .firestore()
+      .doc(`/reports/${report.id}`)
+      .get()
+      .then((doc) => {
+        const comments = doc.data().comments;
+        comments.push({
+          userId: firebase.auth().currentUser.uid,
+          message: message,
+          createdAt: firebase.firestore.Timestamp.now(),
+          photoUrl: firebase.auth().currentUser.photoURL,
+        });
+        firebase
+          .firestore()
+          .doc(`/reports/${report.id}`)
+          .update({
+            comments: comments,
+          })
+          .then(() => {
+            animateScroll.scrollToBottom({
+              containerId: "commentBox",
+            });
+            setMessage("");
+          });
+      })
+      .catch((error) => {
+        console.log()(error.message);
+        alert("Adding Comment Failed");
+      })
+      .finally(() => {
+        setIsMessageSending(false);
+      });
+  }
+
   useEffect(() => {
     firebase
       .firestore()
@@ -327,8 +368,9 @@ export default function ReportDetails({ match }) {
                         roundedCircle
                       />
                       <div className="ml-5">
-                        <h6>{comment.message}</h6>
-                        <p>{comment.createdAt.toDate().toLocaleString()}</p>
+                        <h5><b>User name</b></h5>
+                        <h5>{comment.message}</h5>
+                        <p><small>{comment.createdAt.toDate().toLocaleString()}</small></p>
                       </div>
                     </div>
                   );
@@ -351,46 +393,7 @@ export default function ReportDetails({ match }) {
               <Button
                 variant="primary"
                 type="submit"
-                onClick={(event) => {
-                  event.preventDefault();
-                  if (message.trim() === "") {
-                    alert("Message cannot be empty");
-                    return;
-                  }
-                  setIsMessageSending(true);
-                  firebase
-                    .firestore()
-                    .doc(`/reports/${report.id}`)
-                    .get()
-                    .then((doc) => {
-                      const comments = doc.data().comments;
-                      comments.push({
-                        userId: firebase.auth().currentUser.uid,
-                        message: message,
-                        createdAt: firebase.firestore.Timestamp.now(),
-                        photoUrl: firebase.auth().currentUser.photoURL,
-                      });
-                      firebase
-                        .firestore()
-                        .doc(`/reports/${report.id}`)
-                        .update({
-                          comments: comments,
-                        })
-                        .then(() => {
-                          animateScroll.scrollToBottom({
-                            containerId: "commentBox",
-                          });
-                          setMessage("");
-                        });
-                    })
-                    .catch((error) => {
-                      console.log()(error.message);
-                      alert("Adding Comment Failed");
-                    })
-                    .finally(() => {
-                      setIsMessageSending(false);
-                    });
-                }}
+                onClick={(event) => {submitComent(event)}}
               >
                 Send
               </Button>

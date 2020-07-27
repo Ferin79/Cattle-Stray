@@ -38,7 +38,7 @@ const Header = () => {
         </Button>
       </>
     );
-  } else if (currentUser) {
+  } else if (currentUser && role === "organization") {
     navLinks = (
       <>
         <Nav.Link>
@@ -47,7 +47,7 @@ const Header = () => {
           </NavLink>
         </Nav.Link>
         <Nav.Link>
-          <NavLink to="/report" className="changeNavColor">
+          <NavLink to="/reports" className="changeNavColor">
             Reports
           </NavLink>
         </Nav.Link>
