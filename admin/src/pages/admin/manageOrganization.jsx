@@ -1,5 +1,13 @@
-import React, { useState, useEffect } from 'react'
-import { Table, Col, Row, Button, Container, Form, Spinner } from "react-bootstrap";
+import React, { useState, useEffect } from "react";
+import {
+  Table,
+  Col,
+  Row,
+  Button,
+  Container,
+  Form,
+  Spinner,
+} from "react-bootstrap";
 import { ToastContainer, toast } from "react-toastify";
 import firebase from "../../data/firebase";
 import LoadingScreen from '../../components/LoadingScreen';
@@ -115,72 +123,64 @@ export default function ManageOrganization() {
         })
     }
 
+  return (
+    <Container fluid>
+      <Row className="m-5">
+        <Col sm="12" md="6" lg="6">
+          <Table striped bordered hover responsive variant="dark">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Email</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>{organizationRows}</tbody>
+          </Table>
+        </Col>
 
-    return (
-        <Container>
+        <Col sm="12" md="6" lg="6">
+          <h1 className="mb-5">Add Organization</h1>
+          <Form onSubmit={(e) => addOrganization(e)}>
+            <Form.Group controlId="name">
+              <Form.Label>Organization Name</Form.Label>
+              <Form.Control type="text" placeholder="Enter name" />
+            </Form.Group>
 
-            <Row>
+            <Form.Group controlId="type">
+              <Form.Label>Type</Form.Label>
+              <Form.Control as="select" required>
+                <option>Select</option>
+                <option>Type 1</option>
+                <option>Type 2</option>
+                <option>Type 3</option>
+              </Form.Control>
+            </Form.Group>
 
-                <Col>
-                    <Table striped bordered hover variant="dark">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Name</th>
-                                <th>Type</th>
-                                <th>Email</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {organizationRows}
-                        </tbody>
-                    </Table>
-                </Col>
+            <Form.Group controlId="email">
+              <Form.Label>Email address</Form.Label>
+              <Form.Control type="email" placeholder="Enter email" />
+            </Form.Group>
 
+            <Form.Group controlId="password">
+              <Form.Label>Password</Form.Label>
+              <Form.Control type="password" placeholder="Password" />
+            </Form.Group>
 
-                <Col>
-
-                    <h1 className="mb-5">Add Organization</h1>
-                    <Form onSubmit={(e) => addOrganization(e)}>
-                        <Form.Group controlId="name">
-                            <Form.Label>Organization Name</Form.Label>
-                            <Form.Control type="text" placeholder="Enter name" />
-                        </Form.Group>
-
-                        <Form.Group controlId="type">
-                            <Form.Label>Type</Form.Label>
-                            <Form.Control as="select" required>
-                                <option>Select</option>
-                                <option>Type 1</option>
-                                <option>Type 2</option>
-                                <option>Type 3</option>
-                            </Form.Control>
-                        </Form.Group>
-
-                        <Form.Group controlId="email">
-                            <Form.Label>Email address</Form.Label>
-                            <Form.Control type="email" placeholder="Enter email" />
-                        </Form.Group>
-
-                        <Form.Group controlId="password">
-                            <Form.Label>Password</Form.Label>
-                            <Form.Control type="password" placeholder="Password" />
-                        </Form.Group>
-
-
-                        <div className="text-danger mt-3 mb-3">{errorText}</div>
-                        {isComponentLoading ? (
-                            <Spinner animation="border" variant="primary" />
-                        ) : (
-                                <Button variant="primary" type="submit">
-                                    Login
-                                </Button>
-                            )}
-                    </Form>
-                </Col>
-            </Row>
-            <ToastContainer />
-        </Container>
-    )
+            <div className="text-danger mt-3 mb-3">{errorText}</div>
+            {isComponentLoading ? (
+              <Spinner animation="border" variant="primary" />
+            ) : (
+              <Button variant="primary" type="submit">
+                Login
+              </Button>
+            )}
+          </Form>
+        </Col>
+      </Row>
+      <ToastContainer />
+    </Container>
+  );
 }

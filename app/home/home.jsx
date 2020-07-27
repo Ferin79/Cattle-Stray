@@ -10,6 +10,7 @@ import {
   YellowBox,
   Image,
   Alert,
+  TouchableOpacity,
 } from "react-native";
 import { Searchbar, FAB, Card, Button } from "react-native-paper";
 import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
@@ -18,7 +19,7 @@ import BottomSheet from "react-native-bottomsheet-reanimated";
 import * as geofirestore from "geofirestore";
 import * as Notifications from "expo-notifications";
 import * as Permissions from "expo-permissions";
-import Lightbox from "../hooks/useLightbox";
+import ImageView from "react-native-image-viewing";
 import { GlobalContext } from "../state/RootReducer";
 import useTheme from "../hooks/useTheme";
 import useMapTheme from "../hooks/useMapTheme";
@@ -30,7 +31,7 @@ const SCREEN_HEIGHT = Dimensions.get("window").height;
 const SCREEN_WIDTH = Dimensions.get("window").width;
 let token = "";
 
-const Home = ({ navigation, navigator }) => {
+const Home = ({ navigation }) => {
   YellowBox.ignoreWarnings(["Setting a timer"]);
   const _console = _.clone(console);
   console.warn = (message) => {
@@ -53,6 +54,7 @@ const Home = ({ navigation, navigator }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [selectedAnimal, setSelectedAnimal] = useState(null);
+  const [visible, setIsVisible] = useState(false);
 
   const circleRef = useRef();
   let mapRef = useRef();
@@ -426,7 +428,17 @@ const Home = ({ navigation, navigator }) => {
                   </View>
 
                   <View>
-                    <Lightbox navigator={navigator} style={{ marginTop: 30 }}>
+                    <ImageView
+                      images={[
+                        {
+                          uri: selectedAnimal.animalImageUrl,
+                        },
+                      ]}
+                      imageIndex={0}
+                      visible={visible}
+                      onRequestClose={() => setIsVisible(false)}
+                    />
+                    <TouchableOpacity onPress={() => setIsVisible(true)}>
                       <Image
                         style={{
                           height: 200,
@@ -436,7 +448,7 @@ const Home = ({ navigation, navigator }) => {
                           uri: selectedAnimal.animalImageUrl,
                         }}
                       />
-                    </Lightbox>
+                    </TouchableOpacity>
                   </View>
 
                   <View>

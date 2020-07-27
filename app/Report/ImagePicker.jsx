@@ -17,6 +17,7 @@ import { Surface, TextInput as PaperTextInput } from "react-native-paper";
 import { Camera } from "expo-camera";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { Button } from "react-native-paper";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { GlobalContext } from "../state/RootReducer";
 import useTheme from "../hooks/useTheme";
 import firebase from "../hooks/useFirebase";
@@ -337,6 +338,7 @@ const ImagePicker = ({ navigation }) => {
               style={{
                 height: Dimensions.get("window").height,
                 width: Dimensions.get("window").width,
+                resizeMode: "cover",
               }}
             >
               <View
@@ -381,172 +383,184 @@ const ImagePicker = ({ navigation }) => {
     }
   } else {
     return (
-      <SafeAreaView
-        style={{ flex: 1, backgroundColor: themeStyle.backgroundColor }}
-      >
-        <ScrollView
+      <KeyboardAwareScrollView>
+        <SafeAreaView
           style={{ flex: 1, backgroundColor: themeStyle.backgroundColor }}
         >
-          <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-            <View>
-              <View style={{ marginTop: 20, marginLeft: 20 }}>
-                <Text
-                  style={{
-                    fontSize: 25,
-                    fontWeight: "500",
-                    color: themeStyle.textColor,
-                  }}
-                >
-                  One Last Step
-                </Text>
-              </View>
+          <ScrollView
+            style={{ flex: 1, backgroundColor: themeStyle.backgroundColor }}
+          >
+            <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
               <View>
-                <Button
-                  mode="contained"
-                  style={{
-                    backgroundColor: themeStyle.primaryColor,
-                    margin: 20,
-                  }}
-                  onPress={() => setOpenCamera(true)}
-                >
-                  Take Photo | Open Camera
-                </Button>
-                <Text
-                  style={{
-                    color: themeStyle.textSecondaryColor,
-                    marginHorizontal: 20,
-                    marginBottom: 10,
-                    fontSize: 12,
-                  }}
-                >
-                  Take Photo in such a way that GI tags on animal is clearly
-                  visible.
-                </Text>
-                {isPhotoSelected ? (
-                  <View>
-                    <Text
-                      style={{
-                        color: "green",
-                        marginLeft: 20,
-                      }}
-                    >
-                      1 Photo Selected
-                    </Text>
-                  </View>
-                ) : (
-                  <View>
-                    <Text
-                      style={{
-                        color: "red",
-                        marginLeft: 20,
-                      }}
-                    >
-                      No Photo Selected
-                    </Text>
-                  </View>
-                )}
-              </View>
-
-              <View>
-                <Surface
-                  style={{
-                    backgroundColor: themeStyle.secondaryColor,
-                    elevation: 5,
-                    marginTop: 20,
-                  }}
-                >
+                <View style={{ marginTop: 20, marginLeft: 20 }}>
                   <Text
                     style={{
-                      fontSize: 12,
-                      marginHorizontal: 20,
-                      color: themeStyle.textSecondaryColor,
+                      fontSize: 25,
+                      fontWeight: "500",
+                      color: themeStyle.textColor,
                     }}
                   >
-                    GI number will be automatically detected from image, if it
-                    is incorrect then edit GI number below.
+                    One Last Step
                   </Text>
-                  <PaperTextInput
-                    keyboardType="default"
-                    keyboardAppearance="dark"
-                    mode="outlined"
-                    label="GI Number"
-                    value={GINumber}
-                    placeholder="Example: GOA-12345"
-                    onChangeText={(event) => setGINumber(event)}
+                </View>
+                <View>
+                  <Button
+                    mode="contained"
                     style={{
+                      backgroundColor: themeStyle.primaryColor,
                       margin: 20,
-                      backgroundColor: themeStyle.backgroundColor,
                     }}
-                    theme={{
-                      colors: {
-                        placeholder: themeStyle.textColor,
-                        text: themeStyle.textColor,
-                      },
+                    onPress={() => setOpenCamera(true)}
+                  >
+                    Take Photo | Open Camera
+                  </Button>
+                  <Text
+                    style={{
+                      color: themeStyle.textSecondaryColor,
+                      marginHorizontal: 20,
+                      marginBottom: 10,
+                      fontSize: 12,
                     }}
-                  />
-                  {GIError && (
+                  >
+                    Take Photo in such a way that GI tags on animal is clearly
+                    visible.
+                  </Text>
+                  {isPhotoSelected ? (
+                    <View>
+                      <Text
+                        style={{
+                          color: "green",
+                          marginLeft: 20,
+                        }}
+                      >
+                        1 Photo Selected
+                      </Text>
+                    </View>
+                  ) : (
+                    <View>
+                      <Text
+                        style={{
+                          color: "red",
+                          marginLeft: 20,
+                        }}
+                      >
+                        No Photo Selected
+                      </Text>
+                    </View>
+                  )}
+                </View>
+
+                <View>
+                  <Surface
+                    style={{
+                      backgroundColor: themeStyle.secondaryColor,
+                      elevation: 5,
+                      marginTop: 20,
+                    }}
+                  >
                     <Text
                       style={{
                         fontSize: 12,
-                        color: "red",
                         marginHorizontal: 20,
-                        marginBottom: 5,
+                        color: themeStyle.textSecondaryColor,
                       }}
                     >
-                      * GI number recognization failed. Please enter GI number
-                      manually.
+                      GI number will be automatically detected from image, if it
+                      is incorrect then edit GI number below.
                     </Text>
-                  )}
-                </Surface>
-              </View>
+                    <PaperTextInput
+                      keyboardType="default"
+                      keyboardAppearance="dark"
+                      mode="outlined"
+                      label="GI Number"
+                      value={GINumber}
+                      placeholder="Example: GOA-12345"
+                      onChangeText={(event) => setGINumber(event)}
+                      style={{
+                        margin: 20,
+                        backgroundColor: themeStyle.backgroundColor,
+                      }}
+                      theme={{
+                        colors: {
+                          placeholder: themeStyle.textColor,
+                          text: themeStyle.textColor,
+                        },
+                      }}
+                    />
+                    {GIError && (
+                      <Text
+                        style={{
+                          fontSize: 12,
+                          color: "red",
+                          marginHorizontal: 20,
+                          marginBottom: 5,
+                        }}
+                      >
+                        * GI number recognization failed. Please enter GI number
+                        manually.
+                      </Text>
+                    )}
+                  </Surface>
+                </View>
 
-              <View style={{ padding: 25 }}>
-                <Text
-                  style={{
-                    fontSize: 25,
-                    color: themeStyle.textSecondaryColor,
-                  }}
-                >
-                  Some Suggestion / Feedback / Description
-                </Text>
-                <View style={styles.textAreaContainer}>
-                  <TextInput
-                    style={styles.textArea}
-                    underlineColorAndroid="transparent"
-                    placeholder="Type something (optional)"
-                    placeholderTextColor={themeStyle.textColor}
-                    numberOfLines={10}
-                    multiline={true}
-                    value={desc}
-                    onChangeText={(event) => setDesc(event)}
-                  />
+                <View style={{ padding: 25 }}>
+                  <Text
+                    style={{
+                      fontSize: 25,
+                      color: themeStyle.textSecondaryColor,
+                    }}
+                  >
+                    Some Suggestion / Feedback / Description
+                  </Text>
+                  <View style={styles.textAreaContainer}>
+                    <TextInput
+                      style={{
+                        height: 150,
+                        justifyContent: "flex-start",
+                        color: themeStyle.textColor,
+                      }}
+                      underlineColorAndroid="transparent"
+                      placeholder="Type something (optional)"
+                      placeholderTextColor={themeStyle.textColor}
+                      numberOfLines={10}
+                      multiline={true}
+                      value={desc}
+                      onChangeText={(event) => setDesc(event)}
+                    />
+                  </View>
                 </View>
               </View>
+            </TouchableWithoutFeedback>
+            <View>
+              {isPhotoSelected ? (
+                <Button
+                  mode="contained"
+                  style={{
+                    margin: 20,
+                    backgroundColor: themeStyle.primaryColor,
+                  }}
+                  onPress={() => handlevalidation()}
+                >
+                  Finish
+                </Button>
+              ) : (
+                <Button
+                  mode="contained"
+                  style={{
+                    margin: 20,
+                    backgroundColor: themeStyle.primaryColor,
+                  }}
+                  onPress={() =>
+                    Alert.alert("Error", "Please Take a Photo Of Animal")
+                  }
+                >
+                  Finish
+                </Button>
+              )}
             </View>
-          </TouchableWithoutFeedback>
-          <View>
-            {isPhotoSelected ? (
-              <Button
-                mode="contained"
-                style={{ margin: 20, backgroundColor: themeStyle.primaryColor }}
-                onPress={() => handlevalidation()}
-              >
-                Finish
-              </Button>
-            ) : (
-              <Button
-                mode="contained"
-                style={{ margin: 20, backgroundColor: themeStyle.primaryColor }}
-                onPress={() =>
-                  Alert.alert("Error", "Please Take a Photo Of Animal")
-                }
-              >
-                Finish
-              </Button>
-            )}
-          </View>
-        </ScrollView>
-      </SafeAreaView>
+          </ScrollView>
+        </SafeAreaView>
+      </KeyboardAwareScrollView>
     );
   }
 };

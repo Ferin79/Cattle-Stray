@@ -5,6 +5,7 @@ import ListReports from "../Profile/ListReports";
 import ViewComments from "../home/ViewComments";
 import useTheme from "../hooks/useTheme";
 import EditProfile from "../Profile/EditProfile";
+import MapView from "../Profile/MapView";
 
 const ProfileStackScreen = createStackNavigator();
 
@@ -35,6 +36,13 @@ const ProfileStack = () => {
       <ProfileStackScreen.Screen
         component={EditProfile}
         name="EditProfileStack"
+        options={{
+          header: () => null,
+        }}
+      />
+      <ProfileStackScreen.Screen
+        component={MapView}
+        name="MapViewStack"
         options={{
           header: () => null,
         }}

@@ -8,17 +8,11 @@ import {
   ActivityIndicator,
   Title,
 } from "react-native-paper";
-import Lightbox from "../hooks/useLightbox";
+import ImageView from "react-native-image-viewing";
 import firebase from "../hooks/useFirebase";
-import { View } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 
-const ViewReport = ({
-  item,
-  themeStyle,
-  handleVote,
-  navigation,
-  navigator,
-}) => {
+const ViewReport = ({ item, themeStyle, handleVote, navigation }) => {
   const LeftContent = () => (
     <Avatar.Image size={50} source={{ uri: item.photoUrl }} />
   );
@@ -124,6 +118,7 @@ const ViewReport = ({
 
   const [upvoteLoading, setUpvoteLoading] = useState(false);
   const [downvoteLoading, setDownvoteLoading] = useState(false);
+  const [visible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const upvotes = item.upvotes;
@@ -157,7 +152,7 @@ const ViewReport = ({
     >
       <Card.Title
         title={item.displayName}
-        subtitle={`Points: ${item.points}`}
+        subtitle={item.reportType}
         left={() => <LeftContent />}
         titleStyle={{
           color: themeStyle.textColor,
@@ -180,6 +175,9 @@ const ViewReport = ({
         >
           Count: {item.animalCount}
         </Paragraph>
+        <Paragraph style={{ color: themeStyle.textColor }}>
+          GI: {item.animalGI}
+        </Paragraph>
         <Subheading
           style={{ color: themeStyle.textColor, textTransform: "capitalize" }}
         >
@@ -195,9 +193,19 @@ const ViewReport = ({
         </Paragraph>
       </Card.Content>
 
-      <Lightbox navigator={navigator}>
+      <TouchableOpacity onPress={() => setIsVisible(true)}>
+        <ImageView
+          images={[
+            {
+              uri: item.animalImageUrl,
+            },
+          ]}
+          imageIndex={0}
+          visible={visible}
+          onRequestClose={() => setIsVisible(false)}
+        />
         <Card.Cover source={{ uri: item.animalImageUrl }} />
-      </Lightbox>
+      </TouchableOpacity>
       <Card.Actions>
         {!(item.uid === firebase.auth().currentUser.uid) && (
           <>
@@ -249,6 +257,15 @@ const ViewReport = ({
         >
           {item.comments.length}
         </Button>
+        <Button
+          onPress={() => {
+            navigation.navigate("MapViewStack", {
+              coords: JSON.stringify(item.animalMovingCoords),
+            });
+          }}
+          color={themeStyle.textColor}
+          icon="google-maps"
+        ></Button>
       </Card.Actions>
       <Paragraph
         style={{

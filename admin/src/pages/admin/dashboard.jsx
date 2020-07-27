@@ -57,6 +57,8 @@ const Dashboard = () => {
           </Col>
 
           <Col
+            onClick={() => history.push("/admin/organization")}
+            className="addHoverEffect"
             style={{
               display: "flex",
               flexDirection: "column",
