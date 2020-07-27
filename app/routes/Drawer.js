@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext } from "react";
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
@@ -45,21 +45,6 @@ const DrawerContent = (props) => {
   const { ThemeState, ThemeDispatch } = useContext(GlobalContext);
   const themeStyle = useTheme();
 
-  const [userPoints, setUserPoints] = useState(0);
-
-  useEffect(() => {
-    firebase
-      .firestore()
-      .doc(`/users/${firebase.auth().currentUser.uid}`)
-      .onSnapshot((doc) => {
-        try {
-          setUserPoints(doc.data().points ? doc.data().points : 0);
-        } catch (error) {
-          console.log(error);
-        }
-      });
-  }, []);
-
   return (
     <View style={{ flex: 1, backgroundColor: themeStyle.sidebarColor }}>
       <DrawerContentScrollView {...props}>
@@ -87,29 +72,6 @@ const DrawerContent = (props) => {
                   {firebase.auth().currentUser.email}
                 </Caption>
               </View>
-            </View>
-            <View
-              style={{
-                display: "flex",
-                justifyContent: "flex-start",
-                flexDirection: "row",
-                marginHorizontal: 60,
-                marginTop: 20,
-              }}
-            >
-              <Text
-                style={{
-                  fontWeight: "bold",
-                  marginRight: 10,
-                  fontSize: 18,
-                  color: themeStyle.textColor,
-                }}
-              >
-                {userPoints}
-              </Text>
-              <Text style={{ color: themeStyle.textSecondaryColor }}>
-                Points
-              </Text>
             </View>
           </View>
 

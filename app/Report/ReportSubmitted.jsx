@@ -35,7 +35,7 @@ const ReportSubmitted = ({ navigation }) => {
         style={{
           position: "absolute",
           top: "80%",
-          backgroundColor: themeStyle.primaryColor,
+          backgroundColor: "#F35762",
         }}
         onPress={() =>
           navigation.reset({
