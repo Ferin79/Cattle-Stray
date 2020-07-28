@@ -1,14 +1,15 @@
-import React, { useEffect, useContext, useState } from "react";
+import React, { useEffect, useContext, useState, useCallback } from "react";
 import firebase from "../../data/firebase";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import Image from "react-bootstrap/Image";
 import Table from "react-bootstrap/Table";
 import Tabs from "react-bootstrap/Tabs";
 import Tab from "react-bootstrap/Tab";
 import Card from "react-bootstrap/Card";
+import Image from "react-bootstrap/Image";
+import Spinner from "react-bootstrap/Spinner";
 import { compose, withProps } from "recompose";
 import {
   withScriptjs,
@@ -29,6 +30,7 @@ export default function Reports() {
     lng: 72.831062,
   });
   const [selectedItem, setSelectedItem] = useState(null);
+  const [isComponentLoading, setIsComponentLoading] = useState(true);
 
   const sendNotification = async (token, title, description) => {
     try {
@@ -174,21 +176,29 @@ export default function Reports() {
     </>
   ));
 
-  useEffect(() => {
-    firebase
-      .firestore()
-      .collection("reports")
-      .where("isRejected", "==", false)
-      .where("isResolved", "==", false)
-      .orderBy("createdAt", "desc")
-      .onSnapshot((docs) => {
-        let reports = [];
-        docs.forEach((doc) => {
-          reports.push({ ...doc.data(), id: doc.id });
-        });
-        setReports(reports);
-      });
+  const fetchReports = useCallback(async () => {
+    try {
+      setIsComponentLoading(true);
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/reports`);
+      const responseData = await response.json();
+
+      if (responseData.success) {
+        const reports = responseData.data.reports;
+        setReports([...reports]);
+      } else {
+        alert(responseData.error);
+      }
+    } catch (error) {
+      console.log(error);
+      alert(error.message);
+    } finally {
+      setIsComponentLoading(false);
+    }
   }, [setReports]);
+
+  useEffect(() => {
+    fetchReports();
+  }, [fetchReports]);
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -233,118 +243,126 @@ export default function Reports() {
       {key === "table" && (
         <Row className="d-flex justify-content-center align-items-center mt-5 mb-5">
           <Col lg={true}>
-            <Table striped bordered hover responsive variant="dark">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Image</th>
-                  <th>Time</th>
-                  <th>Animal</th>
-                  <th>Condition</th>
-                  <th>Count</th>
-                  <th>Moving</th>
-                  <th>Description</th>
-                  <th>Up Votes</th>
-                  <th>Down Votes</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {reports.length &&
-                  reports.map((report, index) => {
-                    let injuredStyle = {};
-                    if (
-                      report.animalCondition === "injured" ||
-                      report.animalCondition === "death" ||
-                      report.animalCondition === "Injured" ||
-                      report.animalCondition === "Death"
-                    ) {
-                      injuredStyle = { color: "red" };
-                    }
-                    return (
-                      <tr key={index}>
-                        <td>{++index}</td>
-                        <td>
-                          <Image
-                            height="150px"
-                            width="150px"
-                            src={report.animalImageUrl}
-                            rounded
-                          />
-                        </td>
-                        <td>{report.createdAt.toDate().toLocaleString()}</td>
-                        <td>{report.animalType}</td>
-                        <td style={injuredStyle}>{report.animalCondition}</td>
-                        <td>{report.animalCount}</td>
-                        <td>{report.animalIsMoving}</td>
-                        <td>{report.description}</td>
-                        <td>{report.upvotes.length}</td>
-                        <td>{report.downvotes.length}</td>
-                        <td className="d-flex flex-row flex-wrap justify-content-space-evenly align-items-center">
-                          <Row style={{ margin: 4 }}>
-                            <Button variant="outline-info">
-                              <NavLink
-                                to={`/admin/report/${report.id}`}
-                                className="changeNavColor"
-                              >
-                                View
-                              </NavLink>
-                            </Button>
-                          </Row>
-                          <Row style={{ margin: 4 }}>
-                            {report.isUnderProcess ? (
-                              <Button variant="outline-success" disabled>
-                                Processing
+            {isComponentLoading ? (
+              <Spinner animation="border" variant="primary" />
+            ) : (
+              <Table striped bordered hover responsive variant="dark">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Report Type</th>
+                    <th>Image</th>
+                    <th>Time</th>
+                    <th>Animal</th>
+                    <th>Condition</th>
+                    <th>Count</th>
+                    <th>Moving</th>
+                    <th>Description</th>
+                    <th>GI Number</th>
+                    <th>Up Votes</th>
+                    <th>Down Votes</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {reports.length &&
+                    reports.map((report, index) => {
+                      let injuredStyle = {};
+                      if (
+                        report.animalCondition === "injured" ||
+                        report.animalCondition === "death" ||
+                        report.animalCondition === "Injured" ||
+                        report.animalCondition === "Death"
+                      ) {
+                        injuredStyle = { color: "red" };
+                      }
+                      return (
+                        <tr key={index}>
+                          <td>{++index}</td>
+                          <th>{report.reportType}</th>
+                          <td>
+                            <Image
+                              height="150px"
+                              width="150px"
+                              src={report.animalImageUrl}
+                              rounded
+                            />
+                          </td>
+                          <td>{report.createdAt}</td>
+                          <td>{report.animalType}</td>
+                          <td style={injuredStyle}>{report.animalCondition}</td>
+                          <td>{report.animalCount}</td>
+                          <td>{report.animalIsMoving}</td>
+                          <td>{report.description}</td>
+                          <th>{report.animalGI}</th>
+                          <td>{report.upvotes.length}</td>
+                          <td>{report.downvotes.length}</td>
+                          <td className="d-flex flex-row flex-wrap justify-content-space-evenly align-items-center">
+                            <Row style={{ margin: 4 }}>
+                              <Button variant="outline-info">
+                                <NavLink
+                                  to={`/admin/report/${report.id}`}
+                                  className="changeNavColor"
+                                >
+                                  View
+                                </NavLink>
                               </Button>
-                            ) : (
+                            </Row>
+                            <Row style={{ margin: 4 }}>
+                              {report.isUnderProcess ? (
+                                <Button variant="outline-success" disabled>
+                                  Processing
+                                </Button>
+                              ) : (
+                                <Button
+                                  variant="outline-success"
+                                  onClick={() =>
+                                    handleReportReject(
+                                      report.uid,
+                                      "underProcess",
+                                      report.id
+                                    )
+                                  }
+                                >
+                                  Process request
+                                </Button>
+                              )}
+                            </Row>
+                            <Row style={{ margin: 4 }}>
                               <Button
-                                variant="outline-success"
+                                variant="outline-danger"
                                 onClick={() =>
                                   handleReportReject(
                                     report.uid,
-                                    "underProcess",
+                                    "rejected",
                                     report.id
                                   )
                                 }
                               >
-                                Process request
+                                Reject
                               </Button>
-                            )}
-                          </Row>
-                          <Row style={{ margin: 4 }}>
-                            <Button
-                              variant="outline-danger"
-                              onClick={() =>
-                                handleReportReject(
-                                  report.uid,
-                                  "rejected",
-                                  report.id
-                                )
-                              }
-                            >
-                              Reject
-                            </Button>
-                          </Row>
-                          <Row style={{ margin: 4 }}>
-                            <Button
-                              variant="outline-primary"
-                              onClick={() =>
-                                handleReportReject(
-                                  report.uid,
-                                  "resolved",
-                                  report.id
-                                )
-                              }
-                            >
-                              Resolve
-                            </Button>
-                          </Row>
-                        </td>
-                      </tr>
-                    );
-                  })}
-              </tbody>
-            </Table>
+                            </Row>
+                            <Row style={{ margin: 4 }}>
+                              <Button
+                                variant="outline-primary"
+                                onClick={() =>
+                                  handleReportReject(
+                                    report.uid,
+                                    "resolved",
+                                    report.id
+                                  )
+                                }
+                              >
+                                Resolve
+                              </Button>
+                            </Row>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </Table>
+            )}
           </Col>
         </Row>
       )}

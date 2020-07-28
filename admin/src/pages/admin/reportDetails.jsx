@@ -199,7 +199,7 @@ export default function ReportDetails({ match }) {
       .finally(() => {
         setIsMessageSending(false);
       });
-  }
+  };
 
   useEffect(() => {
     firebase
@@ -368,9 +368,15 @@ export default function ReportDetails({ match }) {
                         roundedCircle
                       />
                       <div className="ml-5">
-                        <h5><b>User name</b></h5>
+                        <h5>
+                          <b>User name</b>
+                        </h5>
                         <h5>{comment.message}</h5>
-                        <p><small>{comment.createdAt.toDate().toLocaleString()}</small></p>
+                        <p>
+                          <small>
+                            {comment.createdAt.toDate().toLocaleString()}
+                          </small>
+                        </p>
                       </div>
                     </div>
                   );
@@ -393,7 +399,9 @@ export default function ReportDetails({ match }) {
               <Button
                 variant="primary"
                 type="submit"
-                onClick={(event) => {submitComent(event)}}
+                onClick={(event) => {
+                  submitComent(event);
+                }}
               >
                 Send
               </Button>

@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "cattle-stray",
+  "private_key_id": "92aeb9124c68bed272233860fddf6812ac6f921e",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDPwh2eL9cD+jjM\n22nO4QT0Sjg5vYEq/wYOb1nIm+fI75c2nmwBati0Ej3L0innq4ZxQOxYEfqgmZxC\nR2oytQCcQfWWzj10ah30aYjLzLkHGT7l1IhlTU6UepHhC+wc78PL6s8wrWdEpG0X\nA+zo5PksTPk+GEYJhxBLYaQTszhggp69/UyTEchXIfGZqtQp/W9q4L8YXiz47efK\nOzCpSnRgPqK9gncXQjgLeZtNECVBKhhwpkpSTU/TR+v21mMUJ/Epf9srk45E5AFI\nDOLI8F4XsvxueKR1QBzQxIuY9CquBaDIgs8pISB/8aVH6ABlRTnhiZgICu23BY3i\nAqMT5NnzAgMBAAECggEAEuwaKHsw+TLEE5x0UZxbCCjuYAvrhM//bDcmFUhl3v47\nZoUdTy+9FwGGUVcN7ATKVOxV2lug2RnEiqDYgk/MA29af+a+4Ch+G/G0vOMjgwsA\nmIw39AoLeyiCut2MHsKTsbHsNwHEIxNawDriS//21dsY5FfvoRSFHmiBOi4bl2aE\nGgVTbZclIlfAPkJ6WRehz7bD6nw5/7b5HqMbDo1E17SYwXCVBZaRAeCQJPhnCAt9\nNAy734YBnOXrdVMTjbkXt7ZxCQWlYA6mnMf0s5r1LXf4UK+6JS1SYup+VbkH7DMU\nf9D6jI7l15cEvVhzFLY8Au/b/n6yKXn7WWdKzZ7ZIQKBgQD1NpagCQEBtYDcAY7j\n1pbybhz75Cwp8n4livD2sVIYY6dbUXffneLuhFK1gBlI+KLhReoJpin0L+Yx8TK4\n49W402sZshez+HdzV6sFr9B19w2LTsuvv6xSGNCJhDKpKB2LgJlh0bBbjdyx6CTU\nKkXuEmfMJn6TUofyeWh5L7uVQwKBgQDY5bylS3eMSExE5kN0p4xG4/NXajp7oSK9\nEw//T+uE0UFErPWvcPvYwXScOXK4wK3C6qm6a8+XYrnuuKHIbv7/eYr3c3NCDtXb\n+iLtB0w4OXjj6E4YI5vJrdYwpgCyEAyuAqtwGzTLW6LEnDoKbXaUik1Jvi3Bnf9k\n94VwkykFkQKBgQDBHnLWKwEt9WI84sVETtamq24MO5FEoAQVUS2hO9mp96HwW2ML\nK+9zZac15mMDgz3UKRm+66yS8b5bitgloNnLLEZnAEmGpaJ9poe8fNCydxWlpzLn\ngQ8XwQ9Lnl+/tSY/ndIupdQ85qbvPiLzLS/R5ZD1yUNah18l6dQLzTnwvQKBgHZd\noX5/WcVXqy+qjcN6sCX7vk/FLBdNz3xpi8BkJ/56h+jnjshomzgmEvIys7W5iNon\nX+rZbReLjDaH0dplIInhFYKHIa46FGGQ90BtTB4e1ydhHkU0IY+Fa69u2FBUS+cm\nk9KBNmWII6KyM0Z/iEf11cnZnHTeOYMrRUozNR7RAoGAej8pX1hH4dfPCVhu7Wxa\nEtA6LEG7og4jj/aBgn7qRQQWbXsDvIkaen5PJrhFNtDzLiNO14/zuh4br3jHTXbH\nRK0SvjpOlCYCaOJKvxazyg+S/99r0JAKYEbPBhHoKpUi2q0caw+qHMNKAS3NsENQ\nEqWeYmWAJNPFduCMmSy39zM=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-8wh18@cattle-stray.iam.gserviceaccount.com",
+  "client_id": "101075449163951536316",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-8wh18%40cattle-stray.iam.gserviceaccount.com"
+}
