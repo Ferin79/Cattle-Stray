@@ -10,118 +10,115 @@ import {
 } from "react-bootstrap";
 import { ToastContainer, toast } from "react-toastify";
 import firebase from "../../data/firebase";
-import LoadingScreen from '../../components/LoadingScreen';
 
 export default function ManageOrganization() {
-    const [isComponentLoading, setIsComponentLoading] = useState(false);
-    const [deleteLoadingId, setDeleteLoadingId] = useState(null)
-    const [errorText, setErrorText] = useState("");
-    const [organizations, setOrganizations] = useState([]);
+  const [isComponentLoading, setIsComponentLoading] = useState(false);
+  const [deleteLoadingId, setDeleteLoadingId] = useState(null);
+  const [errorText, setErrorText] = useState("");
+  const [organizations, setOrganizations] = useState([]);
 
-    const deleteOrganization = (id) => {
-        setDeleteLoadingId(id)
-        const deleteFunction = firebase.functions().httpsCallable("deleteOrganization")
-        deleteFunction({ id })
-        .catch((error) => {
-            console.log(error.message);
-        })
-        .then((response) => {
-            console.log(response);
-            setDeleteLoadingId(null)
-        })
+  const deleteOrganization = async (id) => {
+    setDeleteLoadingId(true);
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/organization/delete`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            organizationId: id,
+            authUserId: firebase.auth().currentUser.uid,
+          }),
+        }
+      );
+      const responseData = await response.json();
+
+      if (responseData.success) {
+        toast("Organization Deleted Successfully");
+      } else {
+        toast.error(responseData.error);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    } finally {
+      setDeleteLoadingId(false);
     }
+  };
 
-    const addOrganization = (e) => {
-        e.preventDefault();
-        const name = e.target.name.value;
-        const type = e.target.type.value;
-        const email = e.target.email.value;
-        const password = e.target.password.value;
+  const addOrganization = async (e) => {
+    e.preventDefault();
 
-        console.log(name);
-        console.log(type);
-        console.log(email);
-        console.log(password);
+    try {
+      setIsComponentLoading(true);
+      const name = e.target.name.value;
+      const type = e.target.type.value;
+      const email = e.target.email.value;
+      const password = e.target.password.value;
 
+      if (
+        email.trim() === "" ||
+        password.trim() === "" ||
+        name.trim() === "" ||
+        type.trim() === "Select"
+      ) {
+        setErrorText("Empty fields");
+        return;
+      }
+      if (password.length < 6) {
+        setErrorText("Password should not be less than 6 characters");
+        return;
+      }
 
-
-        if (
-            email.trim() === "" ||
-            password.trim() === "" ||
-            name.trim() === "" ||
-            type.trim() === "Select"
-        ) {
-            setErrorText("Empty fields");
-            return;
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/organization/add`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            name,
+            password,
+            type,
+            authUserId: firebase.auth().currentUser.uid,
+          }),
         }
-        if (password.length < 6) {
-            setErrorText("Password should not be less than 6 characters");
-            return;
-        }
+      );
 
-        setIsComponentLoading(true)
+      const responseData = await response.json();
 
-        fetch(
-            "https://us-central1-cattle-stray.cloudfunctions.net/api/addOrganization",
-            {
-                method: "POST",
-                headers: {
-                    "content-type": "application/json",
-                    accept: "application/json",
-                },
-                body: JSON.stringify({
-                    name,
-                    email,
-                    password,
-                    type,
-                }),
-            }
-        ).then((response) => {
-            response.json().then((data) => {
-                console.log(data);
-                setIsComponentLoading(false);
-                if (data.success) {
-                    toast("Organization Added!");
-                } else {
-                    toast.error(data.error);
-                }
-            });
+      if (responseData.success) {
+        toast("Organization Added Successfully");
+      } else {
+        toast.error(responseData.error);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    } finally {
+      setIsComponentLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    firebase
+      .firestore()
+      .collection("organizations")
+      .where("role", "==", "organization")
+      .onSnapshot((docs) => {
+        let org = [];
+        docs.forEach((doc) => {
+          org.push({ ...doc.data(), id: doc.id });
         });
-
-    }
-
-    useEffect(() => {
-        firebase.firestore()
-            .collection("users")
-            .where("role", "==", "organization")
-            .onSnapshot((docs) => {
-                let org = [];
-                docs.forEach((doc) => {
-                    org.push({ ...doc.data(), id: doc.id });
-                });
-                setOrganizations(org);
-                console.log(org);
-            })            
-
-    }, [setOrganizations])
-
-    let organizationRows;
-    if (organizations.length > 0) {
-        let count = 0
-        organizationRows = organizations.map((org) => {
-            return (
-                <tr>
-                    <td>{count++}</td>
-                    <td>{org.name}</td>
-                    <td>{org.type}</td>
-                    <td>{org.email}</td>
-                    <td> 
-                        {deleteLoadingId == org.id ? <Spinner animation="border" variant="primary" /> : <Button variant="danger" onClick={() => {deleteOrganization(org.id)}}>Delete</Button>}
-                    </td>
-                </tr>
-            )
-        })
-    }
+        setOrganizations(org);
+      });
+  }, [setOrganizations]);
 
   return (
     <Container fluid>
@@ -137,7 +134,33 @@ export default function ManageOrganization() {
                 <th>Actions</th>
               </tr>
             </thead>
-            <tbody>{organizationRows}</tbody>
+            <tbody>
+              {organizations.length &&
+                organizations.map((org, index) => {
+                  return (
+                    <tr>
+                      <td>{++index}</td>
+                      <td>{org.name}</td>
+                      <td>{org.type}</td>
+                      <td>{org.email}</td>
+                      <td>
+                        {deleteLoadingId === org.id ? (
+                          <Spinner animation="border" variant="primary" />
+                        ) : (
+                          <Button
+                            variant="outline-danger"
+                            onClick={() => {
+                              deleteOrganization(org.id);
+                            }}
+                          >
+                            Delete
+                          </Button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+            </tbody>
           </Table>
         </Col>
 
