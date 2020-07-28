@@ -52,3 +52,13 @@ code {
 .downvotes{
   color: red;
 }
+
+.search {
+  position: absolute;
+  top: 3rem;
+  left: 50%;
+  translate: translateX(-50%);
+  width: 100%;
+  max-width: 400px;
+  z-index: 10;
+}

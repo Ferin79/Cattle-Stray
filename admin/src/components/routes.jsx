@@ -6,7 +6,7 @@ import dashboard from "../pages/dashboard";
 import adminDashboard from "../pages/admin/dashboard";
 import adminReports from "../pages/admin/reports";
 import reports from "../pages/reports";
-import report from "../pages/report";
+import report from "../pages/admin/reportByLocation";
 import profile from "../pages/profile";
 import adminReportDetails from "../pages/admin/reportDetails";
 import manageOrganization from "../pages/admin/manageOrganization";
@@ -32,7 +32,7 @@ const Routes = () => {
         <Route path="/admin/organization" component={manageOrganization} />
         <Route path="/profile" component={Profile} />
         <Route path="/admin/report" component={report} />
-        <Redirect to="/admin/reportByLocation" />
+        <Redirect to="/admin/report" />
       </Switch>
     );
   } else if (currentUser && role === "organization") {
