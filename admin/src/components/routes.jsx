@@ -6,13 +6,12 @@ import dashboard from "../pages/dashboard";
 import adminDashboard from "../pages/admin/dashboard";
 import adminReports from "../pages/admin/reports";
 import reports from "../pages/reports";
-import report from "../pages/admin/reportByLocation";
+import reportByLocation from "../pages/admin/reportByLocation";
 import profile from "../pages/profile";
 import adminReportDetails from "../pages/admin/reportDetails";
 import manageOrganization from "../pages/admin/manageOrganization";
 import { AuthContext } from "../data/auth";
 import { Context } from "../data/context";
-import ViewReportByLocation from "../pages/admin/ViewReportByLocation";
 import Profile from "../pages/admin/profile";
 
 const Routes = () => {
@@ -23,16 +22,12 @@ const Routes = () => {
     return (
       <Switch>
         <Route path="/admin/dashboard" component={adminDashboard} />
-        <Route
-          path="/admin/reportByLocation"
-          component={ViewReportByLocation}
-        />
+        <Route path="/admin/reportByLocation" component={reportByLocation}/>
         <Route path="/admin/reports" component={adminReports} />
         <Route path="/admin/report/:reportId" component={adminReportDetails} />
         <Route path="/admin/organization" component={manageOrganization} />
-        <Route path="/profile" component={Profile} />
-        <Route path="/admin/report" component={report} />
-        <Redirect to="/admin/report" />
+        <Route path="/profile" component={Profile} />        
+        <Redirect to="/admin/reportByLocation" />
       </Switch>
     );
   } else if (currentUser && role === "organization") {

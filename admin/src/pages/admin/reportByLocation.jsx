@@ -1,6 +1,10 @@
 import React, { useState, useCallback, useRef } from "react";
+import { NavLink } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
+import RangeSlider from 'react-bootstrap-range-slider';
 import { ToastContainer, toast } from "react-toastify";
 import Loading from "../../components/LoadingScreen";
 import { GoogleMap, useLoadScript, Marker, Circle, InfoWindow } from "@react-google-maps/api";
@@ -14,9 +18,11 @@ import {
 import "@reach/combobox/styles.css";
 import * as geofirestore from "geofirestore";
 import firebase from "../../data/firebase";
+import { Col } from "react-bootstrap";
 const cowIcon = require("../../images/cow.svg")
 const buffaloIcon = require("../../images/buffalo.svg")
 const goatIcon = require("../../images/goat.svg")
+const locationIcon = require("../../images/location-pin.svg")
 
 const mapContainerStyle = {
   width: "100%",
@@ -58,31 +64,43 @@ export default function Reports() {
   )
 
   const panTo = useCallback(({ lat, lng }) => {
-    mapRef.current.panTo({ lat, lng })
-    mapRef.current.setZoom(zoom)
+    mapRef.current.panTo({ lat, lng })    
     setCoordinates({ lat, lng });
   }, [],
   )
+  const zoomTo = useCallback((r) => {
+    let offset
+    if (r < 4){
+      offset = 0.2              
+    }else if (r == 4) {
+      offset = 0.28                    
+    }else {
+      offset = 0.4
+    }
+    mapRef.current.setZoom(16.5 - r + (r * offset))        
+  }, [],
+  )
 
-  const getReports = useCallback((lat, lng) => {
+  const getReports = useCallback(({lat, lng}) => {
     setSelectedMarker(null)
 
-      const query = geocollection.near({
-        center: new firebase.firestore.GeoPoint(lat, lng),
-        radius: Number(radius),
+    const query = geocollection.near({
+      center: new firebase.firestore.GeoPoint(lat, lng),
+      radius: Number(radius),
+    });
+
+    query.get().then((value) => {
+      const data = [];
+      value.docs.forEach((doc) => {
+        data.push({ ...doc.data(), id: doc.id });
       });
 
-      query.get().then((value) => {
-        const data = [];
-        value.docs.forEach((doc) => {
-          data.push({ ...doc.data(), id: doc.id });
-        });
+      setReports([...data]);
+      zoomTo(radius)
+      console.log("setReports");
 
-        setReports([...data]);
-        console.log("setReports");
-
-      });
-    },[],
+    });
+  }, [radius],
   )
 
   const onMapClick = (event) => {
@@ -93,9 +111,10 @@ export default function Reports() {
 
     setCoordinates({ lat, lng });
 
-    panTo({lat, lng});
+    panTo({ lat, lng });
+    zoomTo(radius)
 
-    getReports(lat, lng)
+    getReports({ lat, lng })
   };
 
   if (loadError) return "Error Loading maps";
@@ -119,7 +138,7 @@ export default function Reports() {
   if (reports.length > 0) {
     markers = (
       reports.map((report) => {
-        let url = require("../../images/location-pin.svg");
+        let url = locationIcon;
         url = report.animalType === "cow" ? cowIcon : url;
         url = report.animalType === "buffalo" ? buffaloIcon : url;
         url = report.animalType === "goat" ? goatIcon : url;
@@ -144,25 +163,45 @@ export default function Reports() {
 
   let infoWindow
   if (selectedMarker) {
-    infoWindow = 
-    <InfoWindow 
-      position={{ lat: selectedMarker.animalMovingCoords.Va, lng: selectedMarker.animalMovingCoords.ga }}
-      onCloseClick={() => {setSelectedMarker(null)}}  
-    >
-     <>
-     <h2>{selectedMarker.createdAt.toDate().toLocaleString()}</h2>
-      <h2>{selectedMarker.animalType}</h2>      
-      <h4>{selectedMarker.animalCount}</h4>      
-      <h4>{selectedMarker.description}</h4>      
-     </>
-    </InfoWindow>
+    const report = selectedMarker
+    infoWindow =
+      <InfoWindow
+        position={{ lat: report.animalMovingCoords.Va, lng: report.animalMovingCoords.ga }}
+        onCloseClick={() => { setSelectedMarker(null) }}
+      >
+        <>
+          <h4>{report.createdAt.toDate().toLocaleString()}</h4>
+          <h5>Animal Count : {report.animalCount}</h5>
+          <div>{report.description}</div>
+
+          <NavLink
+            to={`/admin/report/${report.id}`}
+            className="changeNavButtonColor">
+            <Button variant="info">Details</Button>
+          </NavLink>
+
+        </>
+      </InfoWindow>
   }
 
   return (
     <Container>
       <Row className="d-flex justify-content-center align-items-center mt-5 mb-5">
 
-        <Search panTo={panTo} getReports={getReports} />
+        <Col>
+          <Search panTo={panTo} getReports={getReports} />
+        </Col>
+
+        <Col>
+          <h5>Search Radius</h5>
+          <RangeSlider
+            value={radius}
+            disabled={!coordinates ? true : false}
+            min={1} max={8}
+            onChange={(event) => { setRadius(event.target.value) }}
+            onAfterChange={() => { getReports(coordinates) }}
+          />
+        </Col>
 
         <GoogleMap
           mapContainerStyle={mapContainerStyle}
@@ -198,16 +237,15 @@ function Search({ panTo, getReports }) {
 
   return (
     <div classname="search">
-      <Combobox
+      <Combobox        
         onSelect={async (address) => {
           setValue(address, false);
           clearSuggestions();
-
           try {
             const results = await getGeocode({ address })
             const { lat, lng } = await getLatLng(results[0])
             panTo({ lat, lng })
-            getReports(lat, lng)
+            getReports({ lat, lng })
 
           } catch (error) {
             console.log(error)
@@ -215,6 +253,7 @@ function Search({ panTo, getReports }) {
         }
         }>
         <ComboboxInput
+          className="searchInput"
           value={value}
           onChange={(e) => {
             setValue(e.target.value)
