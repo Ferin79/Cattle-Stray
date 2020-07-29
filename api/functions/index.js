@@ -13,6 +13,8 @@ const {
   deleteOrganization,
 } = require("./controllers/manageOrganization");
 
+const { getUsers } = require("./controllers/users");
+
 const app = express();
 
 app.use((req, res, next) => {
@@ -33,5 +35,7 @@ app.get("/reports/:reportId", getReportsByReportId);
 app.get("/organization", getOrganization);
 app.post("/organization/add", addOrganization);
 app.post("/organization/delete", deleteOrganization);
+
+app.get("/users", getUsers);
 
 exports.api = functions.https.onRequest(app);

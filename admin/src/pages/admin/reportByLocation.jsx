@@ -7,8 +7,17 @@ import Form from "react-bootstrap/Form";
 import RangeSlider from 'react-bootstrap-range-slider';
 import { ToastContainer, toast } from "react-toastify";
 import Loading from "../../components/LoadingScreen";
-import { GoogleMap, useLoadScript, Marker, Circle, InfoWindow } from "@react-google-maps/api";
-import usePlacesAutoComplete, { getGeocode, getLatLng } from "use-places-autocomplete";
+import {
+  GoogleMap,
+  useLoadScript,
+  Marker,
+  Circle,
+  InfoWindow,
+} from "@react-google-maps/api";
+import usePlacesAutoComplete, {
+  getGeocode,
+  getLatLng,
+} from "use-places-autocomplete";
 import {
   Combobox,
   ComboboxInput,
@@ -36,7 +45,7 @@ const options = {
   zoomControl: true,
 };
 
-const libraries = ["places"]
+const libraries = ["places"];
 
 export default function Reports() {
   const { isLoaded, loadError } = useLoadScript({
@@ -48,20 +57,17 @@ export default function Reports() {
   const GeoFirestore = geofirestore.initializeApp(firestore);
   const geocollection = GeoFirestore.collection("reports");
 
-
   const [coordinates, setCoordinates] = useState(null);
-  const [reports, setReports] = useState([])
-  const [selectedMarker, setSelectedMarker] = useState(null)
-  const [radius, setRadius] = useState(1)
-  const defaultZoom = 12.5
-  const zoom = 15
-
+  const [reports, setReports] = useState([]);
+  const [selectedMarker, setSelectedMarker] = useState(null);
+  const [radius, setRadius] = useState(1);
+  const defaultZoom = 12.5;
+  const zoom = 15;
 
   const mapRef = useRef();
   const onMapLoad = useCallback((map) => {
-    mapRef.current = map
-  }, [],
-  )
+    mapRef.current = map;
+  }, []);
 
   const panTo = useCallback(({ lat, lng }) => {
     mapRef.current.panTo({ lat, lng })    
@@ -104,10 +110,10 @@ export default function Reports() {
   )
 
   const onMapClick = (event) => {
-    setSelectedMarker(null)
+    setSelectedMarker(null);
 
-    const lat = event.latLng.lat()
-    const lng = event.latLng.lng()
+    const lat = event.latLng.lat();
+    const lng = event.latLng.lng();
 
     setCoordinates({ lat, lng });
 
@@ -121,17 +127,17 @@ export default function Reports() {
 
   if (!isLoaded) return <Loading text="Loading" />;
 
-  let circle
+  let circle;
   if (coordinates) {
-    circle =
+    circle = (
       <Circle
         center={coordinates}
         radius={radius * 1000}
         visible={true}
-        options={{ strokeColor: "#0AF", }}
+        options={{ strokeColor: "#0AF" }}
         onClick={onMapClick}
       />
-
+    );
   }
 
   let markers;
@@ -161,7 +167,7 @@ export default function Reports() {
     )
   }
 
-  let infoWindow
+  let infoWindow;
   if (selectedMarker) {
     const report = selectedMarker
     infoWindow =
@@ -211,7 +217,6 @@ export default function Reports() {
           onClick={onMapClick}
           onLoad={onMapLoad}
         >
-
           {circle}
 
           {markers}
@@ -220,19 +225,23 @@ export default function Reports() {
         </GoogleMap>
 
         <ToastContainer />
-
       </Row>
     </Container>
   );
 }
 
-
 function Search({ panTo, getReports }) {
-  const { ready, value, suggestions: { status, data }, setValue, clearSuggestions } = usePlacesAutoComplete({
+  const {
+    ready,
+    value,
+    suggestions: { status, data },
+    setValue,
+    clearSuggestions,
+  } = usePlacesAutoComplete({
     requestOptions: {
       location: { lat: () => 21.1702, lng: () => 72.8311 },
-      radius: 1 * 1000
-    }
+      radius: 1 * 1000,
+    },
   });
 
   return (
@@ -248,18 +257,18 @@ function Search({ panTo, getReports }) {
             getReports({ lat, lng })
 
           } catch (error) {
-            console.log(error)
+            console.log(error);
           }
-        }
-        }>
+        }}
+      >
         <ComboboxInput
           className="searchInput"
           value={value}
           onChange={(e) => {
-            setValue(e.target.value)
+            setValue(e.target.value);
           }}
           disabled={!ready}
-          placeHolder="Enter a location..."
+          placeholder="Enter a location..."
         />
         <ComboboxPopover>
           {status === "OK" &&
@@ -269,5 +278,5 @@ function Search({ panTo, getReports }) {
         </ComboboxPopover>
       </Combobox>
     </div>
-  )
+  );
 }

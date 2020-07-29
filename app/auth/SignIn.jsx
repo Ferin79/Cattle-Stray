@@ -341,7 +341,7 @@ const SignIn = () => {
                 }}
               >
                 <Text style={{ fontSize: 35, color: themeStyle.textColor }}>
-                  Hello <Text style={{ fontWeight: "600" }}>Beautiful,</Text>
+                  Hello <Text style={{ fontWeight: "500" }}>Beautiful,</Text>
                 </Text>
                 <Text style={{ color: themeStyle.textColor }}>
                   Enter your information below
@@ -481,13 +481,21 @@ const SignIn = () => {
                 </View>
               </View>
 
-              <View style={{ marginLeft: SCREEN_WIDTH * 0.75 }}>
+              <View
+                style={{
+                  marginLeft: SCREEN_WIDTH * 0.75,
+                  position: "relative",
+                }}
+              >
                 <View
                   style={{
                     padding: 10,
                     backgroundColor: themeStyle.primaryColor,
                     borderRadius: 10,
                     width: 60,
+                    position: "absolute",
+                    bottom: "0%",
+                    right: "3%",
                   }}
                 >
                   {isLoading ? (
