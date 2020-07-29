@@ -14,6 +14,8 @@ import { AuthContext } from "../data/auth";
 import { Context } from "../data/context";
 import ViewReportByLocation from "../pages/admin/ViewReportByLocation";
 import Profile from "../pages/admin/profile";
+import ManageUsers from "../pages/admin/manageUsers";
+import UserDetails from "../pages/admin/userDetails";
 
 const Routes = () => {
   const { currentUser } = useContext(AuthContext);
@@ -31,6 +33,9 @@ const Routes = () => {
         <Route path="/admin/report/:reportId" component={adminReportDetails} />
         <Route path="/admin/organization" component={manageOrganization} />
         <Route path="/profile" component={Profile} />
+        <Route path="/profile" component={Profile} />
+        <Route path="/admin/users" component={ManageUsers} />
+        <Route path="/admin/user/:id" component={UserDetails} />
         <Route path="/admin/report" component={report} />
         <Redirect to="/admin/report" />
       </Switch>
@@ -38,8 +43,8 @@ const Routes = () => {
   } else if (currentUser && role === "organization") {
     return (
       <Switch>
-        <Route path="/dashboard" component={dashboard} />        
-        <Route path="/reports" component={reports} />        
+        <Route path="/dashboard" component={dashboard} />
+        <Route path="/reports" component={reports} />
         <Route path="/profile" component={profile} />
         <Redirect to="/dashboard" />
       </Switch>

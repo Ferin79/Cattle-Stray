@@ -24,6 +24,7 @@ const Dashboard = () => {
           style={{
             width: "100%",
             display: "flex",
+            flexWrap: "wrap",
             justifyContent: "space-evenly",
             alignItems: "center",
           }}
@@ -39,7 +40,7 @@ const Dashboard = () => {
             }}
           >
             <Image src={require("../../images/view-report.png")} rounded />
-            <h5>View Reports</h5>
+            <h5 style={{ textAlign: "center" }}>View Reports</h5>
           </Col>
 
           <Col
@@ -53,7 +54,7 @@ const Dashboard = () => {
             }}
           >
             <Image src={require("../../images/location.png")} rounded />
-            <h5>View Reports By Region</h5>
+            <h5 style={{ textAlign: "center" }}>View Reports By Region</h5>
           </Col>
 
           <Col
@@ -67,7 +68,21 @@ const Dashboard = () => {
             }}
           >
             <Image src={require("../../images/company.png")} rounded />
-            <h5>Edit Organization</h5>
+            <h5 style={{ textAlign: "center" }}>Edit Organization</h5>
+          </Col>
+
+          <Col
+            onClick={() => history.push("/admin/users")}
+            className="addHoverEffect"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Image src={require("../../images/users.png")} rounded />
+            <h5 style={{ textAlign: "center" }}>Manage Users</h5>
           </Col>
 
           <Col
@@ -81,7 +96,7 @@ const Dashboard = () => {
             }}
           >
             <Image src={require("../../images/admin.png")} rounded />
-            <h5>Edit Profile</h5>
+            <h5 style={{ textAlign: "center" }}>Edit Profile</h5>
           </Col>
         </Col>
       </Row>
