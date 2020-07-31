@@ -13,7 +13,6 @@ exports.getReports = (req, res) => {
     .collection("reports")
     .where("isRejected", "==", false)
     .where("isResolved", "==", false)
-    .where("reportType", "==", "general")
     .orderBy("createdAt", "desc")
     .get()
     .then((docs) => {

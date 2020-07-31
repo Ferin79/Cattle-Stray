@@ -10,13 +10,6 @@ const Dashboard = () => {
   const { role } = useContext(Context);
   const history = useHistory();
 
-  if (role !== "admin") {
-    return (
-      <div>
-        <h1>You are not supposed to be here</h1>
-      </div>
-    );
-  }
   return (
     <Container>
       <Row className="mt-5">
@@ -57,34 +50,37 @@ const Dashboard = () => {
             <h5 style={{ textAlign: "center" }}>View Reports By Region</h5>
           </Col>
 
-          <Col
-            onClick={() => history.push("/admin/organization")}
-            className="addHoverEffect"
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Image src={require("../../images/company.png")} rounded />
-            <h5 style={{ textAlign: "center" }}>Edit Organization</h5>
-          </Col>
+          {role === "admin" && (
+            <Col
+              onClick={() => history.push("/admin/organization")}
+              className="addHoverEffect"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Image src={require("../../images/company.png")} rounded />
+              <h5 style={{ textAlign: "center" }}>Edit Organization</h5>
+            </Col>
+          )}
 
-          <Col
-            onClick={() => history.push("/admin/users")}
-            className="addHoverEffect"
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Image src={require("../../images/users.png")} rounded />
-            <h5 style={{ textAlign: "center" }}>Manage Users</h5>
-          </Col>
-
+          {role === "admin" && (
+            <Col
+              onClick={() => history.push("/admin/users")}
+              className="addHoverEffect"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Image src={require("../../images/users.png")} rounded />
+              <h5 style={{ textAlign: "center" }}>Manage Users</h5>
+            </Col>
+          )}
           <Col
             onClick={() => history.push("/profile")}
             className="addHoverEffect"

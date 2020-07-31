@@ -3,9 +3,8 @@ import { NavLink } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
-import RangeSlider from 'react-bootstrap-range-slider';
-import { ToastContainer, toast } from "react-toastify";
+import RangeSlider from "react-bootstrap-range-slider";
+import { ToastContainer } from "react-toastify";
 import Loading from "../../components/LoadingScreen";
 import {
   GoogleMap,
@@ -28,10 +27,10 @@ import "@reach/combobox/styles.css";
 import * as geofirestore from "geofirestore";
 import firebase from "../../data/firebase";
 import { Col } from "react-bootstrap";
-const cowIcon = require("../../images/cow.svg")
-const buffaloIcon = require("../../images/buffalo.svg")
-const goatIcon = require("../../images/goat.svg")
-const locationIcon = require("../../images/location-pin.svg")
+const cowIcon = require("../../images/cow.svg");
+const buffaloIcon = require("../../images/buffalo.svg");
+const goatIcon = require("../../images/goat.svg");
+const locationIcon = require("../../images/location-pin.svg");
 
 const mapContainerStyle = {
   width: "100%",
@@ -62,7 +61,6 @@ export default function Reports() {
   const [selectedMarker, setSelectedMarker] = useState(null);
   const [radius, setRadius] = useState(1);
   const defaultZoom = 12.5;
-  const zoom = 15;
 
   const mapRef = useRef();
   const onMapLoad = useCallback((map) => {
@@ -70,44 +68,43 @@ export default function Reports() {
   }, []);
 
   const panTo = useCallback(({ lat, lng }) => {
-    mapRef.current.panTo({ lat, lng })    
+    mapRef.current.panTo({ lat, lng });
     setCoordinates({ lat, lng });
-  }, [],
-  )
+  }, []);
   const zoomTo = useCallback((r) => {
-    let offset
-    if (r < 4){
-      offset = 0.2              
-    }else if (r == 4) {
-      offset = 0.28                    
-    }else {
-      offset = 0.4
+    let offset;
+    if (r < 4) {
+      offset = 0.2;
+    } else if (r === 4) {
+      offset = 0.28;
+    } else {
+      offset = 0.4;
     }
-    mapRef.current.setZoom(16.5 - r + (r * offset))        
-  }, [],
-  )
+    mapRef.current.setZoom(16.5 - r + r * offset);
+  }, []);
 
-  const getReports = useCallback(({lat, lng}) => {
-    setSelectedMarker(null)
+  const getReports = useCallback(
+    ({ lat, lng }) => {
+      setSelectedMarker(null);
 
-    const query = geocollection.near({
-      center: new firebase.firestore.GeoPoint(lat, lng),
-      radius: Number(radius),
-    });
-
-    query.get().then((value) => {
-      const data = [];
-      value.docs.forEach((doc) => {
-        data.push({ ...doc.data(), id: doc.id });
+      const query = geocollection.near({
+        center: new firebase.firestore.GeoPoint(lat, lng),
+        radius: Number(radius),
       });
 
-      setReports([...data]);
-      zoomTo(radius)
-      console.log("setReports");
+      query.get().then((value) => {
+        const data = [];
+        value.docs.forEach((doc) => {
+          data.push({ ...doc.data(), id: doc.id });
+        });
 
-    });
-  }, [radius],
-  )
+        setReports([...data]);
+        zoomTo(radius);
+        console.log("setReports");
+      });
+    },
+    [radius, zoomTo, geocollection]
+  );
 
   const onMapClick = (event) => {
     setSelectedMarker(null);
@@ -118,9 +115,9 @@ export default function Reports() {
     setCoordinates({ lat, lng });
 
     panTo({ lat, lng });
-    zoomTo(radius)
+    zoomTo(radius);
 
-    getReports({ lat, lng })
+    getReports({ lat, lng });
   };
 
   if (loadError) return "Error Loading maps";
@@ -142,58 +139,62 @@ export default function Reports() {
 
   let markers;
   if (reports.length > 0) {
-    markers = (
-      reports.map((report) => {
-        let url = locationIcon;
-        url = report.animalType === "cow" ? cowIcon : url;
-        url = report.animalType === "buffalo" ? buffaloIcon : url;
-        url = report.animalType === "goat" ? goatIcon : url;
-        return (
-          <Marker
-            key={report.id}
-            icon={{
-              url,
-              scaledSize: new window.google.maps.Size(30, 30),
-            }}
-            position={{
-              lat: report.animalMovingCoords.Va,
-              lng: report.animalMovingCoords.ga,
-            }}
-            onClick={() => {
-              setSelectedMarker(report)
-            }}
-          />)
-      })
-    )
+    markers = reports.map((report) => {
+      let url = locationIcon;
+      url = report.animalType === "cow" ? cowIcon : url;
+      url = report.animalType === "buffalo" ? buffaloIcon : url;
+      url = report.animalType === "goat" ? goatIcon : url;
+      return (
+        <Marker
+          key={report.id}
+          icon={{
+            url,
+            scaledSize: new window.google.maps.Size(30, 30),
+          }}
+          position={{
+            lat: report.animalMovingCoords.Va,
+            lng: report.animalMovingCoords.ga,
+          }}
+          onClick={() => {
+            setSelectedMarker(report);
+          }}
+        />
+      );
+    });
   }
 
   let infoWindow;
   if (selectedMarker) {
-    const report = selectedMarker
-    infoWindow =
+    const report = selectedMarker;
+    infoWindow = (
       <InfoWindow
-        position={{ lat: report.animalMovingCoords.Va, lng: report.animalMovingCoords.ga }}
-        onCloseClick={() => { setSelectedMarker(null) }}
+        position={{
+          lat: report.animalMovingCoords.Va,
+          lng: report.animalMovingCoords.ga,
+        }}
+        onCloseClick={() => {
+          setSelectedMarker(null);
+        }}
       >
         <>
-          <h4>{report.createdAt.toDate().toLocaleString()}</h4>
+          <p>{report.createdAt.toDate().toLocaleString()}</p>
           <h5>Animal Count : {report.animalCount}</h5>
-          <div>{report.description}</div>
+          <h6>{report.description}</h6>
 
           <NavLink
             to={`/admin/report/${report.id}`}
-            className="changeNavButtonColor">
+            className="changeNavButtonColor"
+          >
             <Button variant="info">Details</Button>
           </NavLink>
-
         </>
       </InfoWindow>
+    );
   }
 
   return (
     <Container>
       <Row className="d-flex justify-content-center align-items-center mt-5 mb-5">
-
         <Col>
           <Search panTo={panTo} getReports={getReports} />
         </Col>
@@ -203,9 +204,14 @@ export default function Reports() {
           <RangeSlider
             value={radius}
             disabled={!coordinates ? true : false}
-            min={1} max={8}
-            onChange={(event) => { setRadius(event.target.value) }}
-            onAfterChange={() => { getReports(coordinates) }}
+            min={1}
+            max={8}
+            onChange={(event) => {
+              setRadius(event.target.value);
+            }}
+            onAfterChange={() => {
+              getReports(coordinates);
+            }}
           />
         </Col>
 
@@ -246,16 +252,15 @@ function Search({ panTo, getReports }) {
 
   return (
     <div classname="search">
-      <Combobox        
+      <Combobox
         onSelect={async (address) => {
           setValue(address, false);
           clearSuggestions();
           try {
-            const results = await getGeocode({ address })
-            const { lat, lng } = await getLatLng(results[0])
-            panTo({ lat, lng })
-            getReports({ lat, lng })
-
+            const results = await getGeocode({ address });
+            const { lat, lng } = await getLatLng(results[0]);
+            panTo({ lat, lng });
+            getReports({ lat, lng });
           } catch (error) {
             console.log(error);
           }

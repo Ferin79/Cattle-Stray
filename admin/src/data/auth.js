@@ -16,7 +16,7 @@ export function AuthProvider({ children }) {
         console.log(user.uid);
         firebase
           .firestore()
-          .doc(`users/${user.uid}`)
+          .doc(`/organizations/${user.uid}`)
           .get()
           .then((snapshot) => {
             setCurrentUser(snapshot.data());

@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useState, useCallback } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import firebase from "../../data/firebase";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
@@ -176,29 +176,23 @@ export default function Reports() {
     </>
   ));
 
-  const fetchReports = useCallback(async () => {
-    try {
-      setIsComponentLoading(true);
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/reports`);
-      const responseData = await response.json();
-
-      if (responseData.success) {
-        const reports = responseData.data.reports;
-        setReports([...reports]);
-      } else {
-        alert(responseData.error);
-      }
-    } catch (error) {
-      console.log(error);
-      alert(error.message);
-    } finally {
-      setIsComponentLoading(false);
-    }
-  }, [setReports]);
-
   useEffect(() => {
-    fetchReports();
-  }, [fetchReports]);
+    setIsComponentLoading(true);
+    firebase
+      .firestore()
+      .collection("reports")
+      .where("isRejected", "==", false)
+      .where("isResolved", "==", false)
+      .orderBy("createdAt", "desc")
+      .onSnapshot((docs) => {
+        let reports = [];
+        docs.forEach((doc) => {
+          reports.push({ ...doc.data(), id: doc.id });
+        });
+        setReports(reports);
+        setIsComponentLoading(false);
+      });
+  }, [setReports]);
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -288,7 +282,7 @@ export default function Reports() {
                               rounded
                             />
                           </td>
-                          <td>{report.createdAt}</td>
+                          <td>{report.createdAt.toDate().toLocaleString()}</td>
                           <td>{report.animalType}</td>
                           <td style={injuredStyle}>{report.animalCondition}</td>
                           <td>{report.animalCount}</td>

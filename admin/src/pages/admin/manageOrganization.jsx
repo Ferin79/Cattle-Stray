@@ -197,7 +197,7 @@ export default function ManageOrganization() {
               <Spinner animation="border" variant="primary" />
             ) : (
               <Button variant="primary" type="submit">
-                Login
+                Create Account
               </Button>
             )}
           </Form>
