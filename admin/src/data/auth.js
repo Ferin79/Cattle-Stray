@@ -21,13 +21,13 @@ export function AuthProvider({ children }) {
           .then((snapshot) => {
             setCurrentUser(snapshot.data());
             setRole(snapshot.data().role);
+            setIsLoading(false);
           })
           .catch((error) => {
             console.log(error);
-          })
-          .finally(() => {
             setIsLoading(false);
-          });
+          })
+          .finally(() => {});
       } else {
         setIsLoading(false);
         setCurrentUser(null);

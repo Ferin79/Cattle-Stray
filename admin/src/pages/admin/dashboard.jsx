@@ -1,14 +1,34 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Image from "react-bootstrap/Image";
 import { useHistory } from "react-router-dom";
 import { Context } from "../../data/context";
+import firebase from "../../data/firebase";
 
 const Dashboard = () => {
   const { role } = useContext(Context);
   const history = useHistory();
+
+  useEffect(() => {
+    const messaging = firebase.messaging();
+    messaging
+      .requestPermission()
+      .then(() => {
+        return messaging.getToken();
+      })
+      .then((token) => {
+        console.log(token);
+        firebase
+          .firestore()
+          .doc(`/organizations/${firebase.auth().currentUser.uid}`)
+          .update({
+            notificationToken: token,
+          });
+      })
+      .catch((error) => console.log(error));
+  }, []);
 
   return (
     <Container>
