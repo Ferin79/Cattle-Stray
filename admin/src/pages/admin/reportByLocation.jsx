@@ -74,7 +74,7 @@ export default function Reports() {
     setCoordinates({ lat, lng });
   }, [],
   )
-  const zoomTo = useCallback((r) => {
+  const zoomTo = useCallback((r) => {        
     let offset
     if (r < 4){
       offset = 0.2              

@@ -31,7 +31,7 @@ const Routes = () => {
         <Route path="/profile" component={Profile} />
         <Route path="/admin/users" component={ManageUsers} />
         <Route path="/admin/user/:id" component={UserDetails} />        
-        <Redirect to="/admin/dashboard" />
+        <Redirect to="/admin/reports" />
       </Switch>
     );
   } else if (currentUser && role === "organization") {

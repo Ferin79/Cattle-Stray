@@ -22,6 +22,18 @@ import { ToastContainer, toast } from "react-toastify";
 import { NavLink } from "react-router-dom";
 import { Context } from "../../data/context";
 
+const compareReports = (report_1, report_2) => {
+  if (report_1.reportType !== report_2.reportType) {
+    if (report_1.reportType === "health"){
+      return -1
+    }else if(report_2.reportType === "health") {
+      console.log("Not equal");
+      return 1
+    }
+  }
+  return 0
+}
+
 export default function Reports() {
   const { reports, setReports } = useContext(Context);
   const [key, setKey] = useState("table");
@@ -183,8 +195,10 @@ export default function Reports() {
       const responseData = await response.json();
 
       if (responseData.success) {
-        const reports = responseData.data.reports;
-        setReports([...reports]);
+        if (responseData.data.count > 0) {          
+          const reports = responseData.data.reports.sort(compareReports);                
+          setReports([...reports]);
+        }        
       } else {
         alert(responseData.error);
       }
@@ -253,6 +267,7 @@ export default function Reports() {
                     <th>Report Type</th>
                     <th>Image</th>
                     <th>Time</th>
+                    <th>Type</th>
                     <th>Animal</th>
                     <th>Condition</th>
                     <th>Count</th>
@@ -289,6 +304,7 @@ export default function Reports() {
                             />
                           </td>
                           <td>{report.createdAt}</td>
+                          <td>{report.reportType}</td>
                           <td>{report.animalType}</td>
                           <td style={injuredStyle}>{report.animalCondition}</td>
                           <td>{report.animalCount}</td>
