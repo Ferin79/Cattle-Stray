@@ -16,18 +16,18 @@ export function AuthProvider({ children }) {
         console.log(user.uid);
         firebase
           .firestore()
-          .doc(`users/${user.uid}`)
+          .doc(`/organizations/${user.uid}`)
           .get()
           .then((snapshot) => {
             setCurrentUser(snapshot.data());
             setRole(snapshot.data().role);
+            setIsLoading(false);
           })
           .catch((error) => {
             console.log(error);
-          })
-          .finally(() => {
             setIsLoading(false);
-          });
+          })
+          .finally(() => {});
       } else {
         setIsLoading(false);
         setCurrentUser(null);

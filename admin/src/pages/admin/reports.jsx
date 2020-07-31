@@ -211,8 +211,22 @@ export default function Reports() {
   }, [setReports]);
 
   useEffect(() => {
-    fetchReports();
-  }, [fetchReports]);
+    setIsComponentLoading(true);
+    firebase
+      .firestore()
+      .collection("reports")
+      .where("isRejected", "==", false)
+      .where("isResolved", "==", false)
+      .orderBy("createdAt", "desc")
+      .onSnapshot((docs) => {
+        let reports = [];
+        docs.forEach((doc) => {
+          reports.push({ ...doc.data(), id: doc.id });
+        });
+        setReports(reports);
+        setIsComponentLoading(false);
+      });
+  }, [setReports]);
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -303,7 +317,7 @@ export default function Reports() {
                               rounded
                             />
                           </td>
-                          <td>{report.createdAt}</td>
+                          <td>{report.createdAt.toDate().toLocaleString()}</td>
                           <td>{report.reportType}</td>
                           <td>{report.animalType}</td>
                           <td style={injuredStyle}>{report.animalCondition}</td>

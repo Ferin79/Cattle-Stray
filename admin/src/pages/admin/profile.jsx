@@ -52,7 +52,7 @@ const Profile = () => {
 
           firebase
             .firestore()
-            .doc(`/users/${firebase.auth().currentUser.email}`)
+            .doc(`/organizations/${firebase.auth().currentUser.email}`)
             .update({ photoUrl: downloadURL });
 
           setPhotoUrl(downloadURL);
@@ -66,7 +66,7 @@ const Profile = () => {
     setisLoading(true);
     firebase
       .firestore()
-      .doc(`/users/${firebase.auth().currentUser.uid}`)
+      .doc(`/organizations/${firebase.auth().currentUser.uid}`)
       .get()
       .then((doc) => {
         let url = doc.data().photoUrl
