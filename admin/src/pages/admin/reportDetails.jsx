@@ -236,7 +236,8 @@ export default function ReportDetails({ match }) {
     upvotes,
     downvotes,
     image,
-    comments = [];
+    comments = [],
+    actionDescription;
 
   let injuredStyle = {};
 
@@ -250,6 +251,7 @@ export default function ReportDetails({ match }) {
     upvotes = report.upvotes.length;
     downvotes = report.downvotes.length;
     comments = report.comments;
+    actionDescription = report.actionDescription;
     if (
       animalCondition === "injured" ||
       animalCondition === "death" ||
@@ -337,6 +339,7 @@ export default function ReportDetails({ match }) {
               <h5> Approx number of animals : {animalCount}</h5>
               <h5> Status : {animalIsMoving}</h5>
               {description && <h5> Description : {description}</h5>}
+              {actionDescription && <h5> Action Description : {actionDescription}</h5>}
               <a href={image}>
                 <Image src={image} height={500} width={500} className="mt-3" />
               </a>

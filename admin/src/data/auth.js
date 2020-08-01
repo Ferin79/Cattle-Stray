@@ -21,6 +21,11 @@ export function AuthProvider({ children }) {
             setCurrentUser(snapshot.data());
             setRole(snapshot.data().role);
             setIsLoading(false);
+            const name = snapshot.data().name
+            console.log(name)
+            firebase.auth().currentUser.updateProfile({
+              displayName: name
+            })
           })
           .catch((error) => {
             console.log(error);
