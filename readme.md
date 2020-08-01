@@ -115,6 +115,8 @@ The organizations cannot access the information about the user who has reported,
 <br />
 <br />
 
-<img src="https://cdn.freebiesupply.com/logos/large/2x/react-native-firebase-1-logo-png-transparent.png" alt="React/React-Native & Firebase" width="250" height="250"/>
+<img src="https://github.com/Ferin79/Cattle-Stray/raw/master/admin/public/custom/static/react-firebase.png" alt="React & Firebase" width="250" height="250"/>
 
-<img src="https://user-images.githubusercontent.com/18669142/57947837-dbd25b80-7894-11e9-992d-225e476f760b.png" />
+<img src="https://github.com/Ferin79/Cattle-Stray/raw/master/admin/public/custom/static/mobile-app.png" alt="Expo/React-Native & Firebase"/>
+
+<img src="https://github.com/Ferin79/Cattle-Stray/raw/master/admin/public/custom/static/postman.png" alt="Postman"/>
