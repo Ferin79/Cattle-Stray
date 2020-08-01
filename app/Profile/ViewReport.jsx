@@ -183,9 +183,11 @@ const ViewReport = ({ item, themeStyle, handleVote, navigation }) => {
         >
           Condition: {item.animalCondition}
         </Subheading>
+
         <Paragraph style={{ color: themeStyle.textColor }}>
           Description: {item.description}
         </Paragraph>
+
         <Paragraph
           style={{ color: themeStyle.textSecondaryColor, fontSize: 12 }}
         >
@@ -267,6 +269,19 @@ const ViewReport = ({ item, themeStyle, handleVote, navigation }) => {
           icon="google-maps"
         ></Button>
       </Card.Actions>
+
+      {(item.isRejected || item.isResolved) && (
+        <View style={{ marginLeft: 20 }}>
+          <Subheading style={{ color: themeStyle.textColor }}>
+            Action Taken by:
+            {item.actionDescription && item.actionDescription.name}
+          </Subheading>
+          <Paragraph style={{ color: themeStyle.textSecondaryColor }}>
+            Description:
+            {item.actionDescription && item.actionDescription.description}
+          </Paragraph>
+        </View>
+      )}
       <Paragraph
         style={{
           fontSize: 12,

@@ -43,8 +43,8 @@ exports.api = functions.https.onRequest(app);
 
 exports.sendHealthReports = functions.firestore
   .document(`/reports/{uid}`)
-  .onWrite((event) => {
-    const type = event.after.get("reportType");
+  .onCreate((event) => {
+    const type = event.get("reportType");
 
     if (type === "health") {
       admin
