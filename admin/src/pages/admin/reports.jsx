@@ -35,7 +35,7 @@ const compareReports = (report_1, report_2) => {
   return 0;
 };
 // Modal
-function MyVerticallyCenteredModal(props) {  
+function MyVerticallyCenteredModal(props) {
   return (
     <Modal
       {...props}
@@ -49,22 +49,34 @@ function MyVerticallyCenteredModal(props) {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Form onSubmit={(e) => {
-          e.preventDefault();
-          const uid = props.data.uid
-          const type = props.data.type
-          const rid = props.data.rid
-          const description = e.target.description.value                    
-          props.handleReportReject(uid, type, rid);
-        }}>
-          <Form.Group controlId="description">          
-            <Form.Control  as="textarea" rows="3" type="description" placeholder="Enter description" />            
+        <Form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const uid = props.data.uid;
+            const type = props.data.type;
+            const rid = props.data.rid;
+            props.handleReportReject(uid, type, rid);
+          }}
+        >
+          <Form.Group controlId="description">
+            <Form.Control
+              as="textarea"
+              rows="3"
+              type="description"
+              placeholder="Enter description"
+            />
           </Form.Group>
 
           <Button variant="primary" type="submit">
             Submit
           </Button>
-          <Button variant="danger" onClick={props.onHide} style={{marginLeft: 5}}>Close</Button>
+          <Button
+            variant="danger"
+            onClick={props.onHide}
+            style={{ marginLeft: 5 }}
+          >
+            Close
+          </Button>
         </Form>
       </Modal.Body>
     </Modal>
@@ -81,7 +93,7 @@ export default function Reports() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isComponentLoading, setIsComponentLoading] = useState(true);
   const [modalShow, setModalShow] = React.useState(false);
-  const [modalData, setModalData] = useState({})
+  const [modalData, setModalData] = useState({});
 
   const sendNotification = async (token, title, description) => {
     try {
@@ -100,7 +112,7 @@ export default function Reports() {
     }
   };
 
-  const handleReportReject = (id, type, docId, description="") => {        
+  const handleReportReject = (id, type, docId, description = "") => {
     try {
       firebase
         .firestore()
@@ -122,6 +134,7 @@ export default function Reports() {
                 .update({
                   isUnderProcess: false,
                   isRejected: true,
+                  isResolved: false,
                 })
                 .then(() => {
                   firebase
@@ -132,15 +145,16 @@ export default function Reports() {
                     });
                 })
                 .catch((error) => console.log(error));
-              notificationDesc = `Your report with ID: ${docId} has been rejected and 10 Points has been deducted`;
+              notificationDesc = `Your report with ID: ${docId} has been rejected and 10 Points has been deducted.`;
             } else if (type === "resolved") {
               firebase
                 .firestore()
                 .doc(`/reports/${docId}`)
                 .update({
                   isUnderProcess: false,
+                  isRejected: false,
                   isResolved: true,
-                  actionDescription: description, 
+                  actionDescription: description,
                 })
                 .then(() => {
                   firebase
@@ -151,16 +165,18 @@ export default function Reports() {
                     });
                 })
                 .catch((error) => console.log(error));
-              notificationDesc = `Your report with ID: ${docId} has been approved and 20 points has been added`;
+              notificationDesc = `Your report with ID: ${docId} has been approved and 20 points has been added.`;
             } else if (type === "underProcess") {
               firebase
                 .firestore()
                 .doc(`/reports/${docId}`)
                 .update({
                   isUnderProcess: true,
+                  isRejected: false,
+                  isResolved: false,
                 })
                 .catch((error) => console.log(error));
-              notificationDesc = `Your report with ID: ${docId} is in under process`;
+              notificationDesc = `Your report with ID: ${docId} is in under process.`;
             }
 
             if (notificationDesc.trim() !== "") {
@@ -290,7 +306,7 @@ export default function Reports() {
       <MyVerticallyCenteredModal
         show={modalShow}
         onHide={() => setModalShow(false)}
-        data={modalData}        
+        data={modalData}
         handleReportReject={handleReportReject}
       />
       <div className="d-flex flex-row justify-content-space-evenly align-items-center mt-5">
@@ -316,133 +332,131 @@ export default function Reports() {
             {isComponentLoading ? (
               <Spinner animation="border" variant="primary" />
             ) : (
-                <Table striped bordered hover responsive variant="dark">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Report Type</th>
-                      <th>Image</th>
-                      <th>Time</th>
-                      <th>Type</th>
-                      <th>Animal</th>
-                      <th>Condition</th>
-                      <th>Count</th>
-                      <th>Moving</th>
-                      <th>Description</th>
-                      <th>GI Number</th>
-                      <th>Up Votes</th>
-                      <th>Down Votes</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {reports.length &&
-                      reports.map((report, index) => {
-                        let injuredStyle = {};
-                        if (
-                          report.animalCondition === "injured" ||
-                          report.animalCondition === "death" ||
-                          report.animalCondition === "Injured" ||
-                          report.animalCondition === "Death"
-                        ) {
-                          injuredStyle = { color: "red" };
-                        }
-                        return (
-                          <tr key={index}>
-                            <td>{++index}</td>
-                            <th>{report.reportType}</th>
-                            <td>
-                              <Image
-                                height="150px"
-                                width="150px"
-                                src={report.animalImageUrl}
-                                rounded
-                              />
-                            </td>
-                            <td>{report.createdAt.toDate().toLocaleString()}</td>
-                            <td>{report.reportType}</td>
-                            <td>{report.animalType}</td>
-                            <td style={injuredStyle}>{report.animalCondition}</td>
-                            <td>{report.animalCount}</td>
-                            <td>{report.animalIsMoving}</td>
-                            <td>{report.description}</td>
-                            <th>{report.animalGI}</th>
-                            <td>{report.upvotes.length}</td>
-                            <td>{report.downvotes.length}</td>
-                            <td className="d-flex flex-row flex-wrap justify-content-space-evenly align-items-center">
-                              <Row style={{ margin: 4 }}>
-                                <Button variant="outline-info">
-                                  <NavLink
-                                    to={`/admin/report/${report.id}`}
-                                    className="changeNavColor"
-                                  >
-                                    View
+              <Table striped bordered hover responsive variant="dark">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Report Type</th>
+                    <th>Image</th>
+                    <th>Time</th>
+                    <th>Type</th>
+                    <th>Animal</th>
+                    <th>Condition</th>
+                    <th>Count</th>
+                    <th>Moving</th>
+                    <th>Description</th>
+                    <th>GI Number</th>
+                    <th>Up Votes</th>
+                    <th>Down Votes</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {reports.length &&
+                    reports.map((report, index) => {
+                      let injuredStyle = {};
+                      if (
+                        report.animalCondition === "injured" ||
+                        report.animalCondition === "death" ||
+                        report.animalCondition === "Injured" ||
+                        report.animalCondition === "Death"
+                      ) {
+                        injuredStyle = { color: "red" };
+                      }
+                      return (
+                        <tr key={index}>
+                          <td>{++index}</td>
+                          <th>{report.reportType}</th>
+                          <td>
+                            <Image
+                              height="150px"
+                              width="150px"
+                              src={report.animalImageUrl}
+                              rounded
+                            />
+                          </td>
+                          <td>{report.createdAt.toDate().toLocaleString()}</td>
+                          <td>{report.reportType}</td>
+                          <td>{report.animalType}</td>
+                          <td style={injuredStyle}>{report.animalCondition}</td>
+                          <td>{report.animalCount}</td>
+                          <td>{report.animalIsMoving}</td>
+                          <td>{report.description}</td>
+                          <th>{report.animalGI}</th>
+                          <td>{report.upvotes.length}</td>
+                          <td>{report.downvotes.length}</td>
+                          <td className="d-flex flex-row flex-wrap justify-content-space-evenly align-items-center">
+                            <Row style={{ margin: 4 }}>
+                              <Button variant="outline-info">
+                                <NavLink
+                                  to={`/admin/report/${report.id}`}
+                                  className="changeNavColor"
+                                >
+                                  View
                                 </NavLink>
+                              </Button>
+                            </Row>
+                            <Row style={{ margin: 4 }}>
+                              {report.isUnderProcess ? (
+                                <Button variant="outline-success" disabled>
+                                  Processing
                                 </Button>
-                              </Row>
-                              <Row style={{ margin: 4 }}>
-                                {report.isUnderProcess ? (
-                                  <Button variant="outline-success" disabled>
-                                    Processing
-                                  </Button>
-                                ) : (
-                                    <Button
-                                      variant="outline-success"
-                                      onClick={() =>
-                                        handleReportReject(
-                                          report.uid,
-                                          "underProcess",
-                                          report.id
-                                        )
-                                      }
-                                    >
-                                      Process request
-                                    </Button>
-                                  )}
-                              </Row>
-                              <Row style={{ margin: 4 }}>
+                              ) : (
                                 <Button
-                                  variant="outline-danger"
+                                  variant="outline-success"
                                   onClick={() =>
                                     handleReportReject(
                                       report.uid,
-                                      "rejected",
+                                      "underProcess",
                                       report.id
                                     )
                                   }
                                 >
-                                  Reject
+                                  Process request
+                                </Button>
+                              )}
+                            </Row>
+                            <Row style={{ margin: 4 }}>
+                              <Button
+                                variant="outline-danger"
+                                onClick={() =>
+                                  handleReportReject(
+                                    report.uid,
+                                    "rejected",
+                                    report.id
+                                  )
+                                }
+                              >
+                                Reject
                               </Button>
-                              </Row>
-                              <Row style={{ margin: 4 }}>
-                                <Button
-                                  variant="outline-primary"
-                                  onClick={
-                                    () => {
-                                      setModalData({
-                                        uid: report.uid,
-                                        type: "resolved",
-                                        rid: report.id
-                                      })
-                                      setModalShow(true)
-                                      // handleReportReject(
-                                      //   report.uid,
-                                      //   "resolved",
-                                      //   report.id
-                                      // )
-                                    }
-                                  }
-                                >
-                                  Resolve
+                            </Row>
+                            <Row style={{ margin: 4 }}>
+                              <Button
+                                variant="outline-primary"
+                                onClick={() => {
+                                  setModalData({
+                                    uid: report.uid,
+                                    type: "resolved",
+                                    rid: report.id,
+                                  });
+                                  setModalShow(true);
+                                  // handleReportReject(
+                                  //   report.uid,
+                                  //   "resolved",
+                                  //   report.id
+                                  // )
+                                }}
+                              >
+                                Resolve
                               </Button>
-                              </Row>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                  </tbody>
-                </Table>
-              )}
+                            </Row>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </Table>
+            )}
           </Col>
         </Row>
       )}
@@ -495,19 +509,19 @@ export default function Reports() {
                           Processing
                         </Button>
                       ) : (
-                          <Button
-                            variant="outline-success"
-                            onClick={() =>
-                              handleReportReject(
-                                selectedItem.uid,
-                                "underProcess",
-                                selectedItem.id
-                              )
-                            }
-                          >
-                            Process request
-                          </Button>
-                        )}
+                        <Button
+                          variant="outline-success"
+                          onClick={() =>
+                            handleReportReject(
+                              selectedItem.uid,
+                              "underProcess",
+                              selectedItem.id
+                            )
+                          }
+                        >
+                          Process request
+                        </Button>
+                      )}
                     </Row>
                     <Row style={{ margin: 4 }}>
                       <Button

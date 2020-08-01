@@ -18,7 +18,7 @@ const ManageUsers = () => {
   const fetchUsers = async () => {
     try {
       setIsComponentLoading(true);
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/users`);
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/`);
       const responseData = await response.json();
 
       if (responseData.success) {

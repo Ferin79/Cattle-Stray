@@ -117,7 +117,7 @@ Only the super admin will have access to the details of all the organizations an
 
 #### THE ORGANIZATIONS
 
-It is not feasible for the government to look at all the requests submitted by the users,so a middleware is required who will answer the government and respond to the users. The sub admins, will handle all the reports made by the users.
+It is not feasible for the government to look at all the requests submitted by the users,so a middleware is required who will answer the government and respond to the users. The sub admins, will handle all the reports made by the users. Since there are multiple stakeholders of the system we have integrated role based user system in which following roles are identified. However, system is designed in a manner in which roles could be added further based on the requirements.
 <br />
 The organizations cannot access the information about the user who has reported, so the task of the organization is to respond to the pending requests. The reports will be displayed on the dashboard, the reports will be prioritized and presented.
 
@@ -131,27 +131,22 @@ The organizations cannot access the information about the user who has reported,
 
 ## TECH STACK
 
-- Web App
-
-  - React
-  - Firebase
-
-- Mobile App
-
-  - React-Native and Expo
-  - Firebase
-
-<br />
 <br />
 
 <img src="https://github.com/Ferin79/Cattle-Stray/raw/master/admin/public/custom/static/react-firebase.png" alt="React & Firebase" width="250" height="250"/>
+
+##### React + Firebase ( Web App )
 
 <br />
 <br />
 
 <img src="https://github.com/Ferin79/Cattle-Stray/raw/master/admin/public/custom/static/mobile-app.png" alt="Expo/React-Native & Firebase" width="50%"/>
 
+##### Expo (React-Native) + Firebase ( Cross-platform mobile app )
+
 <br />
 <br />
 
 <img src="https://github.com/Ferin79/Cattle-Stray/raw/master/admin/public/custom/static/postman.png" alt="Postman" width="50%"/>
+
+##### Postman ( API Testing and documentation )

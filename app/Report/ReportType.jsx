@@ -78,12 +78,23 @@ const ReportType = ({ navigation }) => {
               }
             />
             <TouchableOpacity
+              style={{ marginBottom: 20 }}
               onPress={() =>
                 ReportDispatch({ type: "SET_REPORT_TYPE", payload: "general" })
               }
             >
               <Text style={{ fontSize: 20, color: themeStyle.textColor }}>
                 General
+              </Text>
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: themeStyle.textSecondaryColor,
+                  marginVertical: 10,
+                }}
+              >
+                For Example : Traffic Congestion, over-grazzing, grazzing in
+                private property etc.
               </Text>
             </TouchableOpacity>
           </View>
@@ -114,6 +125,16 @@ const ReportType = ({ navigation }) => {
             >
               <Text style={{ fontSize: 20, color: themeStyle.textColor }}>
                 Health
+              </Text>
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: themeStyle.textSecondaryColor,
+                  marginVertical: 10,
+                }}
+              >
+                For Example : Animal is injuried, Animal is spreading disease,
+                animal eating plastic etc.
               </Text>
             </TouchableOpacity>
           </View>
