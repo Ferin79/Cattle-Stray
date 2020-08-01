@@ -372,14 +372,13 @@ export default function Reports() {
                                 </Button>
                               ) : (
                                 <Button
-                                  variant="outline-danger"
+                                  variant="outline-success"
                                   onClick={() => {
-                                    setModalData({
-                                      uid: report.uid,
-                                      type: "rejected",
-                                      rid: report.id
-                                    })
-                                    setModalShow(true)
+                                    handleReportReject(
+                                      report.uid,
+                                      "underProcess",
+                                      report.id
+                                    )
                                   }
                                   }
                                 >
@@ -390,12 +389,15 @@ export default function Reports() {
                             <Row style={{ margin: 4 }}>
                               <Button
                                 variant="outline-danger"
-                                onClick={() =>
-                                  handleReportReject(
-                                    report.uid,
-                                    "rejected",
-                                    report.id
-                                  )
+                                onClick={() =>{
+                                  setModalData({
+                                    uid: report.uid,
+                                    type: "rejected",
+                                    rid: report.id
+                                  })
+                                  setModalShow(true)
+                                }
+                                  
                                 }
                               >
                                 Reject
@@ -410,12 +412,7 @@ export default function Reports() {
                                     type: "resolved",
                                     rid: report.id,
                                   });
-                                  setModalShow(true);
-                                  // handleReportReject(
-                                  //   report.uid,
-                                  //   "resolved",
-                                  //   report.id
-                                  // )
+                                  setModalShow(true);                                  
                                 }}
                               >
                                 Resolve
