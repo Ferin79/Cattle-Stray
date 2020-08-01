@@ -1,5 +1,3 @@
-# Cattle Stray
-
 ## INTRODUCTION
 
 <br />
@@ -102,3 +100,21 @@ Only the super admin will have access to the details of all the organizations an
 It is not feasible for the government to look at all the requests submitted by the users,so a middleware is required who will answer the government and respond to the users. The sub admins, will handle all the reports made by the users.
 <br />
 The organizations cannot access the information about the user who has reported, so the task of the organization is to respond to the pending requests. The reports will be displayed on the dashboard, the reports will be prioritized and presented.
+
+## TECH STACK
+
+- Web App
+
+  - React
+  - Firebase
+
+- Mobile App
+- React-Native and Expo
+- Firebase
+
+<br />
+<br />
+
+<img src="https://cdn.freebiesupply.com/logos/large/2x/react-native-firebase-1-logo-png-transparent.png" alt="React/React-Native & Firebase" width="250" height="250"/>
+
+<img src="https://user-images.githubusercontent.com/18669142/57947837-dbd25b80-7894-11e9-992d-225e476f760b.png" />

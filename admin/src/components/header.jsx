@@ -15,21 +15,22 @@ const Header = () => {
     admin = "Admin";
     navLinks = (
       <>
-        <Nav.Link>
-          <NavLink to="/admin/dashboard" className="changeNavColor">
-            Dashboard
-          </NavLink>
+        <Nav.Link as={NavLink} to="/admin/dashboard" className="changeNavColor">
+          Dashboard
         </Nav.Link>
-        <Nav.Link>
-          <NavLink to="/admin/reports" className="changeNavColor">
-            Reports
-          </NavLink>
+
+        <Nav.Link as={NavLink} to="/admin/reports" className="changeNavColor">
+          Reports
         </Nav.Link>
-        <Nav.Link>
-          <NavLink to="/admin/organization" className="changeNavColor">
-            Organization
-          </NavLink>
+
+        <Nav.Link
+          as={NavLink}
+          to="/admin/organization"
+          className="changeNavColor"
+        >
+          Organization
         </Nav.Link>
+
         <Button
           onClick={() => firebase.auth().signOut()}
           variant="outline-danger"
@@ -41,21 +42,18 @@ const Header = () => {
   } else if (currentUser && role === "organization") {
     navLinks = (
       <>
-        <Nav.Link>
-          <NavLink to="/dashboard" className="changeNavColor">
-            Dashboard
-          </NavLink>
+        <Nav.Link as={NavLink} to="/dashboard" className="changeNavColor">
+          Dashboard
         </Nav.Link>
-        <Nav.Link>
-          <NavLink to="/reports" className="changeNavColor">
-            Reports
-          </NavLink>
+
+        <Nav.Link as={NavLink} to="/reports" className="changeNavColor">
+          Reports
         </Nav.Link>
-        <Nav.Link>
-          <NavLink to="/profile" className="changeNavColor">
-            Profile
-          </NavLink>
+
+        <Nav.Link as={NavLink} to="/profile" className="changeNavColor">
+          Profile
         </Nav.Link>
+
         <Button
           onClick={() => firebase.auth().signOut()}
           variant="outline-danger"
@@ -67,15 +65,12 @@ const Header = () => {
   } else {
     navLinks = (
       <>
-        <Nav.Link>
-          <NavLink to="/login" className="changeNavColor">
-            Login
-          </NavLink>
+        <Nav.Link as={NavLink} to="/login" className="changeNavColor">
+          Login
         </Nav.Link>
-        <Nav.Link>
-          <NavLink to="/register" className="changeNavColor">
-            Register
-          </NavLink>
+
+        <Nav.Link as={NavLink} to="/register" className="changeNavColor">
+          Register
         </Nav.Link>
       </>
     );

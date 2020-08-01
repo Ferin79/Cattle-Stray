@@ -24,15 +24,14 @@ import { Context } from "../../data/context";
 
 const compareReports = (report_1, report_2) => {
   if (report_1.reportType !== report_2.reportType) {
-    if (report_1.reportType === "health"){
-      return -1
-    }else if(report_2.reportType === "health") {
-      console.log("Not equal");
-      return 1
+    if (report_1.reportType === "health") {
+      return -1;
+    } else if (report_2.reportType === "health") {
+      return 1;
     }
   }
-  return 0
-}
+  return 0;
+};
 
 export default function Reports() {
   const { reports, setReports } = useContext(Context);
@@ -52,12 +51,10 @@ export default function Reports() {
         title: title,
         body: description,
       };
-      const response = await fetch("https://exp.host/--/api/v2/push/send", {
+      await fetch("https://exp.host/--/api/v2/push/send", {
         method: "POST",
         body: JSON.stringify(message),
       });
-      const responseDate = await response.json();
-      console.log(responseDate);
     } catch (error) {
       console.log(error);
     }
@@ -137,10 +134,8 @@ export default function Reports() {
   };
 
   const MyMapComponent = compose(
-    // AIzaSyCe66OVhbLjhVls27VDc8jKACUM6AyHNx8
     withProps({
-      googleMapURL:
-        "https://maps.googleapis.com/maps/api/js?key=AIzaSyDgxTYG7n4gf5qpLdeA_pC_RcTQAc7wdWk&v=3.exp&libraries=geometry,drawing,places",
+      googleMapURL: `https://maps.googleapis.com/maps/api/js?key=${process.env.REACT_APP_GOOGLE_PLACES}&v=3.exp&libraries=geometry,drawing,places`,
       loadingElement: <div style={{ height: `100%` }} />,
       containerElement: <div style={{ height: `800px` }} />,
       mapElement: <div style={{ height: `100%` }} />,
@@ -188,6 +183,7 @@ export default function Reports() {
     </>
   ));
 
+  // eslint-disable-next-line
   const fetchReports = useCallback(async () => {
     try {
       setIsComponentLoading(true);
@@ -195,10 +191,10 @@ export default function Reports() {
       const responseData = await response.json();
 
       if (responseData.success) {
-        if (responseData.data.count > 0) {          
-          const reports = responseData.data.reports.sort(compareReports);                
+        if (responseData.data.count > 0) {
+          const reports = responseData.data.reports.sort(compareReports);
           setReports([...reports]);
-        }        
+        }
       } else {
         alert(responseData.error);
       }
@@ -232,7 +228,6 @@ export default function Reports() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          console.log(position);
           setCoordinates({
             lat: position.coords.latitude,
             lng: position.coords.longitude,

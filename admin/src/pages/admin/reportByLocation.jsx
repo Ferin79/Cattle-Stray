@@ -70,16 +70,15 @@ export default function Reports() {
   const panTo = useCallback(({ lat, lng }) => {
     mapRef.current.panTo({ lat, lng });
     setCoordinates({ lat, lng });
-  }, [],
-  )
-  const zoomTo = useCallback((r) => {        
-    let offset
-    if (r < 4){
-      offset = 0.2              
-    }else if (r == 4) {
-      offset = 0.28                    
-    }else {
-      offset = 0.4
+  }, []);
+  const zoomTo = useCallback((r) => {
+    let offset;
+    if (r < 4) {
+      offset = 0.2;
+    } else if (r === 4) {
+      offset = 0.28;
+    } else {
+      offset = 0.4;
     }
     mapRef.current.setZoom(16.5 - r + r * offset);
   }, []);

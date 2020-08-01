@@ -19,7 +19,6 @@ const Dashboard = () => {
         return messaging.getToken();
       })
       .then((token) => {
-        console.log(token);
         firebase
           .firestore()
           .doc(`/organizations/${firebase.auth().currentUser.uid}`)
