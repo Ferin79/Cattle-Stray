@@ -10,8 +10,6 @@ import Tab from "react-bootstrap/Tab";
 import Card from "react-bootstrap/Card";
 import Image from "react-bootstrap/Image";
 import Spinner from "react-bootstrap/Spinner";
-import Modal from "react-bootstrap/Modal";
-import Form from "react-bootstrap/Form";
 import { compose, withProps } from "recompose";
 import {
   withScriptjs,
@@ -23,6 +21,8 @@ import {
 import { ToastContainer, toast } from "react-toastify";
 import { NavLink } from "react-router-dom";
 import { Context } from "../../data/context";
+import ReportDescriptionModal from "../../components/reportDescriptionModal";
+
 
 const compareReports = (report_1, report_2) => {
   if (report_1.reportType !== report_2.reportType) {
@@ -34,42 +34,6 @@ const compareReports = (report_1, report_2) => {
   }
   return 0;
 };
-// Modal
-function MyVerticallyCenteredModal(props) {  
-  return (
-    <Modal
-      {...props}
-      size="lg"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
-      <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          How was this report resolved ?
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form onSubmit={(e) => {
-          e.preventDefault();
-          const uid = props.data.uid
-          const type = props.data.type
-          const rid = props.data.rid
-          const description = e.target.description.value                    
-          props.handleReportReject(uid, type, rid);
-        }}>
-          <Form.Group controlId="description">          
-            <Form.Control  as="textarea" rows="3" type="description" placeholder="Enter description" />            
-          </Form.Group>
-
-          <Button variant="primary" type="submit">
-            Submit
-          </Button>
-          <Button variant="danger" onClick={props.onHide} style={{marginLeft: 5}}>Close</Button>
-        </Form>
-      </Modal.Body>
-    </Modal>
-  );
-}
 
 export default function Reports() {
   const { reports, setReports } = useContext(Context);
@@ -82,6 +46,7 @@ export default function Reports() {
   const [isComponentLoading, setIsComponentLoading] = useState(true);
   const [modalShow, setModalShow] = React.useState(false);
   const [modalData, setModalData] = useState({})
+  const [modalLoading, setModalLoading] = useState(false)
 
   const sendNotification = async (token, title, description) => {
     try {
@@ -100,7 +65,8 @@ export default function Reports() {
     }
   };
 
-  const handleReportReject = (id, type, docId, description="") => {        
+  const handleReportReject = (id, type, docId, description = "") => {
+    if (type === "rejected" || type === "resolved") { setModalLoading(true) }
     try {
       firebase
         .firestore()
@@ -122,6 +88,12 @@ export default function Reports() {
                 .update({
                   isUnderProcess: false,
                   isRejected: true,
+                  actionDescription: {
+                    description,
+                    name: firebase.auth().currentUser.displayName,
+                    uid: firebase.auth().currentUser.uid,
+                    createdAt: firebase.firestore.Timestamp.now()
+                  },
                 })
                 .then(() => {
                   firebase
@@ -129,6 +101,8 @@ export default function Reports() {
                     .doc(`/users/${id}`)
                     .update({
                       points: firebase.firestore.FieldValue.increment(-10),
+                    }).then(() => {
+                      setModalShow(false); setModalLoading(false);
                     });
                 })
                 .catch((error) => console.log(error));
@@ -140,7 +114,12 @@ export default function Reports() {
                 .update({
                   isUnderProcess: false,
                   isResolved: true,
-                  actionDescription: description, 
+                  actionDescription: {
+                    description,
+                    name: firebase.auth().currentUser.displayName,
+                    uid: firebase.auth().currentUser.uid,
+                    createdAt: firebase.firestore.Timestamp.now()
+                  },
                 })
                 .then(() => {
                   firebase
@@ -148,6 +127,8 @@ export default function Reports() {
                     .doc(`/users/${id}`)
                     .update({
                       points: firebase.firestore.FieldValue.increment(20),
+                    }).then(() => {
+                      setModalShow(false); setModalLoading(true);
                     });
                 })
                 .catch((error) => console.log(error));
@@ -287,11 +268,12 @@ export default function Reports() {
 
   return (
     <Container fluid>
-      <MyVerticallyCenteredModal
+      <ReportDescriptionModal
         show={modalShow}
         onHide={() => setModalShow(false)}
-        data={modalData}        
+        data={modalData}
         handleReportReject={handleReportReject}
+        loading={modalLoading}
       />
       <div className="d-flex flex-row justify-content-space-evenly align-items-center mt-5">
         <h3>Admin Reports</h3>
@@ -403,12 +385,14 @@ export default function Reports() {
                               <Row style={{ margin: 4 }}>
                                 <Button
                                   variant="outline-danger"
-                                  onClick={() =>
-                                    handleReportReject(
-                                      report.uid,
-                                      "rejected",
-                                      report.id
-                                    )
+                                  onClick={() => {
+                                    setModalData({
+                                      uid: report.uid,
+                                      type: "rejected",
+                                      rid: report.id
+                                    })
+                                    setModalShow(true)
+                                  }
                                   }
                                 >
                                   Reject
@@ -512,12 +496,14 @@ export default function Reports() {
                     <Row style={{ margin: 4 }}>
                       <Button
                         variant="outline-danger"
-                        onClick={() =>
-                          handleReportReject(
-                            selectedItem.uid,
-                            "rejected",
-                            selectedItem.id
-                          )
+                        onClick={() =>{
+                          setModalData({
+                            uid: selectedItem.uid,
+                            type: "rejected",
+                            rid: selectedItem.id
+                          })
+                          setModalShow(true)
+                        }
                         }
                       >
                         Reject
@@ -526,12 +512,14 @@ export default function Reports() {
                     <Row style={{ margin: 4 }}>
                       <Button
                         variant="outline-primary"
-                        onClick={() =>
-                          handleReportReject(
-                            selectedItem.uid,
-                            "resolved",
-                            selectedItem.id
-                          )
+                        onClick={() => {
+                          setModalData({
+                            uid: selectedItem.uid,
+                            type: "resolved",
+                            rid: selectedItem.id
+                          })
+                          setModalShow(true)
+                        }
                         }
                       >
                         Resolve
