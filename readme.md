@@ -35,6 +35,12 @@ The health report is a priority report, it indicates either the cattle(s) are si
 
 <br />
 
+##### System Design
+
+<img src="https://github.com/Ferin79/Cattle-Stray/raw/master/admin/public/custom/static/system-design.png" alt="System Design"/>
+
+<br />
+
 ## LIFE-CYCLE OF REPORT
 
 The report, after submission by the user can be in one of the four stages:
@@ -62,6 +68,12 @@ The reports which are genuine and are already acted upon are the resolved report
 
 <br />
 
+##### Schema
+
+<img src="https://github.com/Ferin79/Cattle-Stray/raw/master/admin/public/custom/static/schema.png" alt="Schema"/>
+
+<br />
+
 ## AUTHENTICATION OF REPORTS
 
 There may be cases where multiple users spot cattle in same locality ,multiple reports will create redundancy and there may be cases where some mischievous users report fake cattle presence,such cases must require disciplinary actions.To avoid maximum of such cases , we have added a feature of upvote and downvote.
@@ -80,6 +92,14 @@ Introducing the feature of upvote and downvote , the manual work of removing red
 The reports with more upvotes will be displayed on top of the report list,while the reports with more downvotes will be prioritized least.
 <br />
 Prioritizing reports ensures that the reports which are genuine and require immediate actions ,are presented to the stakeholders at first.The health reports will have the highest priority,followed by the reports with highest upvotes and the reports with more downvotes will be the least.
+
+<br />
+
+##### Activity Diagram
+
+<img src="https://github.com/Ferin79/Cattle-Stray/raw/master/admin/public/custom/static/Activity.png" alt="Activity Diagram"/>
+
+<br />
 
 ## ADMIN
 
@@ -101,6 +121,14 @@ It is not feasible for the government to look at all the requests submitted by t
 <br />
 The organizations cannot access the information about the user who has reported, so the task of the organization is to respond to the pending requests. The reports will be displayed on the dashboard, the reports will be prioritized and presented.
 
+<br />
+
+##### Data Flow Diagram
+
+<img src="https://github.com/Ferin79/Cattle-Stray/raw/master/admin/public/custom/static/DFD.png" alt="Data flow Diagram"/>
+
+<br />
+
 ## TECH STACK
 
 - Web App
@@ -109,14 +137,21 @@ The organizations cannot access the information about the user who has reported,
   - Firebase
 
 - Mobile App
-- React-Native and Expo
-- Firebase
+
+  - React-Native and Expo
+  - Firebase
 
 <br />
 <br />
 
 <img src="https://github.com/Ferin79/Cattle-Stray/raw/master/admin/public/custom/static/react-firebase.png" alt="React & Firebase" width="250" height="250"/>
 
-<img src="https://github.com/Ferin79/Cattle-Stray/raw/master/admin/public/custom/static/mobile-app.png" alt="Expo/React-Native & Firebase"/>
+<br />
+<br />
 
-<img src="https://github.com/Ferin79/Cattle-Stray/raw/master/admin/public/custom/static/postman.png" alt="Postman"/>
+<img src="https://github.com/Ferin79/Cattle-Stray/raw/master/admin/public/custom/static/mobile-app.png" alt="Expo/React-Native & Firebase" width="50%"/>
+
+<br />
+<br />
+
+<img src="https://github.com/Ferin79/Cattle-Stray/raw/master/admin/public/custom/static/postman.png" alt="Postman" width="50%"/>
