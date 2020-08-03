@@ -312,9 +312,9 @@ export default function Reports() {
                     <th>Animal</th>
                     <th>Condition</th>
                     <th>Count</th>
-                    <th>Moving</th>
+                    {/* <th>Moving</th> */}
                     <th>Description</th>
-                    <th>GI Number</th>
+                    {/* <th>GI Number</th> */}
                     <th>Up Votes</th>
                     <th>Down Votes</th>
                     <th>Actions</th>
@@ -349,9 +349,9 @@ export default function Reports() {
                           <td>{report.animalType}</td>
                           <td style={injuredStyle}>{report.animalCondition}</td>
                           <td>{report.animalCount}</td>
-                          <td>{report.animalIsMoving}</td>
+                          {/* <td>{report.animalIsMoving}</td> */}
                           <td>{report.description}</td>
-                          <th>{report.animalGI}</th>
+                          {/* <th>{report.animalGI}</th> */}
                           <td>{report.upvotes.length}</td>
                           <td>{report.downvotes.length}</td>
                           <td className="d-flex flex-row flex-wrap justify-content-space-evenly align-items-center">
