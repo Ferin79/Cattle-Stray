@@ -68,13 +68,12 @@ export default function ReportDetails({ match }) {
   const [isMessageSending, setIsMessageSending] = useState(false);
 
   const [modalShow, setModalShow] = React.useState(false);
-  const [modalData, setModalData] = useState({})
-  const [modalLoading, setModalLoading] = useState(false)
-
+  const [modalData, setModalData] = useState({});
+  const [modalLoading, setModalLoading] = useState(false);
 
   const commentBoxRef = useRef();
 
-  const sendNotification = async (token, title, description) => {    
+  const sendNotification = async (token, title, description) => {
     try {
       const message = {
         to: [token],
@@ -94,7 +93,9 @@ export default function ReportDetails({ match }) {
   };
 
   const handleReportReject = (id, type, docId, description = "") => {
-    if (type === "rejected" || type === "resolved") { setModalLoading(true) }
+    if (type === "rejected" || type === "resolved") {
+      setModalLoading(true);
+    }
     try {
       firebase
         .firestore()
@@ -120,7 +121,7 @@ export default function ReportDetails({ match }) {
                     description,
                     name: firebase.auth().currentUser.displayName,
                     uid: firebase.auth().currentUser.uid,
-                    createdAt: firebase.firestore.Timestamp.now()
+                    createdAt: firebase.firestore.Timestamp.now(),
                   },
                 })
                 .then(() => {
@@ -129,8 +130,10 @@ export default function ReportDetails({ match }) {
                     .doc(`/users/${id}`)
                     .update({
                       points: firebase.firestore.FieldValue.increment(-10),
-                    }).then(() => {
-                      setModalShow(false); setModalLoading(true);
+                    })
+                    .then(() => {
+                      setModalShow(false);
+                      setModalLoading(true);
                     });
                 })
                 .catch((error) => console.log(error));
@@ -146,7 +149,7 @@ export default function ReportDetails({ match }) {
                     description,
                     name: firebase.auth().currentUser.displayName,
                     uid: firebase.auth().currentUser.uid,
-                    createdAt: firebase.firestore.Timestamp.now()
+                    createdAt: firebase.firestore.Timestamp.now(),
                   },
                 })
                 .then(() => {
@@ -155,8 +158,10 @@ export default function ReportDetails({ match }) {
                     .doc(`/users/${id}`)
                     .update({
                       points: firebase.firestore.FieldValue.increment(20),
-                    }).then(() => {
-                      setModalShow(false); setModalLoading(true);
+                    })
+                    .then(() => {
+                      setModalShow(false);
+                      setModalLoading(true);
                     });
                 })
                 .catch((error) => console.log(error));
@@ -293,6 +298,7 @@ export default function ReportDetails({ match }) {
         handleReportReject(report.uid, "underProcess", report.id);
       }}
       style={buttonStyles}
+      // eslint-disable-next-line
       disabled={report.isUnderProcess}
     >
       Process Request
@@ -306,9 +312,9 @@ export default function ReportDetails({ match }) {
         setModalData({
           uid: report.uid,
           type: "rejected",
-          rid: report.id
-        })
-        setModalShow(true)
+          rid: report.id,
+        });
+        setModalShow(true);
       }}
       style={buttonStyles}
     >
@@ -323,9 +329,9 @@ export default function ReportDetails({ match }) {
         setModalData({
           uid: report.uid,
           type: "resolved",
-          rid: report.id
-        })
-        setModalShow(true)
+          rid: report.id,
+        });
+        setModalShow(true);
       }}
       style={buttonStyles}
     >
@@ -380,7 +386,9 @@ export default function ReportDetails({ match }) {
               <h5> Approx number of animals : {animalCount}</h5>
               <h5> Status : {animalIsMoving}</h5>
               {description && <h5> Description : {description}</h5>}
-              {actionDescription && <h5> Action Description : {actionDescription.description}</h5>}
+              {actionDescription && (
+                <h5> Action Description : {actionDescription.description}</h5>
+              )}
               <a href={image}>
                 <Image src={image} height={500} width={500} className="mt-3" />
               </a>
@@ -440,16 +448,16 @@ export default function ReportDetails({ match }) {
             {isMessageSending ? (
               <Spinner animation="border" variant="primary" />
             ) : (
-                <Button
-                  variant="primary"
-                  type="submit"
-                  onClick={(event) => {
-                    submitComent(event);
-                  }}
-                >
-                  Send
-                </Button>
-              )}
+              <Button
+                variant="primary"
+                type="submit"
+                onClick={(event) => {
+                  submitComent(event);
+                }}
+              >
+                Send
+              </Button>
+            )}
           </Form>
         </Col>
       </Row>

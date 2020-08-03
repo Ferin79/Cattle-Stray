@@ -68,7 +68,7 @@ exports.addOrganization = (req, res, next) => {
 
   firebase
     .firestore()
-    .doc(`/users/${authUserId}`)
+    .doc(`/organizations/${authUserId}`)
     .get()
     .then((doc) => {
       if (doc.data().role === "admin") {
@@ -116,7 +116,7 @@ exports.deleteOrganization = (req, res, next) => {
 
   firebase
     .firestore()
-    .doc(`/users/${authUserId}`)
+    .doc(`/organizations/${authUserId}`)
     .get()
     .then((doc) => {
       if (doc.data().role === "admin") {

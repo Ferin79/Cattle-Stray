@@ -169,7 +169,9 @@ const Home = ({ navigation }) => {
     try {
       let { status } = await Location.requestPermissionsAsync();
       if (status !== "granted") {
-        setErrorMsg("Permission to access location was denied");
+        setErrorMsg(
+          "Permission to access location was denied. Please Allowed Location or Restart the app."
+        );
         return;
       }
       let location = await Location.getCurrentPositionAsync({});

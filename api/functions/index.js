@@ -15,6 +15,8 @@ const {
 
 const { getUsers } = require("./controllers/users");
 const { admin } = require("./util/admin");
+const { animalDetection } = require("./controllers/detection");
+const { addSuperuser } = require("./controllers/addSuperUser");
 
 const app = express();
 
@@ -38,6 +40,10 @@ app.post("/organization/add", addOrganization);
 app.post("/organization/delete", deleteOrganization);
 
 app.get("/users", getUsers);
+
+app.post("/detect", animalDetection);
+
+app.post("/create-super-user", addSuperuser);
 
 exports.api = functions.https.onRequest(app);
 

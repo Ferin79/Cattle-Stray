@@ -81,7 +81,7 @@ const StartPage = ({ navigation }) => {
           borderTopLeftRadius: 50,
         }}
       >
-        <TouchableOpacity onPress={() => navigation.navigate("PickReportType")}>
+        <TouchableOpacity onPress={() => navigation.navigate("AutoInfo")}>
           <Text style={{ color: "#FFF", fontSize: 20 }}>Start Reporting</Text>
         </TouchableOpacity>
       </View>

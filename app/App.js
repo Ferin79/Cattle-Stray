@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
-import { SafeAreaView } from "react-native";
+import { SafeAreaView, Alert } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { AppLoading } from "expo";
+import * as Updates from "expo-updates";
 import { ContextProvider } from "./state/RootReducer";
 import firebase from "./hooks/useFirebase";
 import AuthStack from "./routes/AuthStack";
@@ -29,9 +30,24 @@ export default function App() {
     });
   };
 
+  const checkUpdates = async () => {
+    try {
+      const update = await Updates.checkForUpdateAsync();
+      if (update.isAvailable) {
+        await Updates.fetchUpdateAsync();
+        Alert.alert("The App is updating, Please don't close the app.");
+        await Updates.reloadAsync();
+      }
+    } catch (error) {
+      console.log(error);
+      Alert.alert(error.message);
+    }
+  };
+
   useEffect(() => {
     IS_MOUNTED = true;
     checkAuth();
+    checkUpdates();
 
     return () => {
       IS_MOUNTED = false;

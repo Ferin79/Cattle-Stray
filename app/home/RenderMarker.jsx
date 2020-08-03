@@ -15,8 +15,8 @@ const RenderMarker = ({ title, description, lat, long, handleOnPress }) => {
       title={title}
       description={`Last seen at ${description}`}
       coordinate={{
-        latitude: parseFloat(lat),
-        longitude: parseFloat(long),
+        latitude: parseFloat(lat) || 22.0162,
+        longitude: parseFloat(long) || 72.0263,
       }}
       image={imgUrl}
       onPress={() => {

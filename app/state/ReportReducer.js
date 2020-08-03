@@ -27,6 +27,10 @@ const ReportReducer = () => {
             latitude: action.payload.latitude,
             longitude: action.payload.longitude,
           },
+          animalMovingCoords: {
+            latitude: action.payload.latitude,
+            longitude: action.payload.longitude,
+          },
         };
 
       case "SET_REPORT_TYPE":

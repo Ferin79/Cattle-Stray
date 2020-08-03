@@ -6,6 +6,7 @@ import LocationPicker from "../Report/LocationPicker";
 import ImagePicker from "../Report/ImagePicker";
 import ReportSubmitted from "../Report/ReportSubmitted";
 import ReportType from "../Report/ReportType";
+import PickImage from "../auto/PickImage";
 
 const ReportStackScreen = createStackNavigator();
 
@@ -15,6 +16,11 @@ const ReportStack = () => {
       <ReportStackScreen.Screen
         name="StartPage"
         component={StartPage}
+        options={{ header: () => null }}
+      />
+      <ReportStackScreen.Screen
+        name="AutoInfo"
+        component={PickImage}
         options={{ header: () => null }}
       />
       <ReportStackScreen.Screen
